@@ -34,11 +34,7 @@
                     <div class="w-full space-y-6">
                         <x-dashboard.application-table
                             :type="'rfid'"
-                            :headers="[
-                                ['key' => 'rfid_tag', 'label' => 'RFID Tag', 'width' => '200px'],
-                                ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
-                                ['key' => 'assigned_to', 'label' => 'Assigned To', 'width' => '200px']
-                            ]"
+                            context="gate_pass"
                             :rows="[
                                 ['rfid_tag' => 'RFID12345', 'status' => 'Active', 'assigned_to' => 'John Doe'],
                                 ['rfid_tag' => 'RFID67890', 'status' => 'Inactive', 'assigned_to' => 'Jane Smith'],

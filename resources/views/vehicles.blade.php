@@ -1,6 +1,5 @@
 @extends('layouts.app-layout')
 @section('main-content')
-<body style="background-color: #f9fafb;">
 <div class="flex-1 md:ml-64 p-6 pt-24">
 <div class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
             <div class="p-6">
@@ -33,11 +32,7 @@
                     <div class="w-full space-y-6">
                         <x-dashboard.application-table
                             :type="'vehicle'"
-                            :headers="[
-                                ['key' => 'vehicle', 'label' => 'Vehicle', 'width' => '250px'],
-                                ['key' => 'owner', 'label' => 'Owner', 'width' => '250px'],
-                                ['key' => 'registration_date', 'label' => 'Registration Date', 'width' => '150px']
-                            ]"
+                            context="vehicles"
                             :rows="[
                                 ['vehicle' => 'Toyota Camry', 'owner' => 'John Doe', 'registration_date' => '2023-05-15'],
                                 ['vehicle' => 'Honda Civic', 'owner' => 'Jane Smith', 'registration_date' => '2023-05-16']
@@ -50,5 +45,4 @@
         </div>
     </div>
     <x-footer.footer></x-footer.footer>
-</body>
 @endsection

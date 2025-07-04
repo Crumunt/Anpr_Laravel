@@ -36,15 +36,7 @@
                     <div class="w-full space-y-6">
                         <x-dashboard.application-table
                             :type="'applicant'"
-                            :headers="[
-                                ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
-                                ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
-                                ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
-                                ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
-                                ['key' => 'submitted_date', 'label' => 'Submitted Date', 'width' => '150px'],
-                                ['key' => 'rfid_tags', 'label' => 'RFID Tags', 'width' => '100px'],
-                                ['key' => 'vehicles', 'label' => 'Vehicles', 'width' => '100px']
-                            ]"
+                            context="user_applicant"
                             :rows="[
                                 ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'phone' => '(555) 123-4567', 'status' => ['label' => 'Pending', 'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'], 'submitted_date' => '2023-05-15', 'rfid_tags' => 2, 'vehicles' => 1],
                                 ['name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'phone' => '(555) 765-4321', 'status' => ['label' => 'Approved', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'submitted_date' => '2023-05-16', 'rfid_tags' => 1, 'vehicles' => 2]

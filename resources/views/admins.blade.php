@@ -56,14 +56,7 @@
                         <div x-show="activeTab === 'All Admins'" x-transition>
                             <x-dashboard.application-table
                                 :type="'admin'"
-                                :headers="[ 
-                                    ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
-                                    ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
-                                    ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
-                                    ['key' => 'role', 'label' => 'Role', 'width' => '150px'],
-                                    ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
-                                    ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px']
-                                ]"
+                                context="user_admin"
                                 :rows="[ 
                                     [
                                         'name' => 'Admin User', 
@@ -113,14 +106,8 @@
                         <div x-show="activeTab === 'Active'" x-transition>
                             <x-dashboard.application-table
                                 :type="'admin'"
-                                :headers="[ 
-                                    ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
-                                    ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
-                                    ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
-                                    ['key' => 'role', 'label' => 'Role', 'width' => '150px'],
-                                    ['key' => 'permissions', 'label' => 'Permissions', 'width' => '220px'],
-                                    ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px']
-                                ]"
+                                context="user_admin"
+                                tab="active"
                                 :rows="[ 
                                     ['name' => 'Admin User', 'email' => 'admin@example.com', 'phone' => '(555) 123-4567', 'role' => 'Super Admin', 'permissions' => 'All permissions', 'last_login' => 'Today, 9:45 AM'],
                                     ['name' => 'Moderator One', 'email' => 'mod1@example.com', 'phone' => '(555) 765-4321', 'role' => 'Moderator', 'permissions' => 'Applicants, Vehicles', 'last_login' => 'Yesterday, 3:20 PM'],
@@ -133,14 +120,8 @@
                         <div x-show="activeTab === 'Inactive'" x-transition>
                             <x-dashboard.application-table
                                 :type="'admin'"
-                                :headers="[ 
-                                    ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
-                                    ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
-                                    ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
-                                    ['key' => 'role', 'label' => 'Role', 'width' => '150px'],
-                                    ['key' => 'inactive_since', 'label' => 'Inactive Since', 'width' => '150px'],
-                                    ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px']
-                                ]"
+                                context="user_admin"
+                                tab="inactive"
                                 :rows="[ 
                                     ['name' => 'Staff Member', 'email' => 'staff@example.com', 'phone' => '(555) 987-6543', 'role' => 'Admin', 'inactive_since' => 'Jun 15, 2023', 'last_login' => 'Jun 15, 2023'],
                                     ['name' => 'Guest Access', 'email' => 'guest@example.com', 'phone' => '(555) 234-5678', 'role' => 'Moderator', 'inactive_since' => 'May 22, 2023', 'last_login' => 'May 22, 2023']

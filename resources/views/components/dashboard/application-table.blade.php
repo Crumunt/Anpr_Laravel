@@ -1,5 +1,6 @@
 @props([
-    'headers' => [],
+    'context' => '',
+    'tab' => 'default',
     'rows' => [],
     'type' => 'applicant',
     'caption' => 'List of applicants and their status',
@@ -7,35 +8,18 @@
     'showStatus' => true,
     'showActions' => true,
     'actionOptions' => [
-        'view' => [
-            'label' => 'View Details',
-            'icon' => view('components.icons.view')->render(),
-        ],
-        'edit' => [
-            'label' => 'Edit',
-            'icon' => view('components.icons.edit')->render(),
-        ],
-        'approve' => [
-            'label' => 'Approve',
-            'icon' => view('components.icons.approve')->render(),
-        ],
-        'delete' => [
-            'label' => 'Delete',
-            'icon' => view('components.icons.delete')->render(),
-        ],
-        'reset_password' => [
-            'label' => 'Reset Password',
-            'icon' => view('components.icons.reset-password')->render(),
-        ],
-        'deactivate' => [
-            'label' => 'Deactivate',
-            'icon' => view('components.icons.deactivate')->render(),
-        ],
+        'view' => [ 'label' => 'View Details' ],
+        'edit' => [ 'label' => 'Edit' ],
+        'approve' => [ 'label' => 'Approve' ],
+        'delete' => [ 'label' => 'Delete' ],
+        'reset-password' => [ 'label' => 'Reset Password' ],
+        'deactivate' => [ 'label' => 'Deactivate' ],
     ],
     'bulkActions' => [
         'approve' => 'Approve Selected',
         'delete' => 'Delete Selected',
         'export' => 'Export Selected',
+        'deactivate' => 'Deactivate Selected'
     ],
 ])
 <style>
@@ -147,46 +131,32 @@
                     </div>
                     <div class="p-1">
                         <!-- Export option first -->
-                        <button @click="executeBulkAction('export', $event)"
-                            class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            {{ $bulkActions['export'] }}
-                        </button>
 
-                        @if ($type !== 'admin')
-                            <!-- Approve option second (not for admin) -->
-                            <button @click="executeBulkAction('approve', $event)"
-                                class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-600"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                </svg>
-                                {{ $bulkActions['approve'] }}
-                            </button>
-                        @else
-                            <!-- Deactivate option for admin -->
-                            <button @click="executeBulkAction('deactivate', $event)"
-                                class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-orange-600"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                                </svg>
-                                Deactivate Selected
-                            </button>
-                        @endif
+                        @php
+                            $bulkActionBtns = [
+                                ['key' => 'export', 'action' => 'bulk-export'],
+                                $type !== 'admin'
+                                    ? ['key' => 'approve', 'action' => 'approve']
+                                    : ['key' => 'deactivate', 'action' => 'deactivate'],
+                                ['key' => 'delete', 'action' => 'delete']
+                            ];
+
+                        @endphp
+                        
+                        @foreach ($bulkActionBtns as $btn)
+                            @php $click = "executeBulkAction('{$btn['key']}', \$event)"; @endphp
+                            
+                            <x-ui.action-button
+                                :click="$click"
+                                :action="$btn['action']"
+                                :label="$bulkActions[$btn['key']]"
+                                variant="bulk"
+                            />
+                        
+                        @endforeach
 
                         <!-- Delete option third -->
-                        <button @click="executeBulkAction('delete', $event)"
+                        <!-- <button @click="executeBulkAction('delete', $event)"
                             class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -198,7 +168,7 @@
                                 <line x1="14" y1="11" x2="14" y1="17"></line>
                             </svg>
                             {{ $bulkActions['delete'] }}
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -216,46 +186,30 @@
             <div class="p-1">
                 @if ($type === 'admin')
                     <!-- Admin-specific actions -->
-                    <button @click="handleRowAction('edit', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['edit']['icon'] !!}
-                        {{ $actionOptions['edit']['label'] }}
-                    </button>
-                    <button @click="handleRowAction('reset_password', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['reset_password']['icon'] !!}
-                        {{ $actionOptions['reset_password']['label'] }}
-                    </button>
-                    <button @click="handleRowAction('deactivate', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['deactivate']['icon'] !!}
-                        {{ $actionOptions['deactivate']['label'] }}
-                    </button>
-                    <button @click="handleRowAction('delete', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['delete']['icon'] !!}
-                        {{ $actionOptions['delete']['label'] }}
-                    </button>
+                    @foreach ($actionOptions as $action => $data)
+                        @if (in_array($action,['view', 'approve']))
+                            @continue
+                        @endif
+                        <x-ui.action-button 
+                            :action="$action"
+                            :label="$data['label']"
+                            :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'"
+                        />
+                    
+                    @endforeach
                 @else
-                    <!-- Default actions for non-admin types -->
-                    <button @click="handleRowAction('view', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['view']['icon'] !!}
-                        {{ $actionOptions['view']['label'] }}
-                    </button>
-
-
-                    <button @click="handleRowAction('approve', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['approve']['icon'] !!}
-                        {{ $actionOptions['approve']['label'] }}
-                    </button>
-
-                    <button @click="handleRowAction('delete', selectedRow, $event)"
-                        class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                        {!! $actionOptions['delete']['icon'] !!}
-                        {{ $actionOptions['delete']['label'] }}
-                    </button>
+                <!-- Default actions for non-admin types -->
+                    @foreach ($actionOptions as $action => $data)
+                        @if (in_array($action,['edit', 'deactivate', 'reset_password']))
+                            @continue
+                        @endif
+                        <x-ui.action-button 
+                            :action="$action"
+                            :label="$data['label']"
+                            :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'"
+                        />
+                    @endforeach
+                    
                 @endif
             </div>
         </div>
@@ -286,6 +240,11 @@
                             </div>
                         </th>
                     @endif
+
+                    @php
+                        $headers = \App\Helpers\ApplicationTableHelper::headerHelper($context, $tab)
+                    @endphp
+
                     @foreach ($headers as $header)
                         @php
                             $header = is_array($header) ? $header : ['key' => $header, 'label' => $header];
@@ -306,23 +265,9 @@
                         :class="{ 'bg-green-50/60': isSelected({{ $index }}) }">
 
                         @if ($showCheckboxes)
-                            <td class="p-4 align-middle">
-                                <div class="checkbox-wrapper">
-                                    <button type="button" @click.stop="toggleCheckbox({{ $index }}, $event)"
-                                        class="relative inline-flex h-4 w-4 shrink-0 rounded-sm border border-gray-300 transition-all duration-200 hover:border-green-500 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500/50"
-                                        :class="{ 'bg-green-50 border-green-500': isSelected({{ $index }}) }">
-                                        <span class="absolute inset-0 m-auto transition-opacity"
-                                            :class="{ 'opacity-100': isSelected({{ $index }}), 'opacity-0': !isSelected(
-                                                    {{ $index }}) }">
-                                            <svg class="h-3.5 w-3.5 text-green-600" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </div>
-                            </td>
+                            <x-table.data-cell>
+                                <x-table.checkbox-cell :index="$index" is-selected="isSelected"/>
+                            </x-table.data-cell>
                         @endif
 
                         @foreach ($headers as $header)
@@ -331,8 +276,12 @@
                                 $key = $header['key'] ?? $header['label'];
                                 $value = $row[$key] ?? null;
                             @endphp
-                            <td
-                                class="p-4 align-middle @if ($key === 'name' || $key === 'owner' || $key === 'vehicle' || $key === 'rfid_tag') font-medium group-hover:text-green-700 @else text-gray-600 @endif">
+
+                            @php
+                                $isHighlight = in_array($key, ['name','owner','vehicle','gate_pass'])
+                            @endphp
+                            <x-table.data-cell :class="$isHighlight ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">
+
                                 @if ($key === 'status' && isset($row['status']) && is_array($row['status']))
 
                                     <x-badge type="status" :label="$row['status']['label'] ?? $value" />
@@ -342,7 +291,10 @@
                                 @else
                                     {{ $value }}
                                 @endif
-                            </td>
+                            
+
+                            </x-table.data-cell>
+                            
                         @endforeach
                         @if ($showActions)
                             <td class="p-4 align-middle text-right">

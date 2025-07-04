@@ -18,7 +18,7 @@
     @stack('scripts')
 
 </head>
-<body>
+<body style="background-color: #f9fafb;">
     
     <x-nav.navbar></x-nav.navbar>
     @yield('main-content')
