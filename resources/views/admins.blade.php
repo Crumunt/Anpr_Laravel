@@ -65,11 +65,46 @@
                                     ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px']
                                 ]"
                                 :rows="[ 
-                                    ['name' => 'Admin User', 'email' => 'admin@example.com', 'phone' => '(555) 123-4567', 'role' => 'Super Admin', 'status' => ['label' => 'Active', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'last_login' => 'Today, 9:45 AM'],
-                                    ['name' => 'Moderator One', 'email' => 'mod1@example.com', 'phone' => '(555) 765-4321', 'role' => 'Moderator', 'status' => ['label' => 'Active', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'last_login' => 'Yesterday, 3:20 PM'],
-                                    ['name' => 'Staff Member', 'email' => 'staff@example.com', 'phone' => '(555) 987-6543', 'role' => 'Admin', 'status' => ['label' => 'Inactive', 'class' => 'bg-red-100/80 text-red-800 hover:bg-red-200/60'], 'last_login' => 'Jun 15, 2023'],
-                                    ['name' => 'System User', 'email' => 'system@example.com', 'phone' => '(555) 456-7890', 'role' => 'Admin', 'status' => ['label' => 'Active', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'last_login' => 'Today, 11:30 AM'],
-                                    ['name' => 'Guest Access', 'email' => 'guest@example.com', 'phone' => '(555) 234-5678', 'role' => 'Moderator', 'status' => ['label' => 'Inactive', 'class' => 'bg-red-100/80 text-red-800 hover:bg-red-200/60'], 'last_login' => 'May 22, 2023']
+                                    [
+                                        'name' => 'Admin User', 
+                                        'email' => 'admin@example.com', 
+                                        'phone' => '(555) 123-4567', 
+                                        'role' => 'Super Admin', 
+                                        'status' => ['label' => 'Active'], 
+                                        'last_login' => 'Today, 9:45 AM'
+                                    ],
+                                    [
+                                        'name' => 'Moderator One',
+                                        'email' => 'mod1@example.com', 
+                                        'phone' => '(555) 765-4321', 
+                                        'role' => 'Moderator', 
+                                        'status' => ['label' => 'Active'], 
+                                        'last_login' => 'Yesterday, 3:20 PM'
+                                        
+                                    ],
+                                    [
+                                        'name' => 'Staff Member',
+                                        'email' => 'staff@example.com', 
+                                        'phone' => '(555) 987-6543', 
+                                        'role' => 'Admin', 
+                                        'status' => ['label' => 'Inactive'], 
+                                        'last_login' => 'Jun 15, 2023'],
+                                    [
+                                        'name' => 'System User',
+                                        'email' => 'system@example.com', 
+                                        'phone' => '(555) 456-7890', 
+                                        'role' => 'Admin', 
+                                        'status' => ['label' => 'Active'], 
+                                        'last_login' => 'Today, 11:30 AM'
+                                    ],
+                                    [
+                                        'name' => 'Guest Access',
+                                        'email' => 'guest@example.com', 
+                                        'phone' => '(555) 234-5678', 
+                                        'role' => 'Moderator', 
+                                        'status' => ['label' => 'Inactive'], 
+                                        'last_login' => 'May 22, 2023'
+                                    ]
                                 ]"
                                 caption="All Administrators" />
                         </div>
