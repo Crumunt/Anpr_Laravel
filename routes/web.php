@@ -22,7 +22,12 @@ Route::prefix('gate-pass')->name('gate-pass.')->group(function () {
     Route::get('/success', fn() => view('gate-pass.success'))->name('success');
 });
 
-
+Route::prefix('view-details')->name('details.')->group(function() {
+    Route::get('/details/{type}/{id}', fn($type, $id) => view('details.' . $type, [
+        'id' => $id,
+        'type' => $type
+    ]))->name('show');
+});
 // gate-pass Application Form - Single unified page
 // Route::get('/gate-pass/application', function () {
 //     return view('gate-pass.application-form');
@@ -38,10 +43,5 @@ Route::post('/gate-pass/submit', 'App\Http\Controllers\RfidApplicationController
 // ];
 // In your routes/web.php file
 Route::put('/applicants/{id}/update/{section}', 'ApplicantController@update')->name('applicant.update');
-Route::get('/details/{type}/{id}', function ($type, $id) {
-    return view('components.details.' . $type, [
-        'id' => $id,
-        'type' => $type
-    ]);
-})->name('details.show');
+
 
