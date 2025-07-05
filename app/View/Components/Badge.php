@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Helpers\ApplicationTableHelper;
 use App\Helpers\BadgeHelper;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -30,8 +31,8 @@ class Badge extends Component
     private function resolveClass($label, $type) {
         return match($type) {
 
-            'status' => BadgeHelper::statusClass($label),
-            'role' => BadgeHelper::roleClass($label),
+            'status' => ApplicationTableHelper::statusClass($label),
+            'role' => ApplicationTableHelper::roleClass($label),
             default => 'bg-gray-100 text-gray-800',
 
         };

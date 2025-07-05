@@ -130,8 +130,6 @@
                         Bulk Actions
                     </div>
                     <div class="p-1">
-                        <!-- Export option first -->
-
                         @php
                             $bulkActionBtns = [
                                 ['key' => 'export', 'action' => 'bulk-export'],
@@ -140,7 +138,6 @@
                                     : ['key' => 'deactivate', 'action' => 'deactivate'],
                                 ['key' => 'delete', 'action' => 'delete']
                             ];
-
                         @endphp
                         
                         @foreach ($bulkActionBtns as $btn)
@@ -154,21 +151,6 @@
                             />
                         
                         @endforeach
-
-                        <!-- Delete option third -->
-                        <!-- <button @click="executeBulkAction('delete', $event)"
-                            class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-green-50 rounded-md my-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                <line x1="14" y1="11" x2="14" y1="17"></line>
-                            </svg>
-                            {{ $bulkActions['delete'] }}
-                        </button> -->
                     </div>
                 </div>
             </div>
@@ -248,10 +230,11 @@
                     @foreach ($headers as $header)
                         @php
                             $header = is_array($header) ? $header : ['key' => $header, 'label' => $header];
-                            $width = $header['width'] ?? 'auto';
-                            $key = $header['key'] ?? $header['label'];
                         @endphp
-                        <x-table.header-cell :label="$header['label']" />
+                        <x-table.header-cell 
+                            :label="$header['label']" 
+                            :width="$header['width'] ?? 'auto'"
+                        />
                     @endforeach
                     @if ($showActions)
                         <x-table.header-cell label="Actions" text_alignment="right"/>
@@ -272,34 +255,22 @@
 
                         @foreach ($headers as $header)
                             @php
-                                $header = is_array($header) ? $header : ['key' => $header, 'label' => $header];
                                 $key = $header['key'] ?? $header['label'];
                                 $value = $row[$key] ?? null;
-                            @endphp
-
-                            @php
                                 $isHighlight = in_array($key, ['name','owner','vehicle','gate_pass'])
                             @endphp
+
                             <x-table.data-cell :class="$isHighlight ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">
 
-                                @if ($key === 'status' && isset($row['status']) && is_array($row['status']))
-
-                                    <x-badge type="status" :label="$row['status']['label'] ?? $value" />
-
-                                @elseif($key === 'role' && $type === 'admin')
-                                    <x-badge type="role" :label="$value" />
-                                @else
-                                    {{ $value }}
-                                @endif
-                            
+                                <x-table.cell-renderer :key="$key" :row="$row" :type="$type" :value="$value" />
 
                             </x-table.data-cell>
                             
                         @endforeach
                         @if ($showActions)
-                            <td class="p-4 align-middle text-right">
+                            <x-table.data-cell class="text-right">
                                 <x-row-action-menu :index="$index"/>
-                            </td>
+                            </x-table.data-cell>
                         @endif
                     </tr>
                 @endforeach
