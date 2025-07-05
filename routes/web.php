@@ -14,9 +14,9 @@ Route::get('/admin/applicant', function () {
     return view('applicant');
 })->name('admin.applicant');
 
-Route::get('/admin/rfid', function () {
-    return view('rfid');
-})->name('admin.rfid');
+Route::get('/admin/gate_pass', function () {
+    return view('gate-pass');
+})->name('admin.gate-pass');
 
 Route::get('/admin/vehicles', function () {
     return view('vehicles');
@@ -27,37 +27,37 @@ Route::get('/admin/admins', function () {
 })->name('admin.admins');
 
 //sa applicant form route
-Route::get('/admin/rfid-applicant-form', function () {
-    return view('rfid-applicant-form');
-})->name('admin.rfid-applicant-form');
+Route::get('/admin/gate_pass-applicant-form', function () {
+    return view('gate-pass-applicant-form');
+})->name('admin.gate-pass-applicant-form');
 
-Route::get('/rfid/personal-info', function () {
-    return view('rfid.personal-info');
-})->name('rfid.personal-info');
+Route::get('/gate_pass/personal-info', function () {
+    return view('gate_pass.personal-info');
+})->name('gate_pass.personal-info');
 
-Route::get('/rfid/documents', function () {
-    return view('rfid.documents');
-})->name('rfid.documents');
+Route::get('/gate_pass/documents', function () {
+    return view('gate_pass.documents');
+})->name('gate_pass.documents');
 
-Route::get('/rfid/vehicle', function () {
-    return view('rfid.vehicle-info');
-})->name('rfid.vehicle');
+Route::get('/gate_pass/vehicle', function () {
+    return view('gate_pass.vehicle-info');
+})->name('gate_pass.vehicle');
 
-Route::get('/rfid/review', function () {
-    return view('rfid.review');
-})->name('rfid.review');
+Route::get('/gate_pass/review', function () {
+    return view('gate_pass.review');
+})->name('gate_pass.review');
 
-Route::get('/rfid/success', function () {
-    return view('rfid.success');
-})->name('rfid.success');
+Route::get('/gate_pass/success', function () {
+    return view('gate_pass.success');
+})->name('gate_pass.success');
 
-// RFID Application Form - Single unified page
-Route::get('/rfid/application', function () {
-    return view('rfid.application-form');
-})->name('rfid.application');
+// gate_pass Application Form - Single unified page
+Route::get('/gate_pass/application', function () {
+    return view('gate_pass.application-form');
+})->name('gate_pass.application');
 
 // Form submission handler
-Route::post('/rfid/submit', 'App\Http\Controllers\RfidApplicationController@submit')->name('rfid.submit');
+Route::post('/gate_pass/submit', 'App\Http\Controllers\RfidApplicationController@submit')->name('rfid.submit');
 // $typeRouteMap = [
 //     'applicant' => ['route' => 'admin.applicants', 'label' => 'Applicants'],
 //     'rfid' => ['route' => 'admin.rfid', 'label' => 'rfid'],

@@ -10,7 +10,7 @@
                 <div class="w-full space-y-6">
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 class="text-2xl font-bold text-gray-800">Applicants Management</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Applicant Management</h2>
                         <div class="flex space-x-2">
                             <x-dashboard.buttons
                                 :icon="false"
@@ -38,8 +38,8 @@
                             :type="'applicant'"
                             context="user_applicant"
                             :rows="[
-                                ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'phone' => '(555) 123-4567', 'status' => ['label' => 'Pending', 'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'], 'submitted_date' => '2023-05-15', 'rfid_tags' => 2, 'vehicles' => 1],
-                                ['name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'phone' => '(555) 765-4321', 'status' => ['label' => 'Approved', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'submitted_date' => '2023-05-16', 'rfid_tags' => 1, 'vehicles' => 2]
+                                ['id'=>'12312','name' => 'John Doe', 'email' => 'john.doe@example.com', 'phone' => '(555) 123-4567', 'status' => ['label' => 'Pending'], 'submitted_date' => '2023-05-15', 'gate_pass' => 2, 'vehicles' => 1],
+                                ['id'=>'12312','name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'phone' => '(555) 765-4321', 'status' => ['label' => 'Approved'], 'submitted_date' => '2023-05-16', 'gate_pass' => 1, 'vehicles' => 2]
                             ]"
                             caption="Applicants list for Summer 2024 Program" />
                         <x-dashboard.pagination></x-dashboard.pagination>

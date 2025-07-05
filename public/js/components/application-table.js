@@ -98,7 +98,9 @@ function applicationTable(totalRows) {
 
         this.selectAll = !this.selectAll;
         if (this.selectAll) {
-            this.selectedRows = Array.from({ length: this.totalRows }, (_, i) => i);
+            // THE PROBLEM WAS WHEN ALPHINE WAS MOVED INTO A SEPARATE JS FILE, THE 'this.totalRows' returns undefined
+            // MEANING IT DOESN'T READ THE LENGHT OF THE TOTAL ROWS IN THE TABLE
+            this.selectedRows = Array.from({ length: totalRows }, (_, i) => i);
         } else {
             this.selectedRows = [];
         }

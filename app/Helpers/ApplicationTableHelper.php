@@ -12,6 +12,7 @@ class ApplicationTableHelper
     public static function headerHelper($context = 'user_admin', $tab = '')
     {
         $base = [
+            ['key' => 'id', 'label' => 'ID', 'width' => '200px'],
             ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
             ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
             ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
@@ -52,7 +53,7 @@ class ApplicationTableHelper
                         ...$base,
                         ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
                         ['key' => 'submitted_date', 'label' => 'Submitted Date', 'width' => '150px'],
-                        ['key' => 'rfid_tags', 'label' => 'Gate Pass', 'width' => '100px'],
+                        ['key' => 'gate_pass', 'label' => 'Gate Pass', 'width' => '100px'],
                         ['key' => 'vehicles', 'label' => 'Vehicles', 'width' => '100px']
                     ]
                 },

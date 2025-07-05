@@ -393,7 +393,7 @@
                 </div>
                 
                 <!-- Search Button -->
-                <x-dashboard.buttons type="search" icon="true" text="Hanapin mo" class="min-w-[100px] h-11"/>
+                <x-dashboard.buttons type="search" icon="true" text="Search" class="min-w-[100px] h-11"/>
             </div>
         </form>
         

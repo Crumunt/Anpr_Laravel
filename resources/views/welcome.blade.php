@@ -56,10 +56,86 @@
                     <div class="w-full space-y-6">
                         <div x-show="activeTab === 'Applicants'" x-transition>
                             <x-dashboard.application-table :type="'applicant'" context="user_applicant" :rows="[
-            ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'phone' => '(555) 123-4567', 'status' => ['label' => 'Pending', 'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'], 'submitted_date' => '2023-05-15', 'rfid_tags' => 2, 'vehicles' => 1],
-            ['name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'phone' => '(555) 765-4321', 'status' => ['label' => 'Approved', 'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'], 'submitted_date' => '2023-05-16', 'rfid_tags' => 1, 'vehicles' => 2]
-        ]"
-                                caption="Applicants list for Summer 2024 Program" />
+            [
+                'id' => '123123',
+                'name' => 'John Doe',
+                'email' => 'john.doe@example.com',
+                'phone' => '(555) 123-4567',
+                'status' => [
+                    'label' => 'Pending',
+                    'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'
+                ],
+                'submitted_date' => '2023-05-15',
+                'gate_pass' => 2,
+                'vehicles' => 1
+            ],
+            [
+                'id' => '123123',
+                'name' => 'Jane Smith',
+                'email' => 'jane.smith@example.com',
+                'phone' => '(555) 765-4321',
+                'status' => [
+                    'label' => 'Approved',
+                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
+                ],
+                'submitted_date' => '2023-05-16',
+                'gate_pass' => 1,
+                'vehicles' => 2
+            ],
+            [
+                'id' => '456789',
+                'name' => 'Emily Johnson',
+                'email' => 'emily.johnson@example.com',
+                'phone' => '(555) 678-9012',
+                'status' => [
+                    'label' => 'Rejected',
+                    'class' => 'bg-red-100/80 text-red-800 hover:bg-red-200/60'
+                ],
+                'submitted_date' => '2023-06-01',
+                'gate_pass' => 0,
+                'vehicles' => 0
+            ],
+            [
+                'id' => '321654',
+                'name' => 'Michael Lee',
+                'email' => 'michael.lee@example.com',
+                'phone' => '(555) 345-6789',
+                'status' => [
+                    'label' => 'Approved',
+                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
+                ],
+                'submitted_date' => '2023-05-22',
+                'gate_pass' => 1,
+                'vehicles' => 3
+            ],
+            [
+                'id' => '789123',
+                'name' => 'Samantha Brown',
+                'email' => 'samantha.brown@example.com',
+                'phone' => '(555) 987-6543',
+                'status' => [
+                    'label' => 'Pending',
+                    'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'
+                ],
+                'submitted_date' => '2023-06-05',
+                'gate_pass' => 1,
+                'vehicles' => 1
+            ],
+            [
+                'id' => '654987',
+                'name' => 'David Wilson',
+                'email' => 'david.wilson@example.com',
+                'phone' => '(555) 234-5678',
+                'status' => [
+                    'label' => 'Approved',
+                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
+                ],
+                'submitted_date' => '2023-06-10',
+                'gate_pass' => 1,
+                'vehicles' => 2
+            ]
+
+        ]" caption="Applicants list for Summer 2024 Program" />
                         </div>
                         <div x-show="activeTab === 'Registered Vehicles'" x-transition>
                             <x-dashboard.application-table :type="'vehicle'" context="vehicles" :rows="[

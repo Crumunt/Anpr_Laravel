@@ -100,7 +100,7 @@
 </style>
 
 
-<div x-data="applicationTable({{ count($rows) }})"
+<div x-data="applicationTable({{ count($rows) }})" 
     class="w-full bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md border border-gray-100 overflow-hidden">
     <!-- Selection indicator and bulk actions -->
     <div x-show="selectedRows.length > 0" x-cloak x-transition:enter="transition ease-out duration-300"
@@ -207,18 +207,7 @@
                     @if ($showCheckboxes)
                         <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 w-[50px]">
                             <div class="checkbox-wrapper">
-                                <button type="button" @click.stop="toggleSelectAll($event)"
-                                    class="relative inline-flex h-4 w-4 shrink-0 rounded-sm border border-gray-300 transition-all duration-200 hover:border-green-500 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500/50"
-                                    :class="{ 'bg-green-50 border-green-500': selectAll }">
-                                    <span class="absolute inset-0 m-auto transition-opacity"
-                                        :class="{ 'opacity-100': selectAll, 'opacity-0': !selectAll }">
-                                        <svg class="h-3.5 w-3.5 text-green-600" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                </button>
+                            <x-table.checkbox-cell variant="bulk" />
                             </div>
                         </th>
                     @endif
@@ -249,7 +238,7 @@
 
                         @if ($showCheckboxes)
                             <x-table.data-cell>
-                                <x-table.checkbox-cell :index="$index" is-selected="isSelected"/>
+                                <x-table.checkbox-cell :index="$index" :is-selected="'isSelected'"/>
                             </x-table.data-cell>
                         @endif
 
@@ -257,7 +246,7 @@
                             @php
                                 $key = $header['key'] ?? $header['label'];
                                 $value = $row[$key] ?? null;
-                                $isHighlight = in_array($key, ['name','owner','vehicle','gate_pass'])
+                                $isHighlight = in_array($key, ['id','owner','vehicle','gate_pass','vehicles'])
                             @endphp
 
                             <x-table.data-cell :class="$isHighlight ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">

@@ -7,7 +7,7 @@
                 <div class="w-full space-y-6">
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 class="text-2xl font-bold text-gray-800">RFID Management</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Gate Pass Management</h2>
                         <div class="flex space-x-2">
                             <!-- <x-dashboard.buttons
                                 :icon="false"
@@ -36,23 +36,23 @@
                             :type="'rfid'"
                             context="gate_pass"
                             :rows="[
-                                ['rfid_tag' => 'RFID12345', 'status' => 'Active', 'assigned_to' => 'John Doe'],
-                                ['rfid_tag' => 'RFID67890', 'status' => 'Inactive', 'assigned_to' => 'Jane Smith'],
-                                ['rfid_tag' => 'RFID23456', 'status' => 'Active', 'assigned_to' => 'Michael Johnson'],
-                                ['rfid_tag' => 'RFID78901', 'status' => 'Active', 'assigned_to' => 'Emily Wilson'],
-                                ['rfid_tag' => 'RFID34567', 'status' => 'Pending', 'assigned_to' => 'Robert Thompson'],
-                                ['rfid_tag' => 'RFID89012', 'status' => 'Active', 'assigned_to' => 'Sarah Davis'],
-                                ['rfid_tag' => 'RFID45678', 'status' => 'Active', 'assigned_to' => 'David Martinez'],
-                                ['rfid_tag' => 'RFID90123', 'status' => 'Inactive', 'assigned_to' => 'Jennifer Garcia'],
-                                ['rfid_tag' => 'RFID56789', 'status' => 'Lost', 'assigned_to' => 'Christopher Robinson'],
-                                ['rfid_tag' => 'RFID01234', 'status' => 'Active', 'assigned_to' => 'Lisa Anderson'],
-                                ['rfid_tag' => 'RFID54321', 'status' => 'Active', 'assigned_to' => 'Thomas Wilson'],
-                                ['rfid_tag' => 'RFID09876', 'status' => 'Inactive', 'assigned_to' => 'Maria Rodriguez'],
-                                ['rfid_tag' => 'RFID65432', 'status' => 'Active', 'assigned_to' => 'Daniel Lewis'],
-                                ['rfid_tag' => 'RFID21098', 'status' => 'Pending', 'assigned_to' => 'Patricia Walker'],
-                                ['rfid_tag' => 'RFID76543', 'status' => 'Active', 'assigned_to' => 'James Hall'],
-                                ['rfid_tag' => 'RFID32109', 'status' => 'Active', 'assigned_to' => 'Nancy Allen'],
-                                ['rfid_tag' => 'RFID87654', 'status' => 'Inactive', 'assigned_to' => 'Steven Young']
+                                ['gate_pass' => 'GP12345', 'status' => ['label' => 'Active'], 'assigned_to' => 'John Doe'],
+                                ['gate_pass' => 'GP67890', 'status' => ['label' => 'Inactive'], 'assigned_to' => 'Jane Smith'],
+                                ['gate_pass' => 'GP23456', 'status' => ['label' => 'Active'], 'assigned_to' => 'Michael Johnson'],
+                                ['gate_pass' => 'GP78901', 'status' => ['label' => 'Active'], 'assigned_to' => 'Emily Wilson'],
+                                ['gate_pass' => 'GP34567', 'status' => ['label' => 'Pending'], 'assigned_to' => 'Robert Thompson'],
+                                ['gate_pass' => 'GP89012', 'status' => ['label' => 'Active'], 'assigned_to' => 'Sarah Davis'],
+                                ['gate_pass' => 'GP45678', 'status' => ['label' => 'Active'], 'assigned_to' => 'David Martinez'],
+                                ['gate_pass' => 'GP90123', 'status' => ['label' => 'Inactive'], 'assigned_to' => 'Jennifer Garcia'],
+                                ['gate_pass' => 'GP56789', 'status' => ['label' => 'Lost'], 'assigned_to' => 'Christopher Robinson'],
+                                ['gate_pass' => 'GP01234', 'status' => ['label' => 'Active'], 'assigned_to' => 'Lisa Anderson'],
+                                ['gate_pass' => 'GP54321', 'status' => ['label' => 'Active'], 'assigned_to' => 'Thomas Wilson'],
+                                ['gate_pass' => 'GP09876', 'status' => ['label' => 'Inactive'], 'assigned_to' => 'Maria Rodriguez'],
+                                ['gate_pass' => 'GP65432', 'status' => ['label' => 'Active'], 'assigned_to' => 'Daniel Lewis'],
+                                ['gate_pass' => 'GP21098', 'status' => ['label' => 'Pending'], 'assigned_to' => 'Patricia Walker'],
+                                ['gate_pass' => 'GP76543', 'status' => ['label' => 'Active'], 'assigned_to' => 'James Hall'],
+                                ['gate_pass' => 'GP32109', 'status' => ['label' => 'Active'], 'assigned_to' => 'Nancy Allen'],
+                                ['gate_pass' => 'GP87654', 'status' => ['label' => 'Inactive'], 'assigned_to' => 'Steven Young']
                             ]"
                             caption="RFID Tags Management list" />
                         <x-dashboard.pagination></x-dashboard.pagination>
