@@ -30,7 +30,7 @@
                     <x-details.modal id="applicant-modal" type="applicant" action="add" />
                     
                     <!-- Moved search filter inside the space-y-6 container -->
-                    <x-dashboard.search-filter :showType="'applicants'" />
+                    <x-dashboard.search-filter :showType="'applicant'" />
                     
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
                     <div class="w-full space-y-6">

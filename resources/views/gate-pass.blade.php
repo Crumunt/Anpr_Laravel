@@ -28,7 +28,7 @@
                     <x-details.modal id="rfid-modal" type="rfid" action="add" />
                     
                     <!-- Moved search filter inside the space-y-6 container -->
-                    <x-dashboard.search-filter :showType="'rfid'" />
+                    <x-dashboard.search-filter :showType="'gatePass'" />
                     
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
                     <div class="w-full space-y-6">

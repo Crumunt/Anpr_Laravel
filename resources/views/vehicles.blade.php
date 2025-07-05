@@ -26,7 +26,7 @@
                     <x-details.modal id="vehicle-modal" type="vehicle" action="add" />
                     
                     <!-- Moved search filter inside the space-y-6 container -->
-                    <x-dashboard.search-filter :showType="'vehicles'" />
+                    <x-dashboard.search-filter :showType="'vehicle'" />
                     
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
                     <div class="w-full space-y-6">
