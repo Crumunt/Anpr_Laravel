@@ -160,7 +160,7 @@
             </div>
 
             <div class="form-step hidden" id="step-3">
-                @include('rfid.documents')
+                @include('gate-pass.documents')
                 <div class="flex justify-between mt-6">
                     <button type="button" class="prev-btn
                         inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium

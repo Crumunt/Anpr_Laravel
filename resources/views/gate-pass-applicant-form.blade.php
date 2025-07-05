@@ -188,7 +188,7 @@
         });
 
         document.getElementById('acceptBtn').addEventListener('click', () => {
-    window.location.href = "{{ route('rfid.personal-info') }}";  // Using Laravel's named routes
+    window.location.href = "{{ route('gate-pass.personal-info') }}";  // Using Laravel's named routes
 });
 
 
