@@ -20,19 +20,16 @@
                     </h3>
                     <div class="flex items-center space-x-2">
                         <span class="inline-flex items-center rounded-full bg-gradient-to-r from-{{ $color }}-100 to-{{ $color }}-50 px-2.5 sm:px-3 py-1 text-xs font-medium text-{{$color}}-700 transition-all duration-300 group-hover:scale-[1.02]">
-                            @if($percent > 0)
+                            @php
+                                $upwardTrend = $percent > 0;
+                                $arrowPath = $upwardTrend ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6';
+                            @endphp
+                            
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 -ml-1 animate-bounce-horizontal" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    d="{{ $arrowPath }}" />
                             </svg>
-                            @else
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 -ml-1 animate-bounce-horizontal" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-                            </svg>
-                            @endif
                             {{ $percent }}%
                         </span>
                         <span class="text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-600">from last month</span>
