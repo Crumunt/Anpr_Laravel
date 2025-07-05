@@ -25,10 +25,7 @@
     $classes = $baseClasses . ' ' . ($variantClasses[$variant] ?? $variantClasses['primary']) . ' ' . ($sizeClasses[$size] ?? $sizeClasses['md']);
 @endphp
 
-<button
-    type="{{ $type }}"
-    {{ $attributes->merge(['class' => $classes]) }}
->
+<button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
     @if($icon && !($slot->isNotEmpty() && isset($slots['icon'])))
         <span class="mr-2">
             @if($variant === 'cancel')
