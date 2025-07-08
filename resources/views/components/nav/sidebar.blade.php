@@ -18,7 +18,7 @@
             <div class="w-full h-20 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
                 <img src="{{ asset($appLogoPath) }}" alt="CLSU Logo" class="max-h-full max-w-full object-contain">
     <!-- Fallback if image fails to load -->
-               <i class="fas fa-image text-3xl text-white opacity-70 hidden" aria-hidden="true"></i>
+               <!-- <i class="fas fa-image text-3xl text-white opacity-70 hidden" aria-hidden="true"></i> -->
             </div>
             <div class="text-center">
                 <h1 class="text-lg font-bold">CLSU</h1>

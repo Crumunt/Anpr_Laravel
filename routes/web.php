@@ -6,8 +6,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn() => view('admin.dashboard'))->name('welcome');
     Route::get('/applicant', fn() => view('admin.users.applicants.index'))->name('applicant');
     Route::get('/applicant/{id}', fn($id) => view('admin.users.applicants.show', ['id' => $id]))->name('applicant.show-details');
-    Route::get('/gate-pass', fn() => view('admin.gate_passes.index'))->name('gate-pass');
-    Route::get('/gate-pass/{id}', fn($id) => view('admin.gate_passess.show', ['id' => $id]))->name('vehicles.show');
+    Route::get('/gate-pass', fn() => view('admin.gate_passes.index'))->name('gate_passes.index');
+    Route::get('/gate-pass/{id}', fn($id) => view('admin.gate_passes.show', ['id' => $id]))->name('gate_passes.show');
     Route::get('/vehicles', fn() => view('admin.vehicles.index'))->name('vehicles');
     Route::get('/vehicles/{id}', fn($id) => view('admin.vehicles.show', ['id' => $id]))->name('vehicles.show');
     Route::get('/admins', fn() => view('admin.users.admins.index'))->name('admins');

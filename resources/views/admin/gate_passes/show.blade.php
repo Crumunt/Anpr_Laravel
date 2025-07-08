@@ -1,12 +1,8 @@
-<x-nav.navbar></x-nav.navbar>
-@section(section: 'main-content')
-<div class="flex-1 md:ml-64 p-6 pt-20">
-
 <x-details.layout title="Vehicle Details" type="gate_pass" :id="$id">
   @php
 $breadcrumbItems = [
     ['label' => 'Dashboard', 'url' => route('admin.welcome')],
-    ['label' => 'RFID', 'url' => route('admin.rfid')],
+    ['label' => 'RFID', 'url' => route('admin.gate_passes.index')],
     ['label' => 'RFID Details']
 ];
   $vehicleInfo = [
