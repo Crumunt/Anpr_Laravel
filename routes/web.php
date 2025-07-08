@@ -3,11 +3,11 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/welcome', fn() => view('welcome'))->name('welcome');
-    Route::get('/applicant', fn() => view('applicant'))->name('applicant');
-    Route::get('/gate-pass', fn() => view('gate-pass'))->name('gate-pass');
-    Route::get('/vehicles', fn() => view('vehicles'))->name('vehicles');
-    Route::get('/admins', fn() => view('admins'))->name('admins');
+    Route::get('/', fn() => view('admin.dashboard'))->name('welcome');
+    Route::get('/applicant', fn() => view('admin.users.applicants.index'))->name('applicant');
+    Route::get('/gate-pass', fn() => view('admin.gate_passes.index'))->name('gate-pass');
+    Route::get('/vehicles', fn() => view('admin.vehicles.index'))->name('vehicles');
+    Route::get('/admins', fn() => view('admin.users.admins.index'))->name('admins');
     
 });
 
