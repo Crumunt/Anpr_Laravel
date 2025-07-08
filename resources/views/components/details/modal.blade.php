@@ -17,7 +17,7 @@ default => 'max-w-md'
 $titles = [
 'applicant' => 'Add Applicant',
 'vehicle' => 'Add Vehicle',
-'rfid' => 'Add RFID Tag',
+'gate_pass' => 'Add RFID Tag',
 'admin' => 'Add Administrator',
 'document_upload' => 'Upload Document',
 ];

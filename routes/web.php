@@ -5,8 +5,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn() => view('admin.dashboard'))->name('welcome');
     Route::get('/applicant', fn() => view('admin.users.applicants.index'))->name('applicant');
+    Route::get('/applicant/{id}', fn($id) => view('admin.users.applicants.show', ['id' => $id]))->name('applicant.show-details');
     Route::get('/gate-pass', fn() => view('admin.gate_passes.index'))->name('gate-pass');
+    Route::get('/gate-pass/{id}', fn($id) => view('admin.gate_passess.show', ['id' => $id]))->name('vehicles.show');
     Route::get('/vehicles', fn() => view('admin.vehicles.index'))->name('vehicles');
+    Route::get('/vehicles/{id}', fn($id) => view('admin.vehicles.show', ['id' => $id]))->name('vehicles.show');
     Route::get('/admins', fn() => view('admin.users.admins.index'))->name('admins');
     
 });
@@ -22,12 +25,6 @@ Route::prefix('gate-pass')->name('gate-pass.')->group(function () {
     Route::get('/success', fn() => view('gate-pass.success'))->name('success');
 });
 
-Route::prefix('view-details')->name('details.')->group(function() {
-    Route::get('/details/{type}/{id}', fn($type, $id) => view('details.' . $type, [
-        'id' => $id,
-        'type' => $type
-    ]))->name('show');
-});
 // gate-pass Application Form - Single unified page
 // Route::get('/gate-pass/application', function () {
 //     return view('gate-pass.application-form');

@@ -1,16 +1,16 @@
 <x-nav.navbar></x-nav.navbar>
 @section(section: 'main-content')
 <div class="flex-1 md:ml-64 p-6 pt-20">
-<x-details.layout title="Vehicle Details" :type="$type" :id="$id">
+
+<x-details.layout title="Vehicle Details" type="gate_pass" :id="$id">
   @php
-  $breadcrumbItems = [
-      ['label' => 'Dashboard', 'url' => route('admin.welcome')],
-      ['label' => 'Vehicles', 'url' => route('admin.vehicles')],
-      ['label' => 'Toyota Fortuner (ABC-1234)']
-  ];
-  
+$breadcrumbItems = [
+    ['label' => 'Dashboard', 'url' => route('admin.welcome')],
+    ['label' => 'RFID', 'url' => route('admin.rfid')],
+    ['label' => 'RFID Details']
+];
   $vehicleInfo = [
-      ['label' => 'Make & Model', 'value' => 'Toyota Fortuner'],
+      ['label' => 'Tag Number', 'value' => 'Tosadas'],
       ['label' => 'Year', 'value' => '2020'],
       ['label' => 'Color', 'value' => 'White'],
       ['label' => 'License Plate', 'value' => 'ABC-1234'],
@@ -18,13 +18,7 @@
       ['label' => 'Engine Number', 'value' => 'EN12345678']
   ];
   
-  $registrationInfo = [
-      ['label' => 'Registration Date', 'value' => 'January 15, 2023'],
-      ['label' => 'Expiration Date', 'value' => 'January 15, 2024'],
-      ['label' => 'Status', 'value' => 'Active'],
-      ['label' => 'Registered By', 'value' => 'Admin User'],
-      ['label' => 'Last Updated', 'value' => 'January 15, 2023']
-  ];
+  
   
   $ownerInfo = [
       ['label' => 'Owner Name', 'value' => 'John Doe'],
@@ -155,11 +149,11 @@
   
   <x-slot name="header">
     <x-details.parts.profile-header 
-      title="Toyota Fortuner (ABC-1234)" 
+      title="RFID-001-2023" 
       initials="TF" 
       status="Active" 
       statusClass="bg-green-100 text-green-800" 
-      id="VEH-2023-001" 
+      id="Issued: Jan 15, 2023" 
       :isActive="true" 
     />
   </x-slot>
@@ -174,31 +168,12 @@
       </div>
     </x-details.parts.info-card>
     
-    <!-- Registration Information Card -->
-    <x-details.parts.info-card title="Registration Information" editId="edit-registration-info-btn">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        @foreach($registrationInfo as $info)
-          <x-details.parts.info-field :label="$info['label']" :value="$info['value']" />
-        @endforeach
-      </div>
-    </x-details.parts.info-card>
     
     <!-- Owner Information Card -->
-    <x-details.parts.info-card title="Owner Information" :editButton="false">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        @foreach($ownerInfo as $info)
-          <x-details.parts.info-field :label="$info['label']" :value="$info['value']" />
-        @endforeach
-      </div>
-      <div class="mt-4 flex justify-end">
-        <a href="{{ route('details.show', ['type' => 'applicant', 'id' => 1]) }}" class="text-green-600 hover:text-green-700 text-sm font-medium">
-          <i class="fas fa-external-link-alt mr-1"></i> View Owner Details
-        </a>
-      </div>
-    </x-details.parts.info-card>
+ 
     
     <!-- RFID Tags Card -->
-    <x-details.parts.info-card title="RFID Tags" editButton="false">
+    <x-details.parts.info-card title="RFID Tags" :editButton="false">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-sm font-medium text-gray-700">Assigned Tags</h3>
         <button id="add-rfid-btn" class="text-green-600 hover:text-green-700 text-sm font-medium">
@@ -228,8 +203,6 @@
       :progress="100" 
     />
     
-    <!-- Documents Card -->
-    <x-details.parts.documents-card :documents="$documents" />
     
     <!-- Activity Log Card -->
     <x-details.parts.activity-log :activities="$activities" />

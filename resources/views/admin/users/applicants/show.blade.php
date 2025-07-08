@@ -1,7 +1,7 @@
 <x-nav.navbar></x-nav.navbar>
 @section(section: 'main-content')
 <div class="flex-1 md:ml-64 p-6 pt-20">
-<x-details.layout title="Applicant Details" :type="$type" :id="$id">
+<x-details.layout title="Applicant Details" type="applicant" :id="$id">
   @php
   $breadcrumbItems = [
       ['label' => 'Dashboard', 'url' => route('admin.welcome')],
