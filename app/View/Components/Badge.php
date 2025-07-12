@@ -18,11 +18,11 @@ class Badge extends Component
     public string $type;
     public string $class;
 
-    public function __construct(string $label, string $type = 'status')
+    public function __construct($label, string $type = 'status')
     {
         //
 
-        $this->label = $label;
+        $this->label = $label ?? 'test';
         $this->type = $type;
 
         $this->class = $this->resolveClass($label, $type);

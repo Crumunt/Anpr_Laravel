@@ -27,30 +27,6 @@ class DashboardController extends Controller
 
     }
 
-    public function applicants() {
-        $users = $this->getUsers();
-
-        return view('admin.users.applicants.index', compact('users'));
-    }
-
-    public function gatePass() {
-        $gatePasses = $this->getGatePasses();
-
-        return view('admin.gate_passes.index', compact('gatePasses'));
-    }
-
-    public function vehicles() {
-        $vehicles = $this->getVehicles();
-
-        return view('admin.vehicles.index', compact('vehicles'));
-    }
-
-    public function admin() {
-        $users = $this->getUsers();
-
-        return view('admin.users.admins.index', compact('users'));
-    }
-
     private function getCardData()
     {
 

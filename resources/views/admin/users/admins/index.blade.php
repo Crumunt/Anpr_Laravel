@@ -57,48 +57,7 @@
                             <x-dashboard.application-table
                                 :type="'admin'"
                                 context="user_admin"
-                                :rows="[ 
-                                    [
-                                        'name' => 'Admin User', 
-                                        'email' => 'admin@example.com', 
-                                        'phone' => '(555) 123-4567', 
-                                        'role' => 'Super Admin', 
-                                        'status' => ['label' => 'Active'], 
-                                        'last_login' => 'Today, 9:45 AM'
-                                    ],
-                                    [
-                                        'name' => 'Moderator One',
-                                        'email' => 'mod1@example.com', 
-                                        'phone' => '(555) 765-4321', 
-                                        'role' => 'Moderator', 
-                                        'status' => ['label' => 'Active'], 
-                                        'last_login' => 'Yesterday, 3:20 PM'
-                                        
-                                    ],
-                                    [
-                                        'name' => 'Staff Member',
-                                        'email' => 'staff@example.com', 
-                                        'phone' => '(555) 987-6543', 
-                                        'role' => 'Admin', 
-                                        'status' => ['label' => 'Inactive'], 
-                                        'last_login' => 'Jun 15, 2023'],
-                                    [
-                                        'name' => 'System User',
-                                        'email' => 'system@example.com', 
-                                        'phone' => '(555) 456-7890', 
-                                        'role' => 'Admin', 
-                                        'status' => ['label' => 'Active'], 
-                                        'last_login' => 'Today, 11:30 AM'
-                                    ],
-                                    [
-                                        'name' => 'Guest Access',
-                                        'email' => 'guest@example.com', 
-                                        'phone' => '(555) 234-5678', 
-                                        'role' => 'Moderator', 
-                                        'status' => ['label' => 'Inactive'], 
-                                        'last_login' => 'May 22, 2023'
-                                    ]
-                                ]"
+                                :rows="$users['all']"
                                 caption="All Administrators" />
                         </div>
                         
@@ -108,11 +67,7 @@
                                 :type="'admin'"
                                 context="user_admin"
                                 tab="active"
-                                :rows="[ 
-                                    ['name' => 'Admin User', 'email' => 'admin@example.com', 'phone' => '(555) 123-4567', 'role' => 'Super Admin', 'permissions' => 'All permissions', 'last_login' => 'Today, 9:45 AM'],
-                                    ['name' => 'Moderator One', 'email' => 'mod1@example.com', 'phone' => '(555) 765-4321', 'role' => 'Moderator', 'permissions' => 'Applicants, Vehicles', 'last_login' => 'Yesterday, 3:20 PM'],
-                                    ['name' => 'System User', 'email' => 'system@example.com', 'phone' => '(555) 456-7890', 'role' => 'Admin', 'permissions' => 'All except Admins', 'last_login' => 'Today, 11:30 AM']
-                                ]"
+                                :rows="$users['active']"
                                 caption="Active Administrators" />
                         </div>
                         
@@ -122,10 +77,7 @@
                                 :type="'admin'"
                                 context="user_admin"
                                 tab="inactive"
-                                :rows="[ 
-                                    ['name' => 'Staff Member', 'email' => 'staff@example.com', 'phone' => '(555) 987-6543', 'role' => 'Admin', 'inactive_since' => 'Jun 15, 2023', 'last_login' => 'Jun 15, 2023'],
-                                    ['name' => 'Guest Access', 'email' => 'guest@example.com', 'phone' => '(555) 234-5678', 'role' => 'Moderator', 'inactive_since' => 'May 22, 2023', 'last_login' => 'May 22, 2023']
-                                ]"
+                                :rows="$users['inactive']"
                                 caption="Inactive Administrators" />
                         </div>
                         

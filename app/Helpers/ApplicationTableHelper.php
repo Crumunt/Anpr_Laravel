@@ -23,15 +23,15 @@ class ApplicationTableHelper
                     'default' => array_merge($base, [
                         ['key' => 'role', 'label' => 'Role', 'width' => '120px'],
                         ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
-                        ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px']
+                        ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px']
                     ]),
                     'active' => array_merge($base, [
                         ['key' => 'permissions', 'label' => 'Permissions', 'width' => '200px'],
-                        ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px'],
+                        ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px'],
                     ]),
                     'inactive' => array_merge($base, [
-                        ['key' => 'inactive_since', 'label' => 'Inactive Since', 'width' => '150px'],
-                        ['key' => 'last_login', 'label' => 'Last Login', 'width' => '150px'],
+                        ['key' => 'inactiveSince', 'label' => 'Inactive Since', 'width' => '150px'],
+                        ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px'],
                     ]),
                 },
             'vehicles' => match ($tab) {
