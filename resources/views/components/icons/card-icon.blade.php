@@ -36,7 +36,7 @@
 
     @case('approval')
         <svg xmlns="http://www.w3.org/2000/svg"
-            class="h-7 w-7 sm:h-8 sm:w-8 text-red-600 transition-colors duration-300 group-hover:text-red-700"
+            class="h-7 w-7 sm:h-8 sm:w-8 text-{{$color}}-600 transition-colors duration-300 group-hover:text-{{ $color }}-700"
             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />

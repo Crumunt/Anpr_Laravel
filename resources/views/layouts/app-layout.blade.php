@@ -24,10 +24,8 @@
 
     <x-nav.navbar></x-nav.navbar>
 
-    <div class="flex-1 md:ml-64 p-6 pt-20">
 
-        @yield('main-content')
-    </div>
+    @yield('main-content')
 
 </body>
 

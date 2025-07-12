@@ -33,10 +33,7 @@
                         <x-dashboard.application-table
                             :type="'vehicle'"
                             context="vehicles"
-                            :rows="[
-                                ['vehicle' => 'Toyota Camry', 'owner' => 'John Doe', 'registration_date' => '2023-05-15'],
-                                ['vehicle' => 'Honda Civic', 'owner' => 'Jane Smith', 'registration_date' => '2023-05-16']
-                            ]"
+                            :rows="$vehicles"
                             caption="Registered Vehicles list" />
                         <x-dashboard.pagination></x-dashboard.pagination>
                     </div>

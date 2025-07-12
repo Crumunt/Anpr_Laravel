@@ -1,16 +1,11 @@
 @extends('layouts.app-layout')
 @section('main-content')
     <div class="flex-1 md:ml-64 p-6 pt-24">
-        <!-- Dashboard Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <x-dashboard.card title="Total Applicants" totalNumber="1,111" percent="+2"
-                description="Total registered applicants" icon="users" />
-            <x-dashboard.card title="Active Gate Pass Stickers" totalNumber="894" percent="+2"
-                description="Currently Active RFID Tags" icon="rfid" />
-            <x-dashboard.card title="Registered Vehicles" totalNumber="115" percent="+5"
-                description="Total registered vehicles" icon="car" />
-            <x-dashboard.card title="Pending Approvals" color="red" totalNumber="1,111" percent="-12"
-                description="Total registered applicants" icon="approval" />
+            @foreach ($cardData as $card)
+                <x-dashboard.card :title="$card['title']" :totalNumber="$card['totalNumber']" :percent="$card['percent']"
+                    :description="$card['description']" :icon="$card['icon']" />
+            @endforeach
         </div>
         <!-- Use ONE Alpine.js data context for the entire section -->
         <div x-data="{ activeTab: 'Applicants' }"
@@ -55,103 +50,14 @@
                     <!-- Remove the mt-6 class since space-y-6 will add consistent spacing -->
                     <div class="w-full space-y-6">
                         <div x-show="activeTab === 'Applicants'" x-transition>
-                            <x-dashboard.application-table :type="'applicant'" context="user_applicant" :rows="[
-            [
-                'id' => '123123',
-                'name' => 'John Doe',
-                'email' => 'john.doe@example.com',
-                'phone' => '(555) 123-4567',
-                'status' => [
-                    'label' => 'Pending',
-                    'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'
-                ],
-                'submitted_date' => '2023-05-15',
-                'gate_pass' => 2,
-                'vehicles' => 1
-            ],
-            [
-                'id' => '123123',
-                'name' => 'Jane Smith',
-                'email' => 'jane.smith@example.com',
-                'phone' => '(555) 765-4321',
-                'status' => [
-                    'label' => 'Approved',
-                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
-                ],
-                'submitted_date' => '2023-05-16',
-                'gate_pass' => 1,
-                'vehicles' => 2
-            ],
-            [
-                'id' => '456789',
-                'name' => 'Emily Johnson',
-                'email' => 'emily.johnson@example.com',
-                'phone' => '(555) 678-9012',
-                'status' => [
-                    'label' => 'Rejected',
-                    'class' => 'bg-red-100/80 text-red-800 hover:bg-red-200/60'
-                ],
-                'submitted_date' => '2023-06-01',
-                'gate_pass' => 0,
-                'vehicles' => 0
-            ],
-            [
-                'id' => '321654',
-                'name' => 'Michael Lee',
-                'email' => 'michael.lee@example.com',
-                'phone' => '(555) 345-6789',
-                'status' => [
-                    'label' => 'Approved',
-                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
-                ],
-                'submitted_date' => '2023-05-22',
-                'gate_pass' => 1,
-                'vehicles' => 3
-            ],
-            [
-                'id' => '789123',
-                'name' => 'Samantha Brown',
-                'email' => 'samantha.brown@example.com',
-                'phone' => '(555) 987-6543',
-                'status' => [
-                    'label' => 'Pending',
-                    'class' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60'
-                ],
-                'submitted_date' => '2023-06-05',
-                'gate_pass' => 1,
-                'vehicles' => 1
-            ],
-            [
-                'id' => '654987',
-                'name' => 'David Wilson',
-                'email' => 'david.wilson@example.com',
-                'phone' => '(555) 234-5678',
-                'status' => [
-                    'label' => 'Approved',
-                    'class' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60'
-                ],
-                'submitted_date' => '2023-06-10',
-                'gate_pass' => 1,
-                'vehicles' => 2
-            ]
-
-        ]" caption="Applicants list for Summer 2024 Program" />
+                            <x-dashboard.application-table :type="'applicant'" context="user_applicant" :rows="$users" caption="Applicants list for Summer 2024 Program" />
                         </div>
                         <div x-show="activeTab === 'Registered Vehicles'" x-transition>
-                            <x-dashboard.application-table :type="'vehicle'" context="vehicles" :rows="[
-            ['vehicle' => 'Toyota Camry', 'owner' => 'John Doe', 'registration_date' => '2023-05-15'],
-            ['vehicle' => 'Honda Civic', 'owner' => 'Jane Smith', 'registration_date' => '2023-05-16']
-        ]"
+                            <x-dashboard.application-table :type="'vehicle'" context="vehicles" :rows="$vehicles"
                                 caption="Registered Vehicles list" />
                         </div>
                         <div x-show="activeTab === 'Gate Pass Management'" x-transition>
-                            <x-dashboard.application-table :type="'rfid'" context="gate_pass" :rows="[
-            ['gate_pass' => 'GP12345', 'status' => 'Active', 'assigned_to' => 'John Doe'],
-            ['gate_pass' => 'GP67890', 'status' => 'Inactive', 'assigned_to' => 'Jane Smith'],
-            ['gate_pass' => 'GP67890', 'status' => 'Pending', 'assigned_to' => 'Jane Smith'],
-            ['gate_pass' => 'GP67890', 'status' => 'Red', 'assigned_to' => 'Jane Smith'],
-            ['gate_pass' => 'GP67890', 'status' => 'Default', 'assigned_to' => 'Jane Smith'],
-        ]" caption="RFID Tags Management list" />
+                            <x-dashboard.application-table :type="'rfid'" context="gate_pass" :rows="$gatePasses" caption="RFID Tags Management list" />
                         </div>
                         <x-dashboard.pagination></x-dashboard.pagination>
                     </div>

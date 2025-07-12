@@ -37,10 +37,7 @@
                         <x-dashboard.application-table
                             :type="'applicant'"
                             context="user_applicant"
-                            :rows="[
-                                ['id'=>'12312','name' => 'John Doe', 'email' => 'john.doe@example.com', 'phone' => '(555) 123-4567', 'status' => ['label' => 'Pending'], 'submitted_date' => '2023-05-15', 'gate_pass' => 2, 'vehicles' => 1],
-                                ['id'=>'12312','name' => 'Jane Smith', 'email' => 'jane.smith@example.com', 'phone' => '(555) 765-4321', 'status' => ['label' => 'Approved'], 'submitted_date' => '2023-05-16', 'gate_pass' => 1, 'vehicles' => 2]
-                            ]"
+                            :rows="$users"
                             caption="Applicants list for Summer 2024 Program" />
                         <x-dashboard.pagination></x-dashboard.pagination>
                     </div>
