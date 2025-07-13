@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone_number')->nullable();
             $table->string('license')->nullable();
             $table->foreignId('role_id')->references('id')->on('roles');
             $table->foreignId('status_id')->references('id')->on('statuses');
