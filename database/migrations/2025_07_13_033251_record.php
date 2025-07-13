@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         //
-        Schema::create('record', function (Blueprint $table) {
+        Schema::create('records', function (Blueprint $table) {
             $table->id();
             $table->string('observed_plate');
-            $table->foreignId('status_id')->references('id')->on('status');
+            $table->foreignId('status_id')->references('id')->on('statuses');
             $table->string('vehicle_type');
             $table->timestamps();
         });

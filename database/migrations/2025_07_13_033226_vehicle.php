@@ -12,15 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         //
-        Schema::create('vehicle', function (Blueprint $table) {
+        Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('owner_id')->references('id')->on('users');
             $table->string('license_plate');
+            $table->string('vehicle_type');
             $table->string('vehicle_make');
             $table->string('vehicle_model');
             $table->integer('vehicle_year');
             $table->string('assigned_gate_pass');
-            $table->foreignId('status_id')->references('id')->on('status');
+            $table->foreignId('status_id')->references('id')->on('statuses');
             $table->timestamps();
         });
     }
