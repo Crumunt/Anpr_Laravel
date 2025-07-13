@@ -37,7 +37,7 @@
                         <x-dashboard.application-table
                             :type="'applicant'"
                             context="user_applicant"
-                            :rows="$users"
+                            :rows="$userDetails"
                             caption="Applicants list for Summer 2024 Program" />
                         <x-dashboard.pagination></x-dashboard.pagination>
                     </div>

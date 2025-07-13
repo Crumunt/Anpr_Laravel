@@ -2,6 +2,7 @@
 
 namespace App\Models\Vehicle;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Vehicle extends Model
@@ -17,4 +18,8 @@ class Vehicle extends Model
         'assigned_gate_pass',
         'status_id'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

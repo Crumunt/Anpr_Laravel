@@ -15,7 +15,7 @@ class ApplicationTableHelper
             ['key' => 'id', 'label' => 'ID', 'width' => '200px'],
             ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
             ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
-            ['key' => 'phone', 'label' => 'Phone', 'width' => '150px'],
+            ['key' => 'phone_number', 'label' => 'Phone', 'width' => '150px'],
         ];
 
         return match ($context) {
