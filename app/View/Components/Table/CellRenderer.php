@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Table;
 
+use App\Helpers\ApplicationTableHelper;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -32,6 +33,12 @@ class CellRenderer extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.table.cell-renderer');
+
+        $badge = ApplicationTableHelper::renderCellBadge($this->key, $this->row, $this->type);
+
+        return view('components.table.cell-renderer', [
+            'badge' => $badge,
+            'value' => $this->value
+        ]);
     }
 }

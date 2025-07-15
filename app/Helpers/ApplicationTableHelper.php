@@ -82,4 +82,24 @@ class ApplicationTableHelper
         };
     }
 
+    public static function renderCellBadge(string $key, mixed $row, string $type)
+    {
+        return match (true) {
+            $key === 'status' && (is_array($row) ?? null) => ['type' => 'status', 'label' => $row['status']['label']],
+            $key === 'role' && $type === 'admin' => ['type' => 'role', 'label' => $row[$key]],
+            default => null
+        };
+    }
+
+    public static function getBulkActions(string $type)
+    {
+        return [
+            ['key' => 'export', 'action' => 'bulk-export'],
+            $type !== 'admin'
+            ? ['key' => 'approve', 'action' => 'approve']
+            : ['key' => 'deactivate', 'action' => 'deactivate'],
+            ['key' => 'delete', 'action' => 'delete']
+        ];
+    }
+
 }

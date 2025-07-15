@@ -131,13 +131,7 @@
                     </div>
                     <div class="p-1">
                         @php
-                            $bulkActionBtns = [
-                                ['key' => 'export', 'action' => 'bulk-export'],
-                                $type !== 'admin'
-                                    ? ['key' => 'approve', 'action' => 'approve']
-                                    : ['key' => 'deactivate', 'action' => 'deactivate'],
-                                ['key' => 'delete', 'action' => 'delete']
-                            ];
+                            $bulkActionBtns = \App\Helpers\ApplicationTableHelper::getBulkActions($type);
                         @endphp
                         
                         @foreach ($bulkActionBtns as $btn)
@@ -148,8 +142,7 @@
                                 :action="$btn['action']"
                                 :label="$bulkActions[$btn['key']]"
                                 variant="bulk"
-                            />
-                        
+                            />   
                         @endforeach
                     </div>
                 </div>
@@ -246,12 +239,17 @@
                             @php
                                 $key = $header['key'] ?? $header['label'];
                                 $value = $row[$key] ?? null;
-                                $isHighlight = in_array($key, ['id','owner','vehicle','gate_pass','vehicles'])
+                                $isHighlight = ['id','owner','vehicle','gate_pass','vehicles'];
                             @endphp
 
-                            <x-table.data-cell :class="$isHighlight ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">
+                            <x-table.data-cell :class="in_array($key, $isHighlight) ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">
 
-                                <x-table.cell-renderer :key="$key" :row="$row" :type="$type" :value="$value" />
+                                <x-table.cell-renderer 
+                                    :key="$key" 
+                                    :row="$row" 
+                                    :type="$type" 
+                                    :value="$value" 
+                                />
 
                             </x-table.data-cell>
                             
