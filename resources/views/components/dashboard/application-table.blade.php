@@ -231,10 +231,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @foreach ($rows as $row)
-                    @php
-                        $index = 0;
-                    @endphp
+                @foreach ($rows as $index => $row)
                     <tr @click="toggleRow({{ $index }}, $event)"
                         class="group relative cursor-pointer transition-all duration-300 hover:bg-green-50/80 hover:shadow-sm hover:-translate-y-0.5"
                         :class="{ 'bg-green-50/60': isSelected({{ $index }}) }">
@@ -265,9 +262,6 @@
                             </x-table.data-cell>
                         @endif
                     </tr>
-                    @php
-                        $index++;
-                    @endphp
                 @endforeach
             </tbody>
         </table>
