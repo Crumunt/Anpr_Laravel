@@ -34,7 +34,7 @@
                     
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
                     <div class="w-full space-y-6">
-                        <x-dashboard.application-table
+                        <x-table.application-table
                             :type="'applicant'"
                             context="user_applicant"
                             :rows="$userDetails"

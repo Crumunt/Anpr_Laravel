@@ -50,14 +50,14 @@
                     <!-- Remove the mt-6 class since space-y-6 will add consistent spacing -->
                     <div class="w-full space-y-6">
                         <div x-show="activeTab === 'Applicants'" x-transition>
-                            <x-dashboard.application-table :type="'applicant'" context="user_applicant" :rows="$users" caption="Applicants list for Summer 2024 Program" />
+                            <x-table.application-table :type="'applicant'" context="user_applicant" :rows="$users" caption="Applicants list for Summer 2024 Program" />
                         </div>
                         <div x-show="activeTab === 'Registered Vehicles'" x-transition>
-                            <x-dashboard.application-table :type="'vehicle'" context="vehicles" :rows="$vehicles"
+                            <x-table.application-table :type="'vehicle'" context="vehicles" :rows="$vehicles"
                                 caption="Registered Vehicles list" />
                         </div>
                         <div x-show="activeTab === 'Gate Pass Management'" x-transition>
-                            <x-dashboard.application-table :type="'rfid'" context="gate_pass" :rows="$gatePasses" caption="RFID Tags Management list" />
+                            <x-table.application-table :type="'rfid'" context="gate_pass" :rows="$gatePasses" caption="RFID Tags Management list" />
                         </div>
                         <x-dashboard.pagination></x-dashboard.pagination>
                     </div>

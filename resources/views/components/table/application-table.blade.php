@@ -1,27 +1,3 @@
-@props([
-    'context' => '',
-    'tab' => 'default',
-    'rows' => [],
-    'type' => 'applicant',
-    'caption' => 'List of applicants and their status',
-    'showCheckboxes' => true,
-    'showStatus' => true,
-    'showActions' => true,
-    'actionOptions' => [
-        'view' => [ 'label' => 'View Details' ],
-        'edit' => [ 'label' => 'Edit' ],
-        'approve' => [ 'label' => 'Approve' ],
-        'delete' => [ 'label' => 'Delete' ],
-        'reset-password' => [ 'label' => 'Reset Password' ],
-        'deactivate' => [ 'label' => 'Deactivate' ],
-    ],
-    'bulkActions' => [
-        'approve' => 'Approve Selected',
-        'delete' => 'Delete Selected',
-        'export' => 'Export Selected',
-        'deactivate' => 'Deactivate Selected'
-    ],
-])
 <style>
     [x-cloak] {
         display: none !important;
@@ -130,10 +106,6 @@
                         Bulk Actions
                     </div>
                     <div class="p-1">
-                        @php
-                            $bulkActionBtns = \App\Helpers\ApplicationTableHelper::getBulkActions($type);
-                        @endphp
-                        
                         @foreach ($bulkActionBtns as $btn)
                             @php $click = "executeBulkAction('{$btn['key']}', \$event)"; @endphp
                             
@@ -205,10 +177,6 @@
                         </th>
                     @endif
 
-                    @php
-                        $headers = \App\Helpers\ApplicationTableHelper::headerHelper($context, $tab)
-                    @endphp
-
                     @foreach ($headers as $header)
                         @php
                             $header = is_array($header) ? $header : ['key' => $header, 'label' => $header];
@@ -239,10 +207,10 @@
                             @php
                                 $key = $header['key'] ?? $header['label'];
                                 $value = $row[$key] ?? null;
-                                $isHighlight = ['id','owner','vehicle','gate_pass','vehicles'];
+                                $highlightClass = $getHighlightClass($key);
                             @endphp
 
-                            <x-table.data-cell :class="in_array($key, $isHighlight) ? 'font-medium group-hover:text-green-700' : 'text-gray-600'">
+                            <x-table.data-cell :class="$highlightClass">
 
                                 <x-table.cell-renderer 
                                     :key="$key" 
