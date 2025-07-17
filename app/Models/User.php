@@ -8,6 +8,8 @@ use App\Models\Vehicle\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
@@ -61,5 +63,9 @@ class User extends Authenticatable
 
     public function statuses() {
         return $this->belongsTo(Status::class, 'status_id');
+    }
+
+    public function roles() {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 }

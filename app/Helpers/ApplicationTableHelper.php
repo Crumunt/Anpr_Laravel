@@ -25,10 +25,7 @@ class ApplicationTableHelper
                         ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
                         ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px']
                     ]),
-                    'active' => array_merge($base, [
-                        ['key' => 'permissions', 'label' => 'Permissions', 'width' => '200px'],
-                        ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px'],
-                    ]),
+                    'active' => [...$base],
                     'inactive' => array_merge($base, [
                         ['key' => 'inactiveSince', 'label' => 'Inactive Since', 'width' => '150px'],
                         ['key' => 'lastLogin', 'label' => 'Last Login', 'width' => '150px'],
@@ -52,9 +49,8 @@ class ApplicationTableHelper
                     'default' => [
                         ...$base,
                         ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
+                        ['key' => 'vehicles', 'label' => 'Vehicles', 'width' => '100px'],
                         ['key' => 'submitted_date', 'label' => 'Submitted Date', 'width' => '150px'],
-                        ['key' => 'gate_pass', 'label' => 'Gate Pass', 'width' => '100px'],
-                        ['key' => 'vehicles', 'label' => 'Vehicles', 'width' => '100px']
                     ]
                 },
             default => []

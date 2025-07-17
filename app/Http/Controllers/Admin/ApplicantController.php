@@ -33,7 +33,6 @@ class ApplicantController extends Controller
                 'phone_number' => $user->phone_number,
                 'status' => ['label' => ucfirst($user->statuses->status_name)],
                 'submitted_date' => $user->created_at,
-                'gate_pass' => count($user->vehicles),
                 'vehicles' => count($user->vehicles)
             ];
         }

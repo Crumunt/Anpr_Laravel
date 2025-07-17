@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
             'last_name' => $faker->lastName(),
             'email' => $faker->email(),
             'password' => $faker->password(),
+            'phone_number' => $faker->phoneNumber(),
             'role_id' => 1,
             'status_id' => 1,
         ]);
@@ -36,6 +37,7 @@ class UserSeeder extends Seeder
                 'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => $faker->password(),
+                'phone_number' => $faker->phoneNumber(),
                 'role_id' => $faker->numberBetween(2, 4),
                 'status_id' => $faker->numberBetween(1, 8),
             ]);

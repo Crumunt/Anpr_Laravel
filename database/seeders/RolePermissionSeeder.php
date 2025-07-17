@@ -46,6 +46,10 @@ class RolePermissionSeeder extends Seeder
             'view_application_profile',
         ];
 
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
         $roles = [
             'Super Admin' => Permission::all()->pluck('name')->toArray(),
             'Admin' => [
@@ -102,11 +106,7 @@ class RolePermissionSeeder extends Seeder
             ]
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
-        foreach($roles as $roleName => $perms) {
+        foreach ($roles as $roleName => $perms) {
             $role = Role::firstOrCreate(['name' => $roleName]);
             $role->syncPermissions($perms);
         }
