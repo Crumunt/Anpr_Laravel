@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ApplicationTableHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
 
@@ -77,20 +79,15 @@ class GatePassController extends Controller
 
     private function getGatePasses()
     {
+
+        $vehicles = Vehicle::with('user', 'status')->paginate(10);
+
         $rows = [];
-
-        $status = [
-            ['label' => 'Active'],
-            ['label' => 'Inactive'],
-            ['label' => 'Pending'],
-            ['label' => 'Default'],
-        ];
-
-        foreach (range(1, 5) as $i) {
+        foreach ($vehicles as $vehicle) {
             $rows[] = [
-                'gate_pass' => $this->faker->unique()->randomNumber(6),
-                'status' => $this->faker->randomElement($status),
-                'assigned_to' => $this->faker->name()
+                'gate_pass' => $vehicle->assigned_gate_pass,
+                'status' => ['label' => ucfirst( $vehicle->status->status_name)],
+                'assigned_to' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
             ];
         }
 

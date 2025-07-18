@@ -30,7 +30,7 @@
                     
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
                     <div class="w-full space-y-6">
-                        <x-table.application-table
+                        <x-table.data
                             :type="'vehicle'"
                             context="vehicles"
                             :rows="$vehicles"

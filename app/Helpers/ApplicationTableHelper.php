@@ -98,4 +98,26 @@ class ApplicationTableHelper
         ];
     }
 
+    public static function getVehicleName($vehicle_make, $vehicle_model) {
+        return $vehicle_make . ' ' . $vehicle_model;
+    }
+
+    public static function getFullNameAttribute($first_name, $middle_name, $last_name)
+    {
+        $middle_initial = self::getMiddleInitialsAttribute($middle_name);
+        return $first_name . ' ' . $middle_initial . ' ' . $last_name;
+    }
+
+    private static function getMiddleInitialsAttribute($middle_name)
+    {
+        if (!$middle_name)
+            return '';
+
+        // Extract each part (in case of compound middle names)
+        $parts = preg_split('/\s+/', $middle_name);
+        $initials = array_map(fn($part) => strtoupper(mb_substr($part, 0, 1)) . '.', $parts);
+
+        return implode('', $initials); // e.g., "R.J."
+    }
+
 }

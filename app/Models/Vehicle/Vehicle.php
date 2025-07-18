@@ -2,6 +2,7 @@
 
 namespace App\Models\Vehicle;
 
+use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,6 +21,10 @@ class Vehicle extends Model
     ];
 
     public function user() {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function status() {
+        return $this->belongsTo(Status::class, 'status_id');
     }
 }

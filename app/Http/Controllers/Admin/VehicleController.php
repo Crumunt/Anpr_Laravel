@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ApplicationTableHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
 
@@ -76,26 +78,15 @@ class VehicleController extends Controller
 
     private function getVehicles()
     {
+
+        $vehicles = Vehicle::with('user')->paginate(10);
+
         $rows = [];
-
-        $vehicles = [
-            'Toyota Fortuner',
-            'Honda Civic',
-            'Mitsubishi Montero Sport',
-            'Hyundai Tucson',
-            'Ford Ranger',
-            'Nissan Navara',
-            'Kia Stonic',
-            'Isuzu D-Max',
-            'Chevrolet Trailblazer',
-            'Mazda CX-5',
-        ];
-
-        foreach (range(1, 5) as $i) {
+        foreach($vehicles as $vehicle) {
             $rows[] = [
-                'vehicle' => $this->faker->randomElement($vehicles),
-                'owner' => $this->faker->name(),
-                'registration_date' => $this->faker->date()
+                'vehicle' => ApplicationTableHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
+                'owner' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
+                'registration_date' => $vehicle->created_at
             ];
         }
 

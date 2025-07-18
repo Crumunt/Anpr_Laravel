@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ApplicationTableHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
 
@@ -82,7 +84,7 @@ class DashboardController extends Controller
         foreach ($users as $user) {
             $userDetails[] = [
                 'id' => $user->user_id ?? '-',
-                'name' => $this->getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
+                'name' => ApplicationTableHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
                 'status' => ['label' => ucfirst($user->statuses->status_name)],
@@ -94,46 +96,16 @@ class DashboardController extends Controller
         return $userDetails;
     }
 
-    private function getFullNameAttribute($first_name, $middle_name, $last_name)
-    {
-        $middle_initial = $this->getMiddleInitialsAttribute($middle_name);
-        return $first_name . ' ' . $middle_initial . ' ' . $last_name;
-    }
-
-    private function getMiddleInitialsAttribute($middle_name)
-    {
-        if (!$middle_name)
-            return '';
-
-        // Extract each part (in case of compound middle names)
-        $parts = preg_split('/\s+/', $middle_name);
-        $initials = array_map(fn($part) => strtoupper(mb_substr($part, 0, 1)) . '.', $parts);
-
-        return implode('', $initials); // e.g., "R.J."
-    }
-
     private function getVehicles()
     {
+        $vehicles = Vehicle::with('user')->paginate(10);
+
         $rows = [];
-
-        $vehicles = [
-            'Toyota Fortuner',
-            'Honda Civic',
-            'Mitsubishi Montero Sport',
-            'Hyundai Tucson',
-            'Ford Ranger',
-            'Nissan Navara',
-            'Kia Stonic',
-            'Isuzu D-Max',
-            'Chevrolet Trailblazer',
-            'Mazda CX-5',
-        ];
-
-        foreach (range(1, 5) as $i) {
+        foreach($vehicles as $vehicle) {
             $rows[] = [
-                'vehicle' => $this->faker->randomElement($vehicles),
-                'owner' => $this->faker->name(),
-                'registration_date' => $this->faker->date()
+                'vehicle' => ApplicationTableHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
+                'owner' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
+                'registration_date' => $vehicle->created_at
             ];
         }
 
@@ -142,20 +114,14 @@ class DashboardController extends Controller
 
     private function getGatePasses()
     {
+        $vehicles = Vehicle::with('user', 'status')->paginate(10);
+
         $rows = [];
-
-        $status = [
-            ['label' => 'Active'],
-            ['label' => 'Inactive'],
-            ['label' => 'Pending'],
-            ['label' => 'Default'],
-        ];
-
-        foreach (range(1, 5) as $i) {
+        foreach ($vehicles as $vehicle) {
             $rows[] = [
-                'gate_pass' => $this->faker->unique()->randomNumber(6),
-                'status' => $this->faker->randomElement($status),
-                'assigned_to' => $this->faker->name()
+                'gate_pass' => $vehicle->assigned_gate_pass,
+                'status' => ['label' => ucfirst( $vehicle->status->status_name)],
+                'assigned_to' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
             ];
         }
 

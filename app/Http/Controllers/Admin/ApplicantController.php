@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ApplicationTableHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class ApplicantController extends Controller
         foreach ($users as $user) {
             $userDetails[] = [
                 'id' => $user->user_id ?? '-',
-                'name' => $this->getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
+                'name' => ApplicationTableHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
                 'status' => ['label' => ucfirst($user->statuses->status_name)],
@@ -86,24 +87,6 @@ class ApplicantController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    private function getFullNameAttribute($first_name, $middle_name, $last_name)
-    {
-        $middle_initial = $this->getMiddleInitialsAttribute($middle_name);
-        return $first_name . ' ' . $middle_initial . ' ' . $last_name;
-    }
-
-    private function getMiddleInitialsAttribute($middle_name)
-    {
-        if (!$middle_name)
-            return '';
-
-        // Extract each part (in case of compound middle names)
-        $parts = preg_split('/\s+/', $middle_name);
-        $initials = array_map(fn($part) => strtoupper(mb_substr($part, 0, 1)) . '.', $parts);
-
-        return implode('', $initials); // e.g., "R.J."
     }
 
     private function getUsers()

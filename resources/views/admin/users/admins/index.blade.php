@@ -54,7 +54,7 @@
                     <div class="w-full space-y-6 mt-6">
                                                 <!-- All Admins Tab Content -->
                         <div x-show="activeTab === 'All Admins'" x-transition>
-                            <x-table.application-table
+                            <x-table.data
                                 :type="'admin'"
                                 context="user_admin"
                                 :rows="$users['all']"
@@ -63,7 +63,7 @@
                         
                         <!-- Active Admins Tab Content -->
                         <div x-show="activeTab === 'Active'" x-transition>
-                            <x-table.application-table
+                            <x-table.data
                                 :type="'admin'"
                                 context="user_admin"
                                 tab="active"
@@ -73,7 +73,7 @@
                         
                         <!-- Inactive Admins Tab Content -->
                         <div x-show="activeTab === 'Inactive'" x-transition>
-                            <x-table.application-table
+                            <x-table.data
                                 :type="'admin'"
                                 context="user_admin"
                                 tab="inactive"
