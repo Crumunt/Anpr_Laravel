@@ -243,7 +243,5 @@
         }))
     })
 </script>
-<!-- Add SweetAlert2 library -->
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="js/sweet-alerts.js"></script>
+
 <script src="{{ asset('js/components/data.js') }}"></script>
