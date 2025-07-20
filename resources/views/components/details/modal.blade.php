@@ -32,7 +32,7 @@ $formId = "{$type}-form";
     aria-labelledby="{{ $id }}-title"
     x-data="entityFormHandler('{{ $type }}', '{{ $entityId }}', '{{ $id }}')">
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-        <div class="absolute inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 modal-backdrop"></div>
+        <div class="absolute inset-0 bg-gray-800/70 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 modal-backdrop"></div>
     </div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div

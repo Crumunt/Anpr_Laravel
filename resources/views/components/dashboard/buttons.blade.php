@@ -7,7 +7,7 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow transform hover:-translate-y-0.5 focus:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-1 active:scale-[0.98]';
+    $baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 focus:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-1 active:scale-[0.98]';
     
     $variantClasses = [
         'primary' => 'bg-green-600 hover:bg-green-700 focus:bg-green-700 text-white focus:ring-green-500',
@@ -27,19 +27,19 @@
 
 <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
     @if($icon && !($slot->isNotEmpty() && isset($slots['icon'])))
-        <span class="mr-2">
+        <span class="mr-2 flex-shrink-0">
             @if($variant === 'cancel')
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img" focusable="false">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             @else
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" role="img" focusable="false">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             @endif
         </span>
     @endif
-    
+
     @if($slot->isNotEmpty())
         {{ $slot }}
     @elseif($text)

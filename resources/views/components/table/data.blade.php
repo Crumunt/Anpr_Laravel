@@ -168,7 +168,7 @@
                 <caption class="mt-4 text-sm text-gray-500 animate-fade-in">{{ $caption }}</caption>
             @endif
             <thead class="top-0 backdrop-blur-sm bg-white/95 z-10">
-                <tr class="border-b transition-colors hover:bg-gray-50/50">
+                <tr class="border-b border-gray-200 transition-colors hover:bg-gray-50/50">
                     @if ($showCheckboxes)
                         <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 w-[50px]">
                             <div class="checkbox-wrapper">

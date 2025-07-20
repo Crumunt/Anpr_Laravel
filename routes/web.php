@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GatePassController;
 use App\Http\Controllers\Admin\VehicleController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/test', fn() => view('testing'));
 
 Route::prefix('admin')->name('admin.')->group(function () {
     

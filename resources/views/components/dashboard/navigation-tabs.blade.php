@@ -3,7 +3,7 @@
     'tabs' => ['Applicants', 'Registered Vehicles', 'RFID Management'],
 ])
 
-<div class="border-b px-6 py-4">
+<div class="border-b border-gray-200 px-6 py-4">
     <div class="flex border-b border-gray-200">
         <!-- Loop through tabs and generate buttons for each -->
         @foreach ($tabs as $tab)

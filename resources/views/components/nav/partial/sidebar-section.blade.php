@@ -10,5 +10,5 @@
         {{ $slot }}
     </div>
     
-    <div class="my-3 h-px bg-white bg-opacity-10"></div>
+    <div class="my-3 h-px bg-white/10"></div>
 </div>

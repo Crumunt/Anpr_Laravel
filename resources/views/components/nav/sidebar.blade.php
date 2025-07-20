@@ -15,7 +15,7 @@
         <!-- Logo -->
         <div class="sidebar-header flex flex-col items-center px-6 py-5 h-auto border-b border-white border-opacity-10 relative">
             <!-- Logo image linked directly -->
-            <div class="w-full h-20 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
+            <div class="w-full h-20 bg-transparent rounded-lg flex items-center justify-center mb-3">
                 <img src="{{ asset($appLogoPath) }}" alt="CLSU Logo" class="max-h-full max-w-full object-contain">
     <!-- Fallback if image fails to load -->
                <!-- <i class="fas fa-image text-3xl text-white opacity-70 hidden" aria-hidden="true"></i> -->

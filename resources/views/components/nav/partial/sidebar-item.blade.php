@@ -38,7 +38,7 @@
     class="flex items-center px-4 py-3 text-white rounded-lg {{$classes}}"
     @if($isActive) aria-current="page" @endif
 >
-    <div class="bg-white bg-opacity-10 w-8 h-8 rounded-md flex items-center justify-center">
+    <div class="bg-white/10 backdrop-blur-md w-8 h-8 rounded-md flex items-center justify-center">
         @if($fontAwesomeIcon)
             <i class="fas {{ $fontAwesomeClass }}" aria-hidden="true"></i>
         @else
