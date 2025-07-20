@@ -20,7 +20,7 @@ class VehicleSeeder extends Seeder
         $vehicleTypes = ['Sedan', 'SUV', 'Motorcycle', 'Van'];
         $vehicleMakes = ['Toyota', 'Honda', 'Ford', 'Mitsubishi', 'Chevrolet', 'Hyundai', 'Nissan'];
 
-        for ($i = 1; $i <= 30; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             $make = $faker->randomElement($vehicleMakes);
 
             Vehicle::create([

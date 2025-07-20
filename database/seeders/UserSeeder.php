@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        for ($i = 1; $i < 30; $i++) {
+        for ($i = 1; $i < 100; $i++) {
             ModelsUser::create([
                 'user_id' => $faker->optional(0.3)->numberBetween(1000, 9999),
                 'first_name' => $faker->firstName(),
