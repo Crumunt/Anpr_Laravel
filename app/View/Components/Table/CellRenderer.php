@@ -19,13 +19,12 @@ class CellRenderer extends Component
 
 
 
-    public function __construct($key, $value, $row = [], $type)
+    public function __construct($value)
     {
         //
-        $this->key = $key;
         $this->value = $value;
-        $this->row = $row;
-        $this->type = $type;
+
+
     }
 
     /**
@@ -34,7 +33,7 @@ class CellRenderer extends Component
     public function render(): View|Closure|string
     {
 
-        $badge = ApplicationTableHelper::renderCellBadge($this->key, $this->row, $this->type);
+        $badge = ApplicationTableHelper::renderCellBadge($this->value);
 
         return view('components.table.cell-renderer', [
             'badge' => $badge,

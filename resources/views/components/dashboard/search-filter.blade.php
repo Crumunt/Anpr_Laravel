@@ -3,7 +3,7 @@
 'title' => 'Filter and Search',
 'searchPlaceholder' => 'Search...',
 'filterOptions' => [
-    'all' => 'All Statuses',
+    '' => 'All Statuses',
     'pending' => 'Pending',
     'approved' => 'Approved',
     'rejected' => 'Rejected',
@@ -18,9 +18,9 @@
 ],
 'typeOptions' => [
     'applicant' => [
-        'resident' => 'Resident',
-        'employee' => 'Employee',
-        'visitor' => 'Visitor'
+        'student' => 'Student',
+        'faculty' => 'Faculty',
+        'staff' => 'Staff'
     ],
     'vehicle' => [
         'motorcycle' => 'Motorcycle',

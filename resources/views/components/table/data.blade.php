@@ -76,12 +76,13 @@
 </style>
 
 
-<div x-data="applicationTable({{ count($rows) }})" 
+<div x-data="applicationTable({{ count($rows) }})"
     class="w-full bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md border border-gray-100 overflow-hidden">
     <!-- Selection indicator and bulk actions -->
     <div x-show="selectedRows.length > 0" x-cloak x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 transform -translate-y-4"
-        x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform -translate-y-4"
         class="bg-green-50 border-b border-green-100 px-4 py-2 flex items-center justify-between top-0 z-40">
@@ -108,13 +109,9 @@
                     <div class="p-1">
                         @foreach ($bulkActionBtns as $btn)
                             @php $click = "executeBulkAction('{$btn['key']}', \$event)"; @endphp
-                            
-                            <x-ui.action-button
-                                :click="$click"
-                                :action="$btn['action']"
-                                :label="$bulkActions[$btn['key']]"
-                                variant="bulk"
-                            />   
+
+                            <x-ui.action-button :click="$click" :action="$btn['action']" :label="$bulkActions[$btn['key']]"
+                                variant="bulk" />
                         @endforeach
                     </div>
                 </div>
@@ -134,29 +131,21 @@
                 @if ($type === 'admin')
                     <!-- Admin-specific actions -->
                     @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action,['view', 'approve']))
+                        @if (in_array($action, ['view', 'approve']))
                             @continue
                         @endif
-                        <x-ui.action-button 
-                            :action="$action"
-                            :label="$data['label']"
-                            :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'"
-                        />
-                    
+                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
+
                     @endforeach
                 @else
-                <!-- Default actions for non-admin types -->
+                    <!-- Default actions for non-admin types -->
                     @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action,['edit', 'deactivate', 'reset_password']))
+                        @if (in_array($action, ['edit', 'deactivate', 'reset_password']))
                             @continue
                         @endif
-                        <x-ui.action-button 
-                            :action="$action"
-                            :label="$data['label']"
-                            :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'"
-                        />
+                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
                     @endforeach
-                    
+
                 @endif
             </div>
         </div>
@@ -172,7 +161,7 @@
                     @if ($showCheckboxes)
                         <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 w-[50px]">
                             <div class="checkbox-wrapper">
-                            <x-table.checkbox-cell variant="bulk" />
+                                <x-table.checkbox-cell variant="bulk" />
                             </div>
                         </th>
                     @endif
@@ -181,54 +170,15 @@
                         @php
                             $header = is_array($header) ? $header : ['key' => $header, 'label' => $header];
                         @endphp
-                        <x-table.header-cell 
-                            :label="$header['label']" 
-                            :width="$header['width'] ?? 'auto'"
-                        />
+                        <x-table.header-cell :label="$header['label']" :width="$header['width'] ?? 'auto'" />
                     @endforeach
                     @if ($showActions)
-                        <x-table.header-cell label="Actions" text_alignment="right"/>
+                        <x-table.header-cell label="Actions" text_alignment="right" />
                     @endif
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-                @foreach ($rows as $index => $row)
-                    <tr @click="toggleRow({{ $index }}, $event)"
-                        class="group relative cursor-pointer transition-all duration-300 hover:bg-green-50/80 hover:shadow-sm hover:-translate-y-0.5"
-                        :class="{ 'bg-green-50/60': isSelected({{ $index }}) }">
-
-                        @if ($showCheckboxes)
-                            <x-table.data-cell>
-                                <x-table.checkbox-cell :index="$index" :is-selected="'isSelected'"/>
-                            </x-table.data-cell>
-                        @endif
-
-                        @foreach ($headers as $header)
-                            @php
-                                $key = $header['key'] ?? $header['label'];
-                                $value = $row[$key] ?? null;
-                                $highlightClass = $getHighlightClass($key);
-                            @endphp
-
-                            <x-table.data-cell :class="$highlightClass">
-
-                                <x-table.cell-renderer 
-                                    :key="$key" 
-                                    :row="$row" 
-                                    :type="$type" 
-                                    :value="$value" 
-                                />
-
-                            </x-table.data-cell>
-                            
-                        @endforeach
-                        @if ($showActions)
-                            <x-table.data-cell class="text-right">
-                                <x-row-action-menu :index="$index"/>
-                            </x-table.data-cell>
-                        @endif
-                    </tr>
-                @endforeach
+            <tbody class="divide-y divide-gray-100" id="user_data">
+                @include('components.table.partials.data-rows')
             </tbody>
         </table>
     </div>
@@ -242,6 +192,12 @@
             }
         }))
     })
+
+    window.tableConfig = {
+        showCheckboxes: json($showCheckboxes),
+        showActions: json($showActions),
+        headers: json($headers),
+    };
 </script>
 
 <script src="{{ asset('js/components/data.js') }}"></script>

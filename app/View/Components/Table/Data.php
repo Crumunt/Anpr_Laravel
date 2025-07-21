@@ -15,7 +15,7 @@ class Data extends Component
     public array $headers;
     public string $context;
     public string $tab;
-    public array $rows;
+    public $rows;
     public string $type;
     public string $caption;
     public bool $showCheckboxes;
@@ -28,7 +28,7 @@ class Data extends Component
     public function __construct(
         string $context = '',
         string $tab = 'default',
-        array $rows = [],
+        $rows = [],
         string $type = 'applicant',
         string $caption = 'List of applicants and their status',
         bool $showCheckboxes = true,

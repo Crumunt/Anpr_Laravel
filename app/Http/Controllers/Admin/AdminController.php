@@ -138,6 +138,6 @@ class AdminController extends Controller
             ];
         }
 
-        return ['all' => $all, 'active' => $active, 'inactive' => $inactive];
+        return ['all' => $all, 'active' => $active, 'inactive' => $inactive, 'paginate' => $users];
     }
 }

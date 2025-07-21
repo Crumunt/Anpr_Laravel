@@ -3,7 +3,6 @@
 namespace App\View\Components;
 
 use App\Helpers\ApplicationTableHelper;
-use App\Helpers\BadgeHelper;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -15,27 +14,19 @@ class Badge extends Component
      */
 
     public string $label;
-    public string $type;
     public string $class;
 
-    public function __construct($label, string $type = 'status')
+    public function __construct($label)
     {
         //
 
         $this->label = $label ?? 'test';
-        $this->type = $type;
 
-        $this->class = $this->resolveClass($label, $type);
+        $this->class = $this->resolveClass($label);
     }
 
-    private function resolveClass($label, $type) {
-        return match($type) {
-
-            'status' => ApplicationTableHelper::statusClass($label),
-            'role' => ApplicationTableHelper::roleClass($label),
-            default => 'bg-gray-100 text-gray-800',
-
-        };
+    private function resolveClass($label) {
+        return ApplicationTableHelper::renderBadgeClass($label);
     }
 
     /**

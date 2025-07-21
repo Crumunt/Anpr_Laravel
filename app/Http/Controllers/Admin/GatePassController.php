@@ -26,7 +26,7 @@ class GatePassController extends Controller
         //
         $gatePasses = $this->getGatePasses();
 
-        return view('admin.gate_passes.index', compact('gatePasses'));
+        return view('admin.gate_passes.index', compact('gatePasses', ));
     }
 
     /**
@@ -91,6 +91,6 @@ class GatePassController extends Controller
             ];
         }
 
-        return $rows;
+        return ['rows' => $rows, 'vehicles' => $vehicles];
     }
 }

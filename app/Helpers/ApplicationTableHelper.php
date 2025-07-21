@@ -4,6 +4,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class ApplicationTableHelper
 {
@@ -46,7 +47,7 @@ class ApplicationTableHelper
                     ]
                 },
             'user_applicant' => match ($tab) {
-                    'default' => [
+                    default => [
                         ...$base,
                         ['key' => 'status', 'label' => 'Status', 'width' => '120px'],
                         ['key' => 'vehicles', 'label' => 'Vehicles', 'width' => '100px'],
@@ -58,31 +59,30 @@ class ApplicationTableHelper
     }
 
 
-    public static function statusClass($status)
+    public static function renderBadgeClass($label)
     {
-        return match ($status) {
+        return match ($label) {
             'Active', 'Registered', 'Approved' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60',
             'Inactive' => 'bg-gray-100/80 text-gray-800 hover:bg-gray-200/60',
             'Pending' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60',
+            'Super Admin' => 'bg-purple-100/80 text-purple-800 hover:bg-purple-200/60',
+            'Admin' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
+            'Encoder' => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
             default => 'bg-red-100/80 text-red-800 hover:bg-red-200/60',
         };
     }
 
-
-    public static function roleClass($role)
+    public static function renderCellBadge($key)
     {
-        return match ($role) {
-            'Super Admin' => 'bg-purple-100/80 text-purple-800 hover:bg-purple-200/60',
-            'Admin' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
-            default => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
-        };
-    }
+        $admin = [
+            'Super Admin',
+            'Admin',
+            'Encoder',
+        ];
 
-    public static function renderCellBadge(string $key, mixed $row, string $type)
-    {
         return match (true) {
-            $key === 'status' && (is_array($row) ?? null) => ['type' => 'status', 'label' => $row['status']['label']],
-            $key === 'role' && $type === 'admin' => ['type' => 'role', 'label' => $row[$key]],
+            is_array($key) => ['type' => 'status', 'label' => $key['label']],
+            in_array($key, $admin) => ['type' => 'role', 'label' => $key],
             default => null
         };
     }
@@ -98,7 +98,8 @@ class ApplicationTableHelper
         ];
     }
 
-    public static function getVehicleName($vehicle_make, $vehicle_model) {
+    public static function getVehicleName($vehicle_make, $vehicle_model)
+    {
         return $vehicle_make . ' ' . $vehicle_model;
     }
 

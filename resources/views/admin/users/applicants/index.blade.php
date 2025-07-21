@@ -1,9 +1,11 @@
 @extends('layouts.app-layout')
 @section('main-content')
-<body style="background-color: #f9fafb;">
-<div class="flex-1 md:ml-64 p-6 pt-24">
-<!-- Dashboard Cards -->
-        <div class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
+
+
+    <div class="flex-1 md:ml-64 p-6 pt-24">
+        <!-- Dashboard Cards -->
+        <div
+            class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
             <div dir="ltr" class="w-full">
             </div>
             <div class="p-6">
@@ -12,12 +14,12 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Applicant Management</h2>
                         <div class="flex space-x-2">
-                            <x-dashboard.buttons
-                                :icon="false"
-                                class="bg-emerald-600 hover:bg-emerald-700"
+                            <x-dashboard.buttons :icon="false" class="bg-emerald-600 hover:bg-emerald-700"
                                 data-open-modal="applicant-modal">
                                 <span slot="icon" class="mr-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <path d="M8 12h8"></path>
                                         <path d="M12 8v8"></path>
@@ -28,23 +30,86 @@
                         </div>
                     </div>
                     <x-details.modal id="applicant-modal" type="applicant" action="add" />
-                    
+
                     <!-- Moved search filter inside the space-y-6 container -->
                     <x-dashboard.search-filter :showType="'applicant'" />
-                    
+
                     <!-- Removed mt-6 since space-y-6 will handle spacing -->
-                    <div class="w-full space-y-6">
-                        <x-table.data
-                            :type="'applicant'"
-                            context="user_applicant"
-                            :rows="$userDetails"
+                    <div class="w-full space-y-6" id="table_wrapper">
+                        <x-table.data :type="'applicant'" context="user_applicant" :rows="$userDetails"
                             caption="Applicants list for Summer 2024 Program" />
-                        <x-dashboard.pagination></x-dashboard.pagination>
+                    </div>
+                    <div id="pagination">
+                        <x-pagination :pagination="$users" />
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <x-footer.footer></x-footer.footer>
-</body>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', 'nav[role=navigation] a', function (e) {
+                e.preventDefault();
+                const url = $(this).attr('href');
+                const filters = $('#statusFilter').serialize();
+                const separator = url.includes('?') ? '&' : '?';
+
+                fetchApplicants(url + separator + filters);
+            });
+            // END FUNCTION
+
+            $(document).on('change', '#statusFilter', function (e) {
+                e.preventDefault()
+                const url = '/Anpr_Laravel/public/admin/applicant';
+                var filter = $(this).serialize();
+                const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
+                const query = types + '&' + filter;
+
+                fetchApplicants(url + '?' + query);
+
+            }); //END FUNCTION
+
+            $(document).on('change', '#applicantTypeFilterDropdown input[type="checkbox"]', function (e) {
+                const url = '/Anpr_Laravel/public/admin/applicant';
+                const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
+                const filter = $('#statusFilter').serialize();
+                const query = types + '&' + filter;
+
+                fetchApplicants(url + '?' + query);
+            });
+
+
+            function fetchApplicants(url, data = null) {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    data: data,
+                    beforeSend: function () {
+                        console.log(url)
+                        Swal.fire({
+                            title: 'Loading...',
+                            text: 'Hang tight — getting your data....',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    success: function (response) {
+                        Swal.close();
+                        console.log(response)
+                        $('#user_data').html(response.rows);
+                        $('#pagination').html(response.pagination);
+                    },
+                    error: function () {
+                        alert('Failed to load data.');
+                    }
+                });
+            }
+        })
+    </script>
 @endsection

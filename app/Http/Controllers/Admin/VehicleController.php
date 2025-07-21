@@ -90,6 +90,6 @@ class VehicleController extends Controller
             ];
         }
 
-        return $rows;
+        return ['rows' => $rows, 'vehicles' => $vehicles];
     }
 }
