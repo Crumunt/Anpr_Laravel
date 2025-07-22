@@ -104,7 +104,10 @@ class AdminController extends Controller
             'Admin'
         ];
 
-        $users = User::with('statuses', 'roles')->where('role_id', '<=', 4)->paginate(10);
+        $users = User::with('statuses')
+            ->whereHas('roles', function ($q) {
+                $q->where('id', '<=', 4);
+            })->paginate(10);
         $all = [];
         $active = [];
         $inactive = [];
@@ -115,7 +118,7 @@ class AdminController extends Controller
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
-                'role' => $user->roles->name,
+                'role' => ucwords($user->roles->first()?->name),
                 'status' => ['label' => ucfirst(string: $user->statuses->status_name)],
                 'lastLogin' => $this->faker->date(),
             ];

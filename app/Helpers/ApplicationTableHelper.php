@@ -68,6 +68,7 @@ class ApplicationTableHelper
             'Super Admin' => 'bg-purple-100/80 text-purple-800 hover:bg-purple-200/60',
             'Admin' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
             'Encoder' => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
+            'Security Staff' => 'bg-rose-100/80 text-rose-800 hover:bg-rose-200/60',
             default => 'bg-red-100/80 text-red-800 hover:bg-red-200/60',
         };
     }
@@ -78,6 +79,7 @@ class ApplicationTableHelper
             'Super Admin',
             'Admin',
             'Encoder',
+            'Security Staff'
         ];
 
         return match (true) {

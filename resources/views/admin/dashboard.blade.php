@@ -59,7 +59,6 @@
                         <div x-show="activeTab === 'Gate Pass Management'" x-transition>
                             <x-table.data :type="'rfid'" context="gate_pass" :rows="$gatePasses" caption="RFID Tags Management list" />
                         </div>
-                        <x-dashboard.pagination></x-dashboard.pagination>
                     </div>
                 </div>
             </div>

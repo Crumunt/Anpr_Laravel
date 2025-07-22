@@ -1,4 +1,4 @@
 @props(['pagination'])
 <div>
-    {{ $pagination->onEachSide(5)->links() }}
+    {{ $pagination->onEachSide(2) }}
 </div>

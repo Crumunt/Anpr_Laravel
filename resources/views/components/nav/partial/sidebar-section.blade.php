@@ -9,6 +9,6 @@
     <div class="space-y-1">
         {{ $slot }}
     </div>
-    
+
     <div class="my-3 h-px bg-white/10"></div>
 </div>

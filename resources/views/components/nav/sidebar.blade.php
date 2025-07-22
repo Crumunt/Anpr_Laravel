@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 sidebar text-white flex flex-col z-50 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 smooth-transition">
         <!-- Logo -->
-        <div class="sidebar-header flex flex-col items-center px-6 py-5 h-auto border-b border-white border-opacity-10 relative">
+        <div class="sidebar-header flex flex-col items-center px-6 py-5 h-auto border-b border-[rgba(255,255,255,0.1)] relative">
             <!-- Logo image linked directly -->
             <div class="w-full h-20 bg-transparent rounded-lg flex items-center justify-center mb-3">
                 <img src="{{ asset($appLogoPath) }}" alt="CLSU Logo" class="max-h-full max-w-full object-contain">
@@ -42,7 +42,7 @@
         </nav>
         
         <!-- Logout button -->
-        <div class="p-4 border-t border-white border-opacity-10">
+        <div class="p-4 border-t border-[rgba(255,255,255,0.1)]">
             <x-nav.partial.sidebar-item 
                 title="Logout" 
                 action="logout()" 

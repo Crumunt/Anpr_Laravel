@@ -78,7 +78,10 @@ class DashboardController extends Controller
 
     private function getUsers()
     {
-        $users = User::with('vehicles', 'statuses')->where('role_id', '>', 4)->paginate(10);
+        $users = User::with('vehicles', 'statuses')
+                    ->whereHas('roles', function($q) {
+                        $q->where('id', '>', 4);
+                    })->paginate(10);
         $userDetails = [];
 
         foreach ($users as $user) {

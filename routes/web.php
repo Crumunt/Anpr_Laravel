@@ -7,26 +7,28 @@ use App\Http\Controllers\Admin\GatePassController;
 use App\Http\Controllers\Admin\VehicleController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', fn() => view('auth.login'));
+
 Route::get('/test', fn() => view('testing'));
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    
+
     Route::get('/', [DashboardController::class, 'index'])->name('welcome');
 
     Route::get('/applicant', [ApplicantController::class, 'index'])->name('applicant');
 
     Route::get('/applicant/{id}', fn($id) => view('admin.users.applicants.show', ['id' => $id]))->name('applicant.show-details');
-    
+
     Route::get('/gate-pass', [GatePassController::class, 'index'])->name('gate_passes.index');
-    
+
     Route::get('/gate-pass/{id}', fn($id) => view('admin.gate_passes.show', ['id' => $id]))->name('gate_passes.show');
-    
+
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles');
-    
+
     Route::get('/vehicles/{id}', fn($id) => view('admin.vehicles.show', ['id' => $id]))->name('vehicles.show');
-    
+
     Route::get('/admins', [AdminController::class, 'index'])->name('admins');
-    
+
 });
 
 //sa applicant form route

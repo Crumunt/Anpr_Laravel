@@ -51,8 +51,8 @@ class RolePermissionSeeder extends Seeder
         }
 
         $roles = [
-            'Super Admin' => Permission::all()->pluck('name')->toArray(),
-            'Admin' => [
+            'super admin' => Permission::all()->pluck('name')->toArray(),
+            'admin' => [
                 'view_users',
                 'create_users',
                 'edit_users',
@@ -75,11 +75,11 @@ class RolePermissionSeeder extends Seeder
                 'edit_roles',
                 'delete_roles',
             ],
-            'Security Staff' => [
+            'security staff' => [
                 'view_anpr_logs',
                 'view_vehicles'
             ],
-            'Encoder' => [
+            'encoder' => [
                 'view_users',
                 'create_users',
 
@@ -89,17 +89,17 @@ class RolePermissionSeeder extends Seeder
                 'view_gate_passes',
                 'create_gate_passes',
             ],
-            'Student' => [
+            'student' => [
                 'submit_application',
                 'view_application_status',
                 'view_application_profile',
             ],
-            'Faculty' => [
+            'faculty' => [
                 'submit_application',
                 'view_application_status',
                 'view_application_profile',
             ],
-            'Staff' => [
+            'staff' => [
                 'submit_application',
                 'view_application_status',
                 'view_application_profile',

@@ -10,11 +10,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +31,6 @@ class User extends Authenticatable
         'password',
         'phone_number',
         'license',
-        'role_id',
         'status_id',
     ];
 
@@ -63,9 +63,5 @@ class User extends Authenticatable
 
     public function statuses() {
         return $this->belongsTo(Status::class, 'status_id');
-    }
-
-    public function roles() {
-        return $this->belongsTo(Role::class, 'role_id');
     }
 }

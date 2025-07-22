@@ -16,7 +16,9 @@ class ApplicantController extends Controller
     public function index(Request $request)
     {
         $query = User::with('vehicles', 'statuses')
-            ->where('role_id', '>', 4);
+            ->whereHas('roles', function ($q) {
+                $q->where('id', '>', 4);
+            });
 
         if ($request->filled('status')) {
             $query->whereHas('statuses', fn($q) => $q->where('status_name', $request->status));
@@ -55,7 +57,7 @@ class ApplicantController extends Controller
 
         }
 
-        $users = $query->paginate(10);
+        $users = $query->paginate(5);
 
         $userDetails = $users->map(
             fn($user) =>
@@ -78,7 +80,6 @@ class ApplicantController extends Controller
 
         // AJAX REQUEST WAS MADE?
         if ($request->ajax()) {
-
             return response()->json([
                 'rows' => view('components.table.partials.data-rows', [
                     'rows' => $userDetails,
@@ -86,7 +87,7 @@ class ApplicantController extends Controller
                     'showActions' => true,
                     'headers' => ApplicationTableHelper::headerHelper('user_applicant', '')
                 ])->render(),
-                'pagination' => view('components.pagination', ['pagination' => $users])->render()
+                'pagination' => view('components.pagination', ['pagination' => $users->links()])->render()
             ]);
         }
 
