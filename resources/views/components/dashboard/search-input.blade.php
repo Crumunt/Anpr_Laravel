@@ -13,7 +13,7 @@
 ])
 
 @php
-    $inputId = $id ?? 'searchInput-' . uniqid();
+    $inputId = ($id) ? "searchInput-$id":'searchInput';
     $clearBtnId = $clearButtonId ?? 'clearSearchBtn-' . uniqid();
     
     // Size classes
@@ -57,7 +57,6 @@
         name="{{ $name }}"
         class="w-full border px-3 py-2 shadow-sm transition-all duration-300 {{ $sizeClasses }} {{ $variantClasses }} {{ $roundedClasses }} placeholder:text-gray-400 group-hover:border-gray-300"
         placeholder="{{ $placeholder }}"
-        value="{{ request($name) }}"
     />
     
     <button

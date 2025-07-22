@@ -97,7 +97,7 @@
             <x-dashboard.search-input
                 :placeholder="$searchPlaceholder"
                 name="search"
-                id="searchInput"
+                id="table"
                 class="w-full md:w-auto"
                 clearButtonId="clearSearchBtn" />
                 
@@ -244,12 +244,6 @@
                                 </div>
                                 @endif
                                 
-                                <!-- Clear Filters Button -->
-                                <div class="text-right mt-4" id="clearFiltersContainer" style="display: none;">
-                                    <button type="button" id="clearAllFiltersBtn" class="text-xs text-green-600 hover:text-green-700 transition-colors">
-                                        Clear All Filters
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>

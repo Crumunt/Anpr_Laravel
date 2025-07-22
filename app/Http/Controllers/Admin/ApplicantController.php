@@ -28,6 +28,33 @@ class ApplicantController extends Controller
             $query->whereHas('roles', fn($q) => $q->whereIn('name', $types));
         }
 
+        $sortOptions = [
+            'newest' => ['created_at', 'asc'],
+            'oldest' => ['created_at', 'desc'],
+            'a-z' => ['first_name', 'asc'],
+            'z-a' => ['first_name', 'desc'],
+        ];
+
+        if ($request->filled('sort_by') && isset($sortOptions[$request->sort_by])) {
+            [$column, $direction] = $sortOptions[$request->sort_by];
+            $query->orderBy($column, $direction);
+        }
+
+        if ($request->filled('search')) {
+            $terms = explode(' ', $request->search);
+
+            $query->where('user_id', '=', $request->search);
+            $query->orWhere('email', 'like', "%{$request->search}%");
+
+            $query->orWhere(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $q->where('first_name', 'like', "{$term}%")
+                        ->orWhere('last_name', $term);
+                }
+            });
+
+        }
+
         $users = $query->paginate(10);
 
         $userDetails = $users->map(
@@ -63,6 +90,7 @@ class ApplicantController extends Controller
             ]);
         }
 
+        // DEFAULT NO AJAX REQUEST
         return view('admin.users.applicants.index', compact('userDetails', 'users'));
     }
 

@@ -72,6 +72,14 @@
 
             }); //END FUNCTION
 
+            $(document).on('change', '#sortByFilter', function (e) {
+                e.preventDefault();
+                const url = '/Anpr_Laravel/public/admin/applicant';
+                var filter = $(this).serialize();
+
+                fetchApplicants(url + '?' + filter);
+            })
+
             $(document).on('change', '#applicantTypeFilterDropdown input[type="checkbox"]', function (e) {
                 const url = '/Anpr_Laravel/public/admin/applicant';
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
@@ -79,29 +87,54 @@
                 const query = types + '&' + filter;
 
                 fetchApplicants(url + '?' + query);
-            });
+            }); //END FUNCTION
 
+            $(document).on('click', '#resetBtn', function (e) {
+                e.preventDefault()
+                $('#activeFilters').empty();
+                $('#filterCount').remove();
+                $('#statusFilter option').prop('selected', function() {
+                    return $(this).defaultSelected;
+                });
+                const url = '/Anpr_Laravel/public/admin/applicant';
+                fetchApplicants(url);
+            }); //END FUNCTION
 
-            function fetchApplicants(url, data = null) {
+            let debounceTimer = null;
+            $(document).on('keyup', '#searchInput-table', function () {
+                if (debounceTimer) clearTimeout(debounceTimer)
+                const url = '/Anpr_Laravel/public/admin/applicant';
+                var search = $(this).val()
+                var query = 'search=' + search;
+                showLoadModal = false
+                debounceTimer = setTimeout(function () {
+                    $('#activeFilters').empty();
+                    $('#filterCount').remove();
+                    fetchApplicants(url + '?' + query, showLoadModal);
+                }, 300)
+            }); //END FUNCTION
+
+            function fetchApplicants(url, showLoad = true) {
                 $.ajax({
                     url: url,
                     type: 'GET',
-                    data: data,
                     beforeSend: function () {
-                        console.log(url)
-                        Swal.fire({
-                            title: 'Loading...',
-                            text: 'Hang tight — getting your data....',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
+                        // console.log(url)
+                        if (showLoad) {
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Hang tight — getting your data....',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                        }
                     },
                     success: function (response) {
-                        Swal.close();
-                        console.log(response)
+                        if (showLoad) Swal.close();
+                        // console.log(response)
                         $('#user_data').html(response.rows);
                         $('#pagination').html(response.pagination);
                     },
@@ -110,6 +143,6 @@
                     }
                 });
             }
-        })
+        });
     </script>
 @endsection

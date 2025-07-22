@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function resetAllFilters() {
         activeFiltersList = [];
-        if (statusFilter) statusFilter.value = "all";
+        if (statusFilter) statusFilter.value = "";
         if (adminStatusFilter) adminStatusFilter.value = "all";
 
         // Reset all type checkboxes
@@ -262,11 +262,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateTypeSelectionLabel();
         updateActiveFilters();
 
-        // Submit form to reset all filters
-        const form = resetBtn ? resetBtn.closest("form") : null;
-        if (form) {
-            form.submit();
-        }
     }
 
     // Search functionality with improved clear button
@@ -296,7 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (
             statusFilter &&
             urlParams.has("status") &&
-            urlParams.get("status") !== "all"
+            urlParams.get("status") !== ""
         ) {
             activeFiltersList.push({
                 type: "status",
