@@ -13,7 +13,7 @@ class ApplicationTableHelper
     public static function headerHelper($context = 'user_admin', $tab = '')
     {
         $base = [
-            ['key' => 'id', 'label' => 'ID', 'width' => '200px'],
+            ['key' => 'user_id', 'label' => 'ID', 'width' => '200px'],
             ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
             ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
             ['key' => 'phone_number', 'label' => 'Phone', 'width' => '150px'],

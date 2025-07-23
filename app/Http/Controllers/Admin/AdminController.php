@@ -115,6 +115,7 @@ class AdminController extends Controller
         foreach ($users as $user) {
             $all[] = [
                 'id' => $user->id,
+                'user_id' => $user->id,
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
@@ -124,6 +125,7 @@ class AdminController extends Controller
             ];
             $active[] = [
                 'id' => $user->id,
+                'user_id' => $user->id,
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
@@ -132,6 +134,7 @@ class AdminController extends Controller
             ];
             $inactive[] = [
                 'id' => $user->id,
+                'user_id' => $user->id,
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,

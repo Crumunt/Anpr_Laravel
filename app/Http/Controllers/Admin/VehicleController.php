@@ -84,6 +84,7 @@ class VehicleController extends Controller
         $rows = [];
         foreach($vehicles as $vehicle) {
             $rows[] = [
+                'id' => $vehicle->id,
                 'vehicle' => ApplicationTableHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
                 'owner' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
                 'registration_date' => $vehicle->created_at

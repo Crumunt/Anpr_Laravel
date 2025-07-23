@@ -54,10 +54,12 @@
             $(document).on('click', 'nav[role=navigation] a', function (e) {
                 e.preventDefault();
                 const url = $(this).attr('href');
+                const search = 'search=' + $('#searchInput-table').val();
                 const filters = $('#statusFilter').serialize();
-                const separator = url.includes('?') ? '&' : '?';
+                const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
+                const query = '&' + filters + '&' + types +'&' + search 
 
-                fetchApplicants(url + separator + filters);
+                fetchApplicants(url + '&' + query);
             });
             // END FUNCTION
 
@@ -104,14 +106,14 @@
             $(document).on('keyup', '#searchInput-table', function () {
                 if (debounceTimer) clearTimeout(debounceTimer)
                 const url = '/Anpr_Laravel/public/admin/applicant';
-                var search = $(this).val()
+                var search = $(this).val();
                 var query = 'search=' + search;
                 showLoadModal = false
                 debounceTimer = setTimeout(function () {
                     $('#activeFilters').empty();
                     $('#filterCount').remove();
                     fetchApplicants(url + '?' + query, showLoadModal);
-                }, 300)
+                }, 250)
             }); //END FUNCTION
 
             function fetchApplicants(url, showLoad = true) {
@@ -119,7 +121,7 @@
                     url: url,
                     type: 'GET',
                     beforeSend: function () {
-                        // console.log(url)
+                        console.log(url)
                         if (showLoad) {
                             Swal.fire({
                                 title: 'Loading...',

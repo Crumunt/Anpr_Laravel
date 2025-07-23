@@ -85,6 +85,7 @@ class GatePassController extends Controller
         $rows = [];
         foreach ($vehicles as $vehicle) {
             $rows[] = [
+                'id' => $vehicle->id,
                 'gate_pass' => $vehicle->assigned_gate_pass,
                 'status' => ['label' => ucfirst( $vehicle->status->status_name)],
                 'assigned_to' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)

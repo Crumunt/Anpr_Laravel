@@ -45,7 +45,7 @@ class ApplicantController extends Controller
         if ($request->filled('search')) {
             $terms = explode(' ', $request->search);
 
-            $query->where('user_id', '=', $request->search);
+            $query->where('user_id', 'like', "{$request->search}%");
             $query->orWhere('email', 'like', "%{$request->search}%");
 
             $query->orWhere(function ($q) use ($terms) {
@@ -57,12 +57,13 @@ class ApplicantController extends Controller
 
         }
 
-        $users = $query->paginate(5);
+        $users = $query->paginate(10);
 
         $userDetails = $users->map(
             fn($user) =>
             [
-                'id' => $user->user_id ?? '-',
+                'id' => $user->id,
+                'user_id' => $user->user_id ?? '-',
                 'name' => ApplicationTableHelper::getFullNameAttribute(
                     $user->first_name,
                     $user->middle_name,
@@ -87,7 +88,7 @@ class ApplicantController extends Controller
                     'showActions' => true,
                     'headers' => ApplicationTableHelper::headerHelper('user_applicant', '')
                 ])->render(),
-                'pagination' => view('components.pagination', ['pagination' => $users->links()])->render()
+                'pagination' => view('components.pagination', ['pagination' => $users])->render()
             ]);
         }
 

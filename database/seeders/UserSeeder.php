@@ -68,7 +68,10 @@ class UserSeeder extends Seeder
         ];
         for ($i = 1; $i < 100; $i++) {
             $applicant = ModelsUser::create([
-                'user_id' => $faker->optional(0.3)->numberBetween(1000, 9999),
+                'user_id' => $faker->optional(0.9) ->randomElement([
+                    $faker->numerify('##-####'),
+                    $faker->numerify('EMP-#####'),
+                ]),
                 'first_name' => $faker->firstName(),
                 'middle_name' => $faker->optional(0.3)->lastName(),
                 'last_name' => $faker->lastName(),
