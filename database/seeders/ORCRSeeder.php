@@ -15,9 +15,9 @@ class ORCRSeeder extends Seeder
     public function run(): void
     {
         //
-        for($i = 1; $i <= 100; $i++) {
+        for($i = 7; $i < 906; $i++) {
             VehicleOrcr::create([
-                'vehicle_id' => $i + 5,
+                'vehicle_id' => $i,
                 'document_path' => Str::random(16)
             ]);
         }

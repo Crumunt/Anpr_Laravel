@@ -123,4 +123,15 @@ class ApplicationTableHelper
         return implode('', $initials); // e.g., "R.J."
     }
 
+    public static function formatPhoneNumber($phoneNumber)
+    {
+
+        if (preg_match('/^(\d{4})(\d{3})(\d{4})$/', $phoneNumber, $matches)) {
+            return "$matches[1]-$matches[2]-$matches[3]";
+        }
+
+        return $phoneNumber;
+
+    }
+
 }

@@ -150,7 +150,7 @@ class DashboardController extends Controller
             $percentageChange = $currentMonthCount > 0 ? 100 : 0;
         }
 
-        return $percentageChange;
+        return round($percentageChange, 2);
     }
 
     private function getUsers()
@@ -167,9 +167,9 @@ class DashboardController extends Controller
                 'user_id' => $user->user_id ?? '-',
                 'name' => ApplicationTableHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
                 'email' => $user->email,
-                'phone_number' => $user->phone_number,
+                'phone_number' => ApplicationTableHelper::formatPhoneNumber($user->phone_number),
                 'status' => ['label' => ucfirst($user->statuses->status_name)],
-                'submitted_date' => $user->created_at,
+                'submitted_date' => $user->created_at->format('F d, Y'),
                 'vehicles' => count($user->vehicles)
             ];
         }

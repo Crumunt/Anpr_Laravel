@@ -57,7 +57,7 @@
                 const search = 'search=' + $('#searchInput-table').val();
                 const filters = $('#statusFilter').serialize();
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
-                const query = '&' + filters + '&' + types +'&' + search 
+                const query = '&' + filters + '&' + types + '&' + search
 
                 fetchApplicants(url + '&' + query);
             });
@@ -65,7 +65,7 @@
 
             $(document).on('change', '#statusFilter', function (e) {
                 e.preventDefault()
-                const url = '/Anpr_Laravel/public/admin/applicant';
+                const url = "{{ route('admin.applicant') }}";
                 var filter = $(this).serialize();
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
                 const query = types + '&' + filter;
@@ -76,14 +76,14 @@
 
             $(document).on('change', '#sortByFilter', function (e) {
                 e.preventDefault();
-                const url = '/Anpr_Laravel/public/admin/applicant';
+                const url = "{{ route('admin.applicant') }}";
                 var filter = $(this).serialize();
 
                 fetchApplicants(url + '?' + filter);
             })
 
             $(document).on('change', '#applicantTypeFilterDropdown input[type="checkbox"]', function (e) {
-                const url = '/Anpr_Laravel/public/admin/applicant';
+                const url = "{{ route('admin.applicant') }}";
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
                 const filter = $('#statusFilter').serialize();
                 const query = types + '&' + filter;
@@ -95,17 +95,17 @@
                 e.preventDefault()
                 $('#activeFilters').empty();
                 $('#filterCount').remove();
-                $('#statusFilter option').prop('selected', function() {
+                $('#statusFilter option').prop('selected', function () {
                     return $(this).defaultSelected;
                 });
-                const url = '/Anpr_Laravel/public/admin/applicant';
+                const url = "{{ route('admin.applicant') }}";
                 fetchApplicants(url);
             }); //END FUNCTION
 
             let debounceTimer = null;
             $(document).on('keyup', '#searchInput-table', function () {
                 if (debounceTimer) clearTimeout(debounceTimer)
-                const url = '/Anpr_Laravel/public/admin/applicant';
+                const url = "{{ route('admin.applicant') }}";
                 var search = $(this).val();
                 var query = 'search=' + search;
                 showLoadModal = false
@@ -115,6 +115,13 @@
                     fetchApplicants(url + '?' + query, showLoadModal);
                 }, 250)
             }); //END FUNCTION
+
+            $(document).on('click', '#clearSearchBtn', function () {
+                const url = "{{ route('admin.applicant') }}";
+                const showLoad = false;
+
+                fetchApplicants(url, showLoad);
+            })
 
             function fetchApplicants(url, showLoad = true) {
                 $.ajax({

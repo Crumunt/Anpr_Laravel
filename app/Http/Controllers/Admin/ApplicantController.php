@@ -70,11 +70,11 @@ class ApplicantController extends Controller
                     $user->last_name
                 ),
                 'email' => $user->email,
-                'phone_number' => $user->phone_number,
+                'phone_number' => ApplicationTableHelper::formatPhoneNumber($user->phone_number),
                 'status' => [
                     'label' => ucfirst($user->statuses->status_name)
                 ],
-                'submitted_date' => $user->created_at->format('F j, Y h:i A'),
+                'submitted_date' => $user->created_at->format('F d, Y'),
                 'vehicles' => $user->vehicles->count()
             ]
         );
@@ -142,13 +142,5 @@ class ApplicantController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    private function getUsers()
-    {
-
-        $rows = User::with('vehicles', 'statuses')->where('role_id', '>', 4)->paginate(10);
-
-        return $rows;
     }
 }

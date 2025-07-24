@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User as ModelsUser;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -43,6 +44,8 @@ class UserSeeder extends Seeder
             'security staff',
             'encoder'
         ];
+
+        $admin_statuses = [4, 5, 7, 8];
         for ($i = 0; $i < 5; $i++) {
             $admin = ModelsUser::create([
                 'first_name' => $faker->firstName(),
@@ -51,7 +54,7 @@ class UserSeeder extends Seeder
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
                 'phone_number' => $faker->phoneNumber(),
-                'status_id' => $faker->numberBetween(1, 8),
+                'status_id' => $faker->randomElement($admin_statuses),
             ]);
             $admin->refresh();
             $role = $admin_roles[array_rand($admin_roles)];
@@ -66,23 +69,29 @@ class UserSeeder extends Seeder
             'faculty',
             'staff'
         ];
-        for ($i = 1; $i < 100; $i++) {
+
+        $applicant_statuses = [1, 2, 3, 7, 8];
+        for ($i = 1; $i < 900; $i++) {
             $applicant = ModelsUser::create([
-                'user_id' => $faker->optional(0.9) ->randomElement([
+                'user_id' => $faker->optional(0.3)->randomElement([
                     $faker->numerify('##-####'),
-                    $faker->numerify('EMP-#####'),
+                    $faker->numerify('EMP-###') . $faker->randomNumber(3),
                 ]),
                 'first_name' => $faker->firstName(),
                 'middle_name' => $faker->optional(0.3)->lastName(),
                 'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
-                'phone_number' => $faker->phoneNumber(),
-                'license' => $faker->randomNumber(5),
-                'status_id' => $faker->numberBetween(1, 8),
+                'phone_number' => $faker->numerify('09#########'),
+                'license' => $faker->randomNumber(9),
+                'status_id' => $faker->randomElement($applicant_statuses),
+                'created_at' => $faker->randomElement([
+                    $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
+                    $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
+                ]),
             ]);
             $applicant->refresh();
-            $role = $applicant_roles[array_rand($applicant_roles)]; 
+            $role = $applicant_roles[array_rand($applicant_roles)];
             if (Role::where('name', $role)->exists()) {
                 $applicant->assignRole($role);
             } else {
