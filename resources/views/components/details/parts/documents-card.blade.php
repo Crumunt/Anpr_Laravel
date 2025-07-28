@@ -125,6 +125,5 @@
 </div>
 
 <!-- Document Upload Modal -->
-<x-details.modal id="document-upload-modal" type="document_upload" maxWidth="lg">
-    <!-- Content is handled by the modal component -->
-</x-details.modal>
+
+<x-modal.modal id="document-upload-modal" type="document_upload" maxWidth="lg" />

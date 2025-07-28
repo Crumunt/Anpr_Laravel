@@ -49,7 +49,7 @@
                         </div>
 
                         <!-- Admin Modal -->
-                        <x-details.modal id="admin-modal" type="admin" action="add" />
+                        <x-modal.modal id="admin-modal" type="admin" action="add" />
 
                         <x-dashboard.search-filter showType="admins" />
                         <!-- Table container -->

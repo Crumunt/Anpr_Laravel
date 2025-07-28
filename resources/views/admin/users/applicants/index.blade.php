@@ -15,7 +15,7 @@
                         <h2 class="text-2xl font-bold text-gray-800">Applicant Management</h2>
                         <div class="flex space-x-2">
                             <x-dashboard.buttons :icon="false" class="bg-emerald-600 hover:bg-emerald-700"
-                                data-open-modal="applicant-modal">
+                                data-open-modal="applicant_modal">
                                 <span slot="icon" class="mr-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -29,8 +29,8 @@
                             </x-dashboard.buttons>
                         </div>
                     </div>
-                    <x-details.modal id="applicant-modal" type="applicant" action="add" />
 
+                    <x-modal.modal id="applicant_modal" type="applicant" action="add" />
                     <!-- Moved search filter inside the space-y-6 container -->
                     <x-dashboard.search-filter :showType="'applicant'" />
 

@@ -90,7 +90,7 @@
                         <option value="visitor">Visitor</option>
                     </x-forms.form-field>
                 </x-forms.form-section>
-                `
+                
                 <div class="flex justify-between mt-6">
                     <div></div>
                     <button type="button" class="next-btn

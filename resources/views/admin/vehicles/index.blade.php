@@ -24,7 +24,11 @@
                             </x-dashboard.buttons>
                         </div>
                     </div>
-                    <x-details.modal id="vehicle-modal" type="vehicle" action="add" />
+                    <x-modal.modal id="vehicle_modal">
+                        <x-slot name="contentSlot">
+                            @include('components.modal.partials.applicant')
+                        </x-slot>
+                    </x-modal.modal>
 
                     <!-- Moved search filter inside the space-y-6 container -->
                     <x-dashboard.search-filter :showType="'vehicle'" />

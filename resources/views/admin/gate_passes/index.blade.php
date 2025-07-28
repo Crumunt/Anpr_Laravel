@@ -11,8 +11,6 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <h2 class="text-2xl font-bold text-gray-800">Gate Pass Management</h2>
                         </div>
-                        <!-- RFID Modal -->
-                        <x-details.modal id="rfid-modal" type="rfid" action="add" />
 
                         <!-- Moved search filter inside the space-y-6 container -->
                         <x-dashboard.search-filter :showType="'gatePass'" />
