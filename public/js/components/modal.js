@@ -6,9 +6,10 @@ function entityFormHandler(type, entityId, modalId) {
         formData: {},
         isSubmitting: false,
         errors: {}, // Object to store field-specific validation errors
-        filePreview: null,
-        fileInput: null,
+        filePreview: [],
+        fileInput: [],
         currentStep: 1,
+
 
         init() {
             this.initializeFormData();
@@ -87,23 +88,38 @@ function entityFormHandler(type, entityId, modalId) {
         },
 
         handleFileChange(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            // Clear previous file error
+            console.log(this.filePreview)
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
             this.errors.file = null;
-            if (file.size > 10 * 1024 * 1024) {
-                this.errors.file = "File size should not exceed 10MB";
-                event.target.value = "";
-                return;
+            this.filePreview = []; 
+            this.fileInput = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Check size limit
+                if (file.size > 10 * 1024 * 1024) {
+                    this.errors.file = "File size should not exceed 10MB";
+                    event.target.value = ""; 
+                    this.filePreview = [];
+                    this.fileInput = [];
+                    return;
+                }
+
+               
+                const type = this.getFileType(file.name);
+                const formattedSize = this.formatFileSize(file.size);
+
+                this.filePreview.push({
+                    name: file.name,
+                    size: formattedSize,
+                    type: type,
+                });
+
+                this.fileInput.push(file);
             }
-            const type = this.getFileType(file.name);
-            const formattedSize = this.formatFileSize(file.size);
-            this.filePreview = {
-                name: file.name,
-                size: formattedSize,
-                type: type,
-            };
-            this.fileInput = file;
         },
 
         getFileType(filename) {
@@ -129,8 +145,8 @@ function entityFormHandler(type, entityId, modalId) {
         },
 
         removeFile() {
-            this.filePreview = null;
-            this.fileInput = null;
+            this.filePreview = [];
+            this.fileInput = [];
             this.errors.file = null;
             document.getElementById("file-upload").value = "";
         },

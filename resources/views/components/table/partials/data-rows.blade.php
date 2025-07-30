@@ -25,7 +25,7 @@
         @endforeach
         @if ($showActions)
             <x-table.data-cell class="text-right">
-                <x-row-action-menu :index="$index" />
+                <x-row-action-menu :index="$index" :uid="$row['id']"/>
             </x-table.data-cell>
         @endif
     </tr>

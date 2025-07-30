@@ -166,7 +166,7 @@
       initials="JD" 
       status="Approved" 
       statusClass="bg-green-100 text-green-800" 
-      id="APP-2023-001" 
+      user_id="APP-2023-001" 
       :isActive="true" 
     />
   </x-slot>

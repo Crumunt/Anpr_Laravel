@@ -117,7 +117,9 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::with('statuses')->find($id);
+
+        return view('admin.users.applicants.show', ['id' => $id]);
     }
 
     /**

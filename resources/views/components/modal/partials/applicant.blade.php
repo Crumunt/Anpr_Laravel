@@ -11,25 +11,19 @@
                 <p x-show="errors.full_name" x-text="errors.full_name" class="mt-1 text-sm text-red-600"></p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Home Address</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                <input type="text" name="full_name" x-model="formData.full_name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.full_name}" required>
+                <p x-show="errors.full_name" x-text="errors.full_name" class="mt-1 text-sm text-red-600"></p>
+                <p class="mt-1 text-sm text-gray-500">Leave blank if not applicable.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                 <input type="text" name="address" x-model="formData.address"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.address}" required>
                 <p x-show="errors.address" x-text="errors.address" class="mt-1 text-sm text-red-600"></p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department</label>
-                <input type="text" name="department" x-model="formData.department"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.department}" required>
-                <p x-show="errors.department" x-text="errors.department" class="mt-1 text-sm text-red-600"></p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Designation/Position</label>
-                <input type="text" name="position" x-model="formData.position"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.position}" required>
-                <p x-show="errors.position" x-text="errors.position" class="mt-1 text-sm text-red-600"></p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
@@ -45,7 +39,22 @@
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
                 <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
             </div>
-            <div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Applicant Type</label>
+                    <select x-model="formData.applicant_type"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
+                        <option value="">Select applicant type</option>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="visitor">Visitor/Outsider</option>
+                    </select>
+                    <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
+                    </p>
+                </div>
+            </div>
+            <div x-show="['student','faculty', 'staff'].includes(formData.applicant_type)" class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">CLSU ID Number</label>
                 <input type="text" name="clsu_id" x-model="formData.clsu_id"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -107,72 +116,78 @@
         </div>
     </template>
     <template x-if="currentStep === 3">
-        <div class="space-y-6">
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Applicant Type</label>
-                <select x-model="formData.applicant_type"
-                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
-                    <option value="">Select applicant type</option>
-                    <option value="student">Student</option>
-                    <option value="faculty">Faculty</option>
-                    <option value="visitor">Visitor/Outsider</option>
-                </select>
-                <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600"></p>
-            </div>
-            <!-- File Upload Area (reuse existing UI) -->
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Upload Document</label>
-                <div x-show="!filePreview"
-                    class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-green-500 transition-colors duration-200 cursor-pointer"
-                    :class="{'border-red-300 hover:border-red-500': errors.file}"
-                    @click="document.getElementById('file-upload').click()">
-                    <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
-                            viewBox="0 0 48 48" aria-hidden="true">
-                            <path
-                                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex text-sm text-gray-600">
-                            <label for="file-upload"
-                                class="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none">
-                                <span>Upload a file</span>
-                                <input id="file-upload" type="file" class="sr-only" @change="handleFileChange"
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-                            </label>
-                            <p class="pl-1">or drag and drop</p>
-                        </div>
-                        <p class="text-xs text-gray-500">PDF, Word, Excel, and Image files up to 10MB</p>
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Upload Document</label>
+            <div x-show="filePreview.length === 0"
+                class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-green-500 transition-colors duration-200 cursor-pointer"
+                :class="{'border-red-300 hover:border-red-500': errors.file}"
+                @click="document.getElementById('file-upload').click()">
+                <div class="space-y-1 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"
+                        aria-hidden="true">
+                        <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="flex text-sm text-gray-600">
+                        <label for="file-upload"
+                            class="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none">
+                            <span>Upload a file</span>
+                            <input id="file-upload" type="file" multiple class="sr-only" @change="handleFileChange"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </label>
+                        <p class="pl-1">or drag and drop</p>
                     </div>
+                    <p class="text-xs text-gray-500">PDF, Word, Excel, and Image files up to 10MB</p>
                 </div>
-                <!-- File Preview (reuse existing UI) -->
-                <div x-show="filePreview" class="mt-3 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-lg flex items-center justify-center"
-                                :class="{'bg-red-100': filePreview?.type === 'pdf','bg-blue-100': filePreview?.type === 'word','bg-green-100': filePreview?.type === 'excel','bg-purple-100': filePreview?.type === 'image','bg-gray-100': filePreview?.type === 'other'}">
-                                <!-- SVGs as before -->
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900" x-text="filePreview?.name"></p>
-                                <p class="text-xs text-gray-500" x-text="filePreview?.size"></p>
-                            </div>
-                        </div>
-                        <button type="button" @click="removeFile"
-                            class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    <button type="button" class="mt-3 text-sm text-green-600 hover:text-green-500 focus:outline-none"
-                        @click="document.getElementById('file-upload').click()">Change file</button>
-                </div>
-                <p x-show="errors.file" x-text="errors.file" class="mt-1 text-sm text-red-600"></p>
             </div>
+            <!-- File Preview (reuse existing UI) -->
+            <div x-show="filePreview.length > 0" class="mt-3 space-y-3">
+                <template x-for="(file, index) in filePreview" :key="file.name">
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <!-- Icon container -->
+                                <div class="flex-shrink-0 h-10 w-10 rounded-lg flex items-center justify-center" :class="{
+                            'bg-red-100': file.type === 'pdf',
+                            'bg-blue-100': file.type === 'word',
+                            'bg-green-100': file.type === 'excel',
+                            'bg-purple-100': file.type === 'image',
+                            'bg-gray-100': file.type === 'other'
+                        }">
+                                    <!-- Optional SVG icon here depending on file type -->
+                                    <svg class="h-5 w-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 4h12v12H4z" />
+                                    </svg>
+                                </div>
+
+                                <!-- File name and size -->
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900" x-text="file.name"></p>
+                                    <p class="text-xs text-gray-500" x-text="file.size"></p>
+                                </div>
+                            </div>
+
+                            <!-- Remove file button -->
+                            <button type="button" @click="removeFile(index)"
+                                class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500">
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Change file (optional if you allow editing individual file inputs) -->
+                        <button type="button"
+                            class="mt-3 text-sm text-green-600 hover:text-green-500 focus:outline-none"
+                            @click="$refs.fileInput.click()">Change file</button>
+                    </div>
+                </template>
+            </div>
+
+            <p x-show="errors.file" x-text="errors.file" class="mt-1 text-sm text-red-600"></p>
         </div>
     </template>
     <template x-if="currentStep === 4">
@@ -206,7 +221,14 @@
                     <h4 class="font-medium">Document</h4>
                     <ul class="text-sm">
                         <li><strong>Applicant Type:</strong> <span x-text="formData.applicant_type"></span></li>
-                        <li><strong>File:</strong> <span x-text="filePreview?.name"></span></li>
+                        <li>
+                            <template x-for="(file, index) in filePreview">
+                                <div :key="file.name">
+                                    <strong>File:</strong> <span x-text="file.name"></span>
+                                </div>
+                            </template>
+
+                        </li>
                     </ul>
                 </div>
             </div>

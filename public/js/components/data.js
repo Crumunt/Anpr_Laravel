@@ -333,11 +333,7 @@ function applicationTable(totalRows) {
 
             // For edit and view, navigate directly
             if (action === "edit" || action === "view") {
-                window.location.href =
-                    `{{ route('admin.applicant.show-details', ['type' => $type, 'id' => '__ID__']) }}`.replace(
-                        "__ID__",
-                        rowId + 1
-                    );
+                window.location.href = `applicant/${rowId}`
                 return;
             }
 

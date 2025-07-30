@@ -119,37 +119,6 @@
         </div>
     </div>
 
-    <!-- Row action dropdown -->
-    <div x-show="showActionDropdown" @click.away="showActionDropdown = false" x-cloak
-        class="row-action-menu absolute bg-white border border-gray-200 rounded-lg shadow-xl min-w-[220px] overflow-hidden z-50"
-        :style="window.innerWidth >= 640 ? `top: ${actionDropdownPosition.top}px; left: ${actionDropdownPosition.left}px;` : ''">
-        <div class="divide-y divide-gray-100">
-            <div class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                Actions
-            </div>
-            <div class="p-1">
-                @if ($type === 'admin')
-                    <!-- Admin-specific actions -->
-                    @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action, ['view', 'approve']))
-                            @continue
-                        @endif
-                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
-
-                    @endforeach
-                @else
-                    <!-- Default actions for non-admin types -->
-                    @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action, ['edit', 'deactivate', 'reset_password']))
-                            @continue
-                        @endif
-                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
-                    @endforeach
-
-                @endif
-            </div>
-        </div>
-    </div>
 
     <div class="relative w-full table-container">
         <table class="w-full caption-bottom text-sm">
@@ -182,6 +151,39 @@
             </tbody>
         </table>
     </div>
+    <!-- Row action dropdown -->
+    <div x-show="showActionDropdown" @click.away="showActionDropdown = false" x-cloak
+        class="row-action-menu absolute bg-white border border-gray-200 rounded-lg shadow-xl min-w-[220px] overflow-hidden z-50"
+        :style="window.innerWidth >= 640 ? `top: ${actionDropdownPosition.top}px; left: ${actionDropdownPosition.left}px;` : ''">
+        <div class="divide-y divide-gray-100">
+            <div class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                Actions
+            </div>
+            <div class="p-1">
+                @if ($type === 'admin')
+                    <!-- Admin-specific actions -->
+                    @foreach ($actionOptions as $action => $data)
+                        @if (in_array($action, ['view', 'approve']))
+                            @continue
+                        @endif
+                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
+
+                    @endforeach
+                @else
+                    <!-- Default actions for non-admin types -->
+                    @foreach ($actionOptions as $action => $data)
+                        @if (in_array($action, ['edit', 'deactivate', 'reset_password']))
+                            @continue
+                        @endif
+                        <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
+                    @endforeach
+
+                @endif
+            </div>
+        </div>
+    </div>
+
+
 </div>
 <script>
     document.addEventListener('alpine:init', () => {

@@ -17,7 +17,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/applicant', [ApplicantController::class, 'index'])->name('applicant');
 
-    Route::get('/applicant/{id}', fn($id) => view('admin.users.applicants.show', ['id' => $id]))->name('applicant.show-details');
+    Route::get('/applicant/{id}', [ApplicantController::class, 'show'])->name('applicant.show-details');
 
     Route::get('/gate-pass', [GatePassController::class, 'index'])->name('gate_passes.index');
 

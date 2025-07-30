@@ -40,9 +40,6 @@
                             </div>
                         </div>
                     </div>
-                    <x-details.modal id="applicant-modal" type="applicant" action="add" />
-                    <x-details.modal id="vehicle-modal" type="vehicle" action="add" />
-                    <x-details.modal id="rfid-modal" type="rfid" action="add" />
 
                     <!-- Move the search filter inside the padded content div -->
                     <x-dashboard.search-filter />
