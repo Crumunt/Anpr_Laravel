@@ -12,11 +12,11 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                <input type="text" name="full_name" x-model="formData.full_name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.full_name}" required>
+                <input type="text" name="middle_name" x-model="formData.middle_name"
+                    placeholder="Leave blank if not applicable."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-500 placeholder:italic placeholder:text-sm"
+                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.full_name}">
                 <p x-show="errors.full_name" x-text="errors.full_name" class="mt-1 text-sm text-red-600"></p>
-                <p class="mt-1 text-sm text-gray-500">Leave blank if not applicable.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
@@ -28,13 +28,21 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                 <input type="tel" name="phone" x-model="formData.phone"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="09123456789"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-500 placeholder:italic placeholder:text-sm"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.phone}" required>
                 <p x-show="errors.phone" x-text="errors.phone" class="mt-1 text-sm text-red-600"></p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                 <input type="email" name="email" x-model="formData.email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
+                <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department</label>
+                <input type="text" name="college_unit_department" x-model="formData.email"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
                 <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
@@ -48,13 +56,13 @@
                         <option value="">Select applicant type</option>
                         <option value="student">Student</option>
                         <option value="faculty">Faculty</option>
-                        <option value="visitor">Visitor/Outsider</option>
+                        <option value="staff">Staff</option>
                     </select>
                     <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
                     </p>
                 </div>
             </div>
-            <div x-show="['student','faculty', 'staff'].includes(formData.applicant_type)" class="md:col-span-2">
+            <div x-show="['student','faculty', 'staff'].includes(formData.applicant_type)" x-transition.duration-200>
                 <label class="block text-sm font-medium text-gray-700 mb-1">CLSU ID Number</label>
                 <input type="text" name="clsu_id" x-model="formData.clsu_id"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
