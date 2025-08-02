@@ -22,16 +22,16 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    protected $keyType = 'string';
+    public $incrementing = false;
     protected $fillable = [
-        'user_id',
         'first_name',
         'middle_name',
         'last_name',
+        'suffx',
         'email',
         'password',
-        'phone_number',
-        'license',
-        'status_id',
     ];
 
     /**
@@ -55,6 +55,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    
+    public function details() {
+        return $this->hasOne(UserDetails::class, 'user_id', 'uuid');
+    }
+
+    public function approvedDetailes() {
+        return $this->hasMany(UserDetails::class, 'approved_by', 'uuid');
     }
 
     public function vehicles() {

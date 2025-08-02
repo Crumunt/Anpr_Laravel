@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class Vehicle extends Model
 {
     //
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'owner_id',
         'license_plate',

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         //
         Schema::create('records', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('gate_detected');
+            $table->string('direction');
             $table->string('observed_plate');
-            $table->foreignId('status_id')->references('id')->on('statuses');
-            $table->string('vehicle_type');
             $table->timestamps();
         });
     }
