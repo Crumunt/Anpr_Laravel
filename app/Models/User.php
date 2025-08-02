@@ -69,7 +69,4 @@ class User extends Authenticatable
         return $this->hasMany(Vehicle::class, 'owner_id');
     }
 
-    public function statuses() {
-        return $this->belongsTo(Status::class, 'status_id');
-    }
 }

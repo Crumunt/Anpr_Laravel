@@ -9,11 +9,13 @@ class Status extends Model
 {
     //
     protected $fillable = [
-        'status_name'
+        'code',
+        'status_name',
+        'description',
     ];
 
-    public function user() {
-        return $this->hasMany(User::class, 'status_id');
+    public function userDetails() {
+        return $this->hasMany(UserDetails::class, 'status_id');
     }
 
     public function vehicle() {

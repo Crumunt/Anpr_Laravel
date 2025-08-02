@@ -34,4 +34,13 @@ class UserDetails extends Model
     public function approvedBy() {
         return $this->belongsTo(UserDetails::class, 'approved_by', 'uuid');
     }
+
+    public function status() {
+        return $this->belongsTo(Status::class, 'status_id');
+    }
+
+    public function setStatusByCode(string $code) {
+        $status = Status::where('code', $code)->firstOrFail();
+        $this->status()->associate($status);
+    }
 }
