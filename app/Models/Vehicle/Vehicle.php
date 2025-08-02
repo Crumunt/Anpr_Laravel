@@ -5,6 +5,7 @@ namespace App\Models\Vehicle;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Vehicle extends Model
 {
@@ -21,6 +22,15 @@ class Vehicle extends Model
         'assigned_gate_pass',
         'status_id'
     ];
+
+    protected static function booted()
+{
+    static::creating(function ($model) {
+        if (!$model->id) {
+            $model->id = (string) Str::uuid();
+        }
+    });
+}
 
     public function user() {
         return $this->belongsTo(User::class, 'owner_id');

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\ApplicantType;
 use App\Models\User as ModelsUser;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -9,6 +10,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
@@ -29,20 +31,23 @@ class UserSeeder extends Seeder
             'last_name' => $faker->lastName(),
             'email' => $faker->email(),
             'password' => Hash::make('password123'),
-            'phone_number' => $faker->phoneNumber(),
-            'status_id' => 1,
         ]);
+
+        $super_admin->details()->create([
+            'clsu_id' => $faker->numerify('EMP-#######'),
+        ])->setStatusByCode('active');
         $super_admin->refresh();
-        if (Role::where('name', 'super admin')->exists()) {
-            $super_admin->assignRole('super admin');
+        if (Role::where('name', 'super_admin')->exists()) {
+            $super_admin->assignRole('super_admin');
         } else {
             Log::warning('Role "super admin" not found!');
         }
 
         $admin_roles = [
-            'admin',
-            'security staff',
-            'encoder'
+            'admin_editor',
+            'admin_viewer',
+            'security',
+            'encoder',
         ];
 
         $admin_statuses = [4, 5, 7, 8];
@@ -53,9 +58,18 @@ class UserSeeder extends Seeder
                 'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
-                'phone_number' => $faker->phoneNumber(),
-                'status_id' => $faker->randomElement($admin_statuses),
             ]);
+
+            $admin->details()->create([
+                'clsu_id' => $faker->numerify('EMP-#####'),
+                'phone_number' => $faker->numerify('09#########'),
+            ])->setStatusByCode($faker->randomElement([
+                            'pending',
+                            'active',
+                            'inactive',
+                            'revoked'
+                        ]));
+
             $admin->refresh();
             $role = $admin_roles[array_rand($admin_roles)];
             if (Role::where('name', $role)->exists()) {
@@ -64,34 +78,66 @@ class UserSeeder extends Seeder
                 Log::warning('Role "$role" not found!');
             }
         }
-        $applicant_roles = [
-            'student',
-            'faculty',
-            'staff'
-        ];
+        $vehicleTypes = ['Sedan', 'SUV', 'Motorcycle', 'Van'];
+        $vehicleMakes = ['Toyota', 'Honda', 'Ford', 'Mitsubishi', 'Chevrolet', 'Hyundai', 'Nissan'];
 
-        $applicant_statuses = [1, 2, 3, 7, 8];
-        for ($i = 1; $i < 900; $i++) {
+        for ($i = 1; $i < 400; $i++) {
             $applicant = ModelsUser::create([
-                'user_id' => $faker->optional(0.3)->randomElement([
-                    $faker->numerify('##-####'),
-                    $faker->numerify('EMP-###') . $faker->randomNumber(3),
-                ]),
                 'first_name' => $faker->firstName(),
                 'middle_name' => $faker->optional(0.3)->lastName(),
                 'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
+                'created_at' => $faker->randomElement([
+                    $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
+                    $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
+                ]),
+            ]);
+            $applicant->details()->create([
+                'clsu_id' => $faker->randomElement([
+                    $faker->numerify('##-####'),
+                    $faker->numerify('EMP-###') . $faker->randomNumber(3),
+                ]),
+                'current_address' => $faker->address(),
+                'street_address' => $faker->streetAddress(),
+                'barangay' => $faker->streetAddress(),
+                'city_municipality' => $faker->city(),
+                'province' => $faker->city(),
+                'postal_code' => $faker->postcode(),
+                'country' => $faker->country(),
+                'license_number' => $faker->randomNumber(9),
+                'college_unit_department' => $faker->word(),
                 'phone_number' => $faker->numerify('09#########'),
-                'license' => $faker->randomNumber(9),
-                'status_id' => $faker->randomElement($applicant_statuses),
+                'applicant_type' => collect(ApplicantType::cases())->random(),
+            ])->setStatusByCode($faker->randomElement([
+                            'pending',
+                            'approved',
+                            'rejected',
+                            'under_review'
+                        ]));
+            // VEHICLE SEEDER
+            $make = $faker->randomElement($vehicleMakes);
+            $status = \App\Models\Status::where('code', $faker->randomElement([
+                'pending',
+                'approved',
+                'rejected',
+                'under_review',
+            ]))->firstOrFail();
+            $applicant->vehicles()->create([
+                'license_plate' => strtoupper(Str::random(3)) . ' ' . $faker->numberBetween(100, 9999),
+                'vehicle_type' => $faker->randomElement($vehicleTypes),
+                'vehicle_make' => $make,
+                'vehicle_model' => $faker->word(),
+                'vehicle_year' => $faker->numberBetween(2000, 2023),
+                'assigned_gate_pass' => $faker->numberBetween(100, 9999),
+                'status_id' => $status->id,
                 'created_at' => $faker->randomElement([
                     $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
                     $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
                 ]),
             ]);
             $applicant->refresh();
-            $role = $applicant_roles[array_rand($applicant_roles)];
+            $role = 'applicant';
             if (Role::where('name', $role)->exists()) {
                 $applicant->assignRole($role);
             } else {

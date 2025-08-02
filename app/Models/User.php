@@ -8,6 +8,7 @@ use App\Models\Vehicle\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
@@ -56,9 +57,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public static function booted(){
+        static::creating(function($model) {
+            if(!$model->id) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
     
     public function details() {
-        return $this->hasOne(UserDetails::class, 'user_id', 'uuid');
+        return $this->hasOne(UserDetails::class, 'user_id', 'id');
     }
 
     public function approvedDetailes() {
