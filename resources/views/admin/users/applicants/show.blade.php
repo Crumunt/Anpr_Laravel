@@ -35,11 +35,11 @@
     <!-- Address Information Card -->
     <x-details.parts.info-card title="Address Information" editId="edit-address-info-btn">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <x-details.parts.info-field label="Country" :value="$user_details['country']" :span="$info['span'] ?? 1" />
+        <x-details.parts.info-field label="Province" :value="$user_details['province']" :span="$info['span'] ?? 1" />
         <x-details.parts.info-field label="City/Municipality" :value="$user_details['city_municipality']"
           :span="$info['span'] ?? 1" />
-        <x-details.parts.info-field label="Province" :value="$user_details['province']" :span="$info['span'] ?? 1" />
         <x-details.parts.info-field label="Postal Code" :value="$user_details['postal_code']" :span="$info['span'] ?? 1" />
-        <x-details.parts.info-field label="Country" :value="$user_details['country']" :span="$info['span'] ?? 1" />
         <x-details.parts.info-field label="Current Address" :value="$user_details['curr_address']" :span="$info['span'] ?? 1" />
       </div>
     </x-details.parts.info-card>
@@ -54,7 +54,7 @@
       </div>
       <x-details.parts.data-table :headers="$rfidHeaders" :rows="$gate_pass_details" />
     </x-details.parts.info-card>
-    <x-details.parts.access-history title="Access History" :accessRecords="$accessRecords"/>
+    <x-details.parts.access-history title="Access History" :accessRecords="$accessRecords" />
     <!-- Vehicles Card -->
     <x-details.parts.info-card title="Registered Vehicles" :editButton="false">
       <div class="flex items-center justify-between mb-4">

@@ -34,8 +34,8 @@ class DashboardController extends Controller
 
     private function getCardData()
     {
-        $userModel = User::find(1);
-        $vehicleModel = Vehicle::find(1);
+        $userModel = User::query();
+        $vehicleModel = Vehicle::query();
 
         return [
             [
@@ -74,7 +74,7 @@ class DashboardController extends Controller
     {
         $count = 0;
         $userModel = User::whereHas('roles', function ($q) {
-            $q->whereIn('name', ['student', 'faculty', 'staff']);
+            $q->where('name', 'applicant');
         });
 
         switch ($tbl) {
@@ -94,9 +94,9 @@ class DashboardController extends Controller
                 $pendingVehicles = Vehicle::where('status_id', 3)->count();
 
                 $pendingUsers = User::whereHas('roles')
-                    ->where('id', '>', 4)
-                    ->whereHas('statuses', function ($q) {
-                        $q->where('status_id', 3);
+                    ->where('id', '=', 7)
+                    ->whereHas('details.status', function ($q) {
+                        $q->where('code', 'pending');
                     })
                     ->count();
 
@@ -120,17 +120,15 @@ class DashboardController extends Controller
         $lastMonthCount = 0;
         $currentMonthCount = 0;
 
-        $mainQuery = $tblModel::query();
-
 
         if ($tblModel == User::class) {
-            $mainQuery->whereHas('roles', function ($q) {
-                $q->whereIn('name', ['student', 'faculty', 'staff']);
+            $tblModel->whereHas('roles', function ($q) {
+                $q->where('name', 'applicant');
             });
 
             if ($supplementaryModel) {
-                $mainQuery->whereHas('statuses', function ($q) {
-                    $q->where('status_id', 3);
+                $tblModel->whereHas('details.status', function ($q) {
+                    $q->where('code', 'pending');
                 });
 
                 $lastMonthCount += $supplementaryModel->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
@@ -155,21 +153,21 @@ class DashboardController extends Controller
 
     private function getUsers()
     {
-        $users = User::with('vehicles', 'statuses')
+        $users = User::with('vehicles', 'details.status')
             ->whereHas('roles', function ($q) {
-                $q->where('id', '>', 4);
+                $q->where('id', '=', 7);
             })->paginate(10);
         $userDetails = [];
 
         foreach ($users as $user) {
             $userDetails[] = [
                 'id' => $user->id,
-                'user_id' => $user->user_id ?? '-',
+                'user_id' => $user->details?->clsu_id,
                 'name' => ApplicationDisplayHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
                 'email' => $user->email,
-                'phone_number' => ApplicationDisplayHelper::formatPhoneNumber($user->phone_number),
-                'status' => ['label' => ucfirst($user->statuses->status_name)],
-                'submitted_date' => $user->created_at->format('F d, Y'),
+                'phone_number' => ApplicationDisplayHelper::formatPhoneNumber($user->details?->phone_number),
+                'status' => ['label' => ucfirst($user->details?->status?->status_name)],
+                'submitted_date' => $user->details?->created_at->format('F d, Y'),
                 'vehicles' => count($user->vehicles)
             ];
         }
