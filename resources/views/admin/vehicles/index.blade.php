@@ -8,27 +8,7 @@
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Vehicle Management</h2>
-                        <div class="flex space-x-2">
-                            <x-dashboard.buttons :icon="false" class="bg-emerald-600 hover:bg-emerald-700"
-                                data-open-modal="vehicle-modal">
-                                <span slot="icon" class="mr-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M8 12h8"></path>
-                                        <path d="M12 8v8"></path>
-                                    </svg>
-                                </span>
-                                <span>Add Vehicle</span>
-                            </x-dashboard.buttons>
-                        </div>
                     </div>
-                    <x-modal.modal id="vehicle_modal">
-                        <x-slot name="contentSlot">
-                            @include('components.modal.partials.applicant')
-                        </x-slot>
-                    </x-modal.modal>
 
                     <!-- Moved search filter inside the space-y-6 container -->
                     <x-dashboard.search-filter :showType="'vehicle'" />

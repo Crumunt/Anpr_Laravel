@@ -2,6 +2,7 @@
 
 namespace App\Models\Vehicle;
 
+use App\Helpers\ApplicationDisplayHelper;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -24,19 +25,33 @@ class Vehicle extends Model
     ];
 
     protected static function booted()
-{
-    static::creating(function ($model) {
-        if (!$model->id) {
-            $model->id = (string) Str::uuid();
-        }
-    });
-}
+    {
+        static::creating(function ($model) {
+            if (!$model->id) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function status() {
+    public function status()
+    {
         return $this->belongsTo(Status::class, 'status_id');
+    }
+
+    public function getVehicleMakeModelAttribute(): string
+    {
+        $make = $this->vehicle_make ?? '';
+        $model = $this->vehicle_model ?? '';
+        return trim("$make $model");
+    }
+
+    public function getStatusBadgeAttribute() {
+        $statusBadgeClass = ApplicationDisplayHelper::renderBadgeClass($this->status?->status_name);
+        return ['label' => $this->status?->status_name, 'class' => $statusBadgeClass];
     }
 }

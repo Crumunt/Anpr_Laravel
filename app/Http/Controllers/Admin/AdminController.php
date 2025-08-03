@@ -78,36 +78,11 @@ class AdminController extends Controller
 
     private function getUsers()
     {
-        $statusOptions = [
-            [
-                'label' => 'Active'
-            ],
-            [
-                'label' => 'Inactive'
-            ],
-            [
-                'label' => 'Disbaled'
-            ]
-        ];
-
-        $permission = [
-            'All Permissions',
-            'Vehicles',
-            'Applicants',
-            'Admin',
-            'None'
-        ];
-
-        $role = [
-            'Super Admin',
-            'Moderator',
-            'Admin'
-        ];
-
-        $users = User::with('statuses')
+        $users = User::with(relations: ['details', 'roles'])
             ->whereHas('roles', function ($q) {
-                $q->where('id', '<=', 4);
+                $q->whereIn('name', ['admin_viewer','admin_editor', 'encoder','super_admin','security','maintenance']);
             })->paginate(10);
+
         $all = [];
         $active = [];
         $inactive = [];
@@ -115,29 +90,29 @@ class AdminController extends Controller
         foreach ($users as $user) {
             $all[] = [
                 'id' => $user->id,
-                'user_id' => $user->id,
+                'user_id' => $user->details->clsu_id,
                 'name' => $user->first_name,
                 'email' => $user->email,
-                'phone_number' => $user->phone_number,
-                'role' => ucwords($user->roles->first()?->name),
-                'status' => ['label' => ucfirst(string: $user->statuses->status_name)],
+                'phone_number' => $user->details->phone_number,
+                'role' => ucwords(str_replace('_',' ',$user->roles->first()?->name)),
+                'status' => ['label' => $user->details?->status?->status_name],
                 'lastLogin' => $this->faker->date(),
             ];
             $active[] = [
                 'id' => $user->id,
-                'user_id' => $user->id,
+                'user_id' => $user->details?->clsu_id,
                 'name' => $user->first_name,
                 'email' => $user->email,
-                'phone_number' => $user->phone_number,
+                'phone_number' => $user->details?->phone_number,
                 'lastLogin' => $this->faker->date(),
 
             ];
             $inactive[] = [
                 'id' => $user->id,
-                'user_id' => $user->id,
+                'user_id' => $user->details->id,
                 'name' => $user->first_name,
                 'email' => $user->email,
-                'phone_number' => $user->phone_number,
+                'phone_number' => $user->details?->phone_number,
                 'inactiveSince' => $this->faker->date(),
                 'lastLogin' => $this->faker->date(),
 

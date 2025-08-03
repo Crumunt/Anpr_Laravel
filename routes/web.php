@@ -13,7 +13,7 @@ Route::get('/test', fn() => view('testing'));
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/', [DashboardController::class, 'index'])->name('welcome');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/applicant', [ApplicantController::class, 'index'])->name('applicant');
 

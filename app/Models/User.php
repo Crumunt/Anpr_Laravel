@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Helpers\ApplicationDisplayHelper;
 use App\Models\Vehicle\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -58,24 +59,106 @@ class User extends Authenticatable
         ];
     }
 
-    public static function booted(){
-        static::creating(function($model) {
-            if(!$model->id) {
+    public static function booted()
+    {
+        static::creating(function ($model) {
+            if (!$model->id) {
                 $model->id = (string) Str::uuid();
             }
         });
     }
-    
-    public function details() {
+
+    public function details()
+    {
         return $this->hasOne(UserDetails::class, 'user_id', 'id');
     }
 
-    public function approvedDetailes() {
+    public function approvedDetailes()
+    {
         return $this->hasMany(UserDetails::class, 'approved_by', 'uuid');
     }
 
-    public function vehicles() {
+    public function vehicles()
+    {
         return $this->hasMany(Vehicle::class, 'owner_id');
     }
 
+    public function getFullNameAttribute(): string
+    {
+        return ApplicationDisplayHelper::getFullNameAttribute(
+            $this->first_name,
+            $this->middle_name,
+            $this->last_name
+        );
+    }
+
+    public function getNameInitialAttribute()
+    {
+        return ApplicationDisplayHelper::generateNameThumbnail($this->first_name, $this->last_name);
+    }
+
+    public function scopeApplicant($query)
+    {
+        return $query->whereHas('roles', fn($q) => $q->where('name', 'applicant'));
+    }
+
+    public function scopeWithStatusCode($query, string $status)
+    {
+        return $query->whereHas('details.status', fn($q) => $q->where('code', $status));
+    }
+
+    public function scopeSearchTerm($query, string $term)
+    {
+        $term = trim($term);
+        $tokens = preg_split('/\s+/', $term, -1, PREG_SPLIT_NO_EMPTY);
+
+        return $query->where(function ($q2) use ($term, $tokens) {
+            // Primary search: clsu_id or email
+            $q2->whereHas(
+                'details',
+                fn($d) =>
+                $d->where('clsu_id', 'like', "{$term}%")
+            )
+                ->orWhere('email', 'like', "%{$term}%");
+
+            // Name tokens: any of the terms matching first or last name
+            if (!empty($tokens)) {
+                $q2->orWhere(function ($q3) use ($tokens) {
+                    foreach ($tokens as $token) {
+                        $q3->where(function ($q4) use ($token) {
+                            $q4->where('first_name', 'like', "{$token}%")
+                                ->orWhere('last_name', 'like', "{$token}%");
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    public function scopeApplicantType($query, $types)
+    {
+        if (empty($types)) {
+            return $query;
+        }
+
+        if (!is_array($types)) {
+            $types = array_map('trim', explode(',', $types));
+        }
+
+        return $query->whereHas('details', fn($q) => $q->whereIn('applicant_type', $types));
+    }
+
+    public function scopeSortApplicant($query, $option) {
+        $sortOptions = [
+            'newest' => ['created_at', 'desc'],
+            'oldest' => ['created_at', 'asc'],
+            'a-z' => ['first_name', 'asc'],
+            'z-a' => ['first_name', 'desc'],
+        ];
+
+        if(isset($sortOptions[$option])) {
+            [$column, $direction] = $sortOptions[$option];
+            return $query->orderBy($column, $direction);
+        }
+    }
 }

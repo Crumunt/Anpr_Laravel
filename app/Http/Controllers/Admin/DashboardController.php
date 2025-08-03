@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Vehicle\Vehicle;
@@ -165,9 +165,9 @@ class DashboardController extends Controller
             $userDetails[] = [
                 'id' => $user->id,
                 'user_id' => $user->user_id ?? '-',
-                'name' => ApplicationTableHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
+                'name' => ApplicationDisplayHelper::getFullNameAttribute($user->first_name, $user->middle_name, $user->last_name),
                 'email' => $user->email,
-                'phone_number' => ApplicationTableHelper::formatPhoneNumber($user->phone_number),
+                'phone_number' => ApplicationDisplayHelper::formatPhoneNumber($user->phone_number),
                 'status' => ['label' => ucfirst($user->statuses->status_name)],
                 'submitted_date' => $user->created_at->format('F d, Y'),
                 'vehicles' => count($user->vehicles)
@@ -185,8 +185,8 @@ class DashboardController extends Controller
         foreach ($vehicles as $vehicle) {
             $rows[] = [
                 'id' => $vehicle->id,
-                'vehicle' => ApplicationTableHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
-                'owner' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
+                'vehicle' => ApplicationDisplayHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
+                'owner' => ApplicationDisplayHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
                 'registration_date' => $vehicle->created_at
             ];
         }
@@ -204,7 +204,7 @@ class DashboardController extends Controller
                 'id' => $vehicle->id,
                 'gate_pass' => $vehicle->assigned_gate_pass,
                 'status' => ['label' => ucfirst($vehicle->status->status_name)],
-                'assigned_to' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
+                'assigned_to' => ApplicationDisplayHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
             ];
         }
 

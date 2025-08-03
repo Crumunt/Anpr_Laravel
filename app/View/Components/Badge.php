@@ -2,7 +2,7 @@
 
 namespace App\View\Components;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -26,7 +26,7 @@ class Badge extends Component
     }
 
     private function resolveClass($label) {
-        return ApplicationTableHelper::renderBadgeClass($label);
+        return ApplicationDisplayHelper::renderBadgeClass($label);
     }
 
     /**

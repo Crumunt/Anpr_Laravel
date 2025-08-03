@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\ApplicantType;
+use App\Helpers\ApplicationDisplayHelper;
 use Illuminate\Database\Eloquent\Model;
 
 class UserDetails extends Model
@@ -53,5 +54,17 @@ class UserDetails extends Model
     {
         $status = Status::where('code', $code)->firstOrFail();
         $this->status()->associate($status);
+    }
+
+    // SHEESH MAGIC __GET IN LARAVEL SHEEEEEESHHH
+    public function getStatusNameAttribute(): ?string
+    {
+        return ucwords(str_replace('_', ' ', $this->status->status_name)) ?? null;
+    }
+
+    public function getStatusBadgeAttribute(): ?string
+    {
+        return ApplicationDisplayHelper::renderBadgeClass($this->status_name)
+            ?? null;
     }
 }

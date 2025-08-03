@@ -5,14 +5,39 @@
     'applicationDate' => 'Jan 10, 2023',
     'approvalDate' => 'Jan 15, 2023',
     'approvedBy' => 'Admin User',
-    'progress' => 70,
-    'steps' => [
-        ['label' => 'Submitted', 'complete' => true, 'current' => false],
-        ['label' => 'Under Review', 'complete' => true, 'current' => false],
-        ['label' => 'Verified', 'complete' => false, 'current' => true],
-        ['label' => 'Approved', 'complete' => false, 'current' => false]
-    ]
 ])
+@php
+$steps = [
+  'pending' => ['label' => 'Submitted', 'complete' => false, 'current' => false],
+  'under_review' => ['label' => 'Under Review', 'complete' => false, 'current' => false],
+  'verified' => ['label' => 'Verified', 'complete' => false, 'current' => false],
+  'approved' => ['label' => 'Approved', 'complete' => false, 'current' => false]
+];
+
+//breaks words with _ into two ex. under_review => under review charan
+$normalize = fn($s) => str_replace('_', ' ', strtolower($s));
+
+$keys = array_keys($steps);
+$normalizedKeys = array_map($normalize, $keys);
+$target = $normalize($status);
+
+//find index from steps array which was normalized, still same index after processing
+$index = array_search($target, $normalizedKeys, true);
+if ($index === false) {
+    $index = -1; //set to -1 if there are no matches
+}
+
+foreach($keys as $i => $step) {
+  $steps[$step]['complete'] = $i < $index;
+  $steps[$step]['current'] = $i === $index;
+}
+
+$max_progress = 100;
+$base_progress = 20;
+$progress_steps = 4;
+$increment = ($max_progress - $base_progress) / $progress_steps;
+$progress = $base_progress + $index * $increment;
+@endphp
 
 <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg">
   <!-- Enhanced Header with Gradient Background -->
@@ -56,7 +81,7 @@
         @foreach($steps as $index => $step)
         <li>
           <div class="relative pb-8">
-            @if($index < count($steps) - 1)
+            @if($loop->index < count($steps) - 1)
               <span class="absolute top-5 left-5 -ml-px h-full w-0.5 {{ $step['complete'] ? 'bg-green-500' : 'bg-gray-200' }}" aria-hidden="true"></span>
             @endif
             <div class="relative flex items-start space-x-3">

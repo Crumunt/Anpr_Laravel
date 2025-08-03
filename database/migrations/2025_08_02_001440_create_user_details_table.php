@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,10 +14,10 @@ return new class extends Migration
         Schema::create('user_details', function (Blueprint $table) {
             $table->uuid('user_id')->primary();
             $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->cascadeOnDelete();
-            
+                ->references('id')
+                ->on('users')
+                ->cascadeOnDelete();
+
 
             $table->string('clsu_id');
             $table->string('current_address')->nullable();
@@ -32,14 +31,16 @@ return new class extends Migration
             $table->string('college_unit_department')->nullable();
             $table->string('phone_number')->nullable();
             $table->enum('applicant_type', ApplicantType::values())
-                  ->nullable();
+                ->nullable();
 
             // admin approved by
             $table->uuid('approved_by')->nullable();
             $table->foreign('approved_by')
-                  ->references('id')
-                  ->on('users')
-                  ->nullOnDelete();
+                ->references('id')
+                ->on('users')
+                ->nullOnDelete();
+
+            $table->foreignId('status_id')->references('id')->on('statuses');
             $table->timestamps();
         });
     }

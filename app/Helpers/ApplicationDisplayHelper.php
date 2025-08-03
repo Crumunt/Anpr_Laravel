@@ -3,10 +3,7 @@
 
 namespace App\Helpers;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
-
-class ApplicationTableHelper
+class ApplicationDisplayHelper
 {
 
 
@@ -62,13 +59,29 @@ class ApplicationTableHelper
     public static function renderBadgeClass($label)
     {
         return match ($label) {
-            'Active', 'Registered', 'Approved' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60',
-            'Inactive' => 'bg-gray-100/80 text-gray-800 hover:bg-gray-200/60',
             'Pending' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60',
+            'Under Review' => 'bg-amber-100/80 text-amber-800 hover:bg-amber-200/60',
+            'Approved' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60',
+            'Rejected' => 'bg-red-100/80 text-red-800 hover:bg-red-200/60',
+            'Active' => 'bg-emerald-100/80 text-emerald-800 hover:bg-emerald-200/60',
+            'Inactive' => 'bg-gray-100/80 text-gray-800 hover:bg-gray-200/60',
+            'Expired' => 'bg-slate-100/80 text-slate-800 hover:bg-slate-200/60',
+            'Revoked' => 'bg-orange-100/80 text-orange-800 hover:bg-orange-200/60',
+            'Blacklisted' => 'bg-red-200/80 text-red-900 hover:bg-red-300/60',
+            'Flagged' => 'bg-rose-100/80 text-rose-800 hover:bg-rose-200/60',
+            'Lost' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
+            'Stolen' => 'bg-gray-200/80 text-gray-900 hover:bg-gray-300/60',
+            'Maintenance' => 'bg-sky-100/80 text-sky-800 hover:bg-sky-200/60',
+
+            // Roles
             'Super Admin' => 'bg-purple-100/80 text-purple-800 hover:bg-purple-200/60',
-            'Admin' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
+            'Admin Editor' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
+            'Admin Viewer' => 'bg-teal-100/80 text-teal-800 hover:bg-teal-200/60',
+            'Admin' => 'bg-sky-100/80 text-sky-800 hover:bg-sky-200/60', // generic full admin
             'Encoder' => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
             'Security Staff' => 'bg-rose-100/80 text-rose-800 hover:bg-rose-200/60',
+
+            // Fallback
             default => 'bg-red-100/80 text-red-800 hover:bg-red-200/60',
         };
     }
@@ -78,8 +91,10 @@ class ApplicationTableHelper
         $admin = [
             'Super Admin',
             'Admin',
+            'Admin Viewer',
+            'Admin Editor',
             'Encoder',
-            'Security Staff'
+            'Security'
         ];
 
         return match (true) {
@@ -132,6 +147,10 @@ class ApplicationTableHelper
 
         return $phoneNumber;
 
+    }
+
+    public static function generateNameThumbnail($first_name, $last_name) {
+        return "$first_name[0]$last_name[0]";
     }
 
 }

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\ApplicantType;
+use App\Helpers\SeederStatusHelper;
 use App\Models\User as ModelsUser;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -24,6 +25,8 @@ class UserSeeder extends Seeder
 
         $faker = Faker::create();
 
+        $status = \App\Models\Status::where('code', 'active')->firstOrFail();
+
         // SuperAdmin
         $super_admin = ModelsUser::create([
             'first_name' => $faker->firstName(),
@@ -33,9 +36,13 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password123'),
         ]);
 
-        $super_admin->details()->create([
-            'clsu_id' => $faker->numerify('EMP-#######'),
-        ])->setStatusByCode('active');
+        $super_admin_status =
+
+            $super_admin->details()->create([
+                'clsu_id' => $faker->numerify('EMP-#######'),
+                'status_id' => $status->id,
+            ]);
+
         $super_admin->refresh();
         if (Role::where('name', 'super_admin')->exists()) {
             $super_admin->assignRole('super_admin');
@@ -52,6 +59,8 @@ class UserSeeder extends Seeder
 
         $admin_statuses = [4, 5, 7, 8];
         for ($i = 0; $i < 5; $i++) {
+            $status = SeederStatusHelper::generateRandomStatus();
+
             $admin = ModelsUser::create([
                 'first_name' => $faker->firstName(),
                 'middle_name' => $faker->lastName(),
@@ -63,12 +72,8 @@ class UserSeeder extends Seeder
             $admin->details()->create([
                 'clsu_id' => $faker->numerify('EMP-#####'),
                 'phone_number' => $faker->numerify('09#########'),
-            ])->setStatusByCode($faker->randomElement([
-                            'pending',
-                            'active',
-                            'inactive',
-                            'revoked'
-                        ]));
+                'status_id' => $status->id,
+            ]);
 
             $admin->refresh();
             $role = $admin_roles[array_rand($admin_roles)];
@@ -82,16 +87,20 @@ class UserSeeder extends Seeder
         $vehicleMakes = ['Toyota', 'Honda', 'Ford', 'Mitsubishi', 'Chevrolet', 'Hyundai', 'Nissan'];
 
         for ($i = 1; $i < 400; $i++) {
+            $random_date = $faker->randomElement([
+                $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
+                $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
+            ]);
+
+            $status = SeederStatusHelper::generateRandomStatus();
+
             $applicant = ModelsUser::create([
                 'first_name' => $faker->firstName(),
                 'middle_name' => $faker->optional(0.3)->lastName(),
                 'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
-                'created_at' => $faker->randomElement([
-                    $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
-                    $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
-                ]),
+                'created_at' => $random_date,
             ]);
             $applicant->details()->create([
                 'clsu_id' => $faker->randomElement([
@@ -109,20 +118,12 @@ class UserSeeder extends Seeder
                 'college_unit_department' => $faker->word(),
                 'phone_number' => $faker->numerify('09#########'),
                 'applicant_type' => collect(ApplicantType::cases())->random(),
-            ])->setStatusByCode($faker->randomElement([
-                            'pending',
-                            'approved',
-                            'rejected',
-                            'under_review'
-                        ]));
+                'status_id' => $status->id,
+                'created_at' => $random_date
+            ]);
+
             // VEHICLE SEEDER
             $make = $faker->randomElement($vehicleMakes);
-            $status = \App\Models\Status::where('code', $faker->randomElement([
-                'pending',
-                'approved',
-                'rejected',
-                'under_review',
-            ]))->firstOrFail();
             $applicant->vehicles()->create([
                 'license_plate' => strtoupper(Str::random(3)) . ' ' . $faker->numberBetween(100, 9999),
                 'vehicle_type' => $faker->randomElement($vehicleTypes),
@@ -131,10 +132,7 @@ class UserSeeder extends Seeder
                 'vehicle_year' => $faker->numberBetween(2000, 2023),
                 'assigned_gate_pass' => $faker->numberBetween(100, 9999),
                 'status_id' => $status->id,
-                'created_at' => $faker->randomElement([
-                    $faker->dateTimeBetween(Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()),
-                    $faker->dateTimeBetween(Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()),
-                ]),
+                'created_at' => $random_date,
             ]);
             $applicant->refresh();
             $role = 'applicant';

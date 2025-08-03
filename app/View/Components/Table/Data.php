@@ -2,7 +2,7 @@
 
 namespace App\View\Components\Table;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -49,8 +49,8 @@ class Data extends Component
 
     protected function setup(): void
     {
-        $this->headers = ApplicationTableHelper::headerHelper($this->context, $this->tab);
-        $this->bulkActionBtns = ApplicationTableHelper::getBulkActions($this->type);
+        $this->headers = ApplicationDisplayHelper::headerHelper($this->context, $this->tab);
+        $this->bulkActionBtns = ApplicationDisplayHelper::getBulkActions($this->type);
         $this->actionOptions = $this->defaultActionOptions();
         $this->bulkActions = $this->defaultBulkActions();
     }

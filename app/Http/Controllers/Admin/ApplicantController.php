@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
 
 class ApplicantController extends Controller
@@ -15,64 +16,33 @@ class ApplicantController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with('vehicles', 'statuses')
-            ->whereHas('roles', function ($q) {
-                $q->where('id', '>', 4);
-            });
 
-        if ($request->filled('status')) {
-            $query->whereHas('statuses', fn($q) => $q->where('status_name', $request->status));
-        }
-
-        if ($request->filled('applicant_types')) {
-            $types = $request->input('applicant_types');
-
-            $query->whereHas('roles', fn($q) => $q->whereIn('name', $types));
-        }
-
-        $sortOptions = [
-            'newest' => ['created_at', 'asc'],
-            'oldest' => ['created_at', 'desc'],
-            'a-z' => ['first_name', 'asc'],
-            'z-a' => ['first_name', 'desc'],
-        ];
-
-        if ($request->filled('sort_by') && isset($sortOptions[$request->sort_by])) {
-            [$column, $direction] = $sortOptions[$request->sort_by];
-            $query->orderBy($column, $direction);
-        }
-
-        if ($request->filled('search')) {
-            $terms = explode(' ', $request->search);
-
-            $query->where('user_id', 'like', "{$request->search}%");
-            $query->orWhere('email', 'like', "%{$request->search}%");
-
-            $query->orWhere(function ($q) use ($terms) {
-                foreach ($terms as $term) {
-                    $q->where('first_name', 'like', "{$term}%")
-                        ->orWhere('last_name', $term);
-                }
-            });
-
-        }
-
-        $users = $query->paginate(10);
+        $users = User::with(['vehicles', 'roles', 'details.status'])
+            ->applicant()
+            ->when($request->filled('status'), fn($q) => $q->withStatusCode($request->status))
+            ->when($request->filled('search'), fn($q) => $q->searchTerm($request->search))
+            ->when($request->filled('applicant_types'), fn($q) => $q->applicantType($request->input('applicant_types')))
+            ->when(
+                $request->filled('sort_by'),
+                fn($q) => $q->sortApplicant($request->sort_by),
+                fn($q) => $q->orderBy('created_at', 'desc')
+            )
+            ->paginate(10);
 
         $userDetails = $users->map(
             fn($user) =>
             [
                 'id' => $user->id,
-                'user_id' => $user->user_id ?? '-',
-                'name' => ApplicationTableHelper::getFullNameAttribute(
+                'user_id' => $user->details?->clsu_id ?? '-',
+                'name' => ApplicationDisplayHelper::getFullNameAttribute(
                     $user->first_name,
                     $user->middle_name,
                     $user->last_name
                 ),
                 'email' => $user->email,
-                'phone_number' => ApplicationTableHelper::formatPhoneNumber($user->phone_number),
+                'phone_number' => ApplicationDisplayHelper::formatPhoneNumber($user->details?->phone_number),
                 'status' => [
-                    'label' => ucfirst($user->statuses->status_name)
+                    'label' => ucfirst($user->details?->status?->status_name)
                 ],
                 'submitted_date' => $user->created_at->format('F d, Y'),
                 'vehicles' => $user->vehicles->count()
@@ -86,7 +56,7 @@ class ApplicantController extends Controller
                     'rows' => $userDetails,
                     'showCheckboxes' => true,
                     'showActions' => true,
-                    'headers' => ApplicationTableHelper::headerHelper('user_applicant', '')
+                    'headers' => ApplicationDisplayHelper::headerHelper('user_applicant', '')
                 ])->render(),
                 'pagination' => view('components.pagination', ['pagination' => $users])->render()
             ]);
@@ -117,9 +87,48 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with('statuses')->find($id);
+        $user = User::with(['details', 'vehicles'])->findOrFail($id);
 
-        return view('admin.users.applicants.show', ['id' => $id]);
+        $user_details = [
+            'clsu_id' => $user->details?->clsu_id,
+            'full_name' => $user->full_name,
+            'name_initials' => $user->name_initial,
+            'email_address' => $user->email,
+            'phone_number' => $user->details?->phone_number,
+            'license_number' => $user->details?->license_number,
+            'applicant_type' => $user->details?->applicant_type,
+            'curr_address' => $user->details?->current_address,
+            'city_municipality' => $user->details?->city_municipality,
+            'province' => $user->details?->province,
+            'postal_code' => $user->details?->postal_code,
+            'country' => $user->details?->country,
+            'status_name' => $user->details?->status_name,
+            'status_badge' => $user->details?->status_badge,
+            'submitted_date' => $user->details?->created_at->format('F d, Y')
+        ];
+
+        $vehicle_details = $user->vehicles->map(fn($vehicle) => [
+            'plate_number' => $vehicle->license_plate,
+            'vehicle_make_model' => $vehicle->vehicle_make_model,
+            'vehicle_year' => $vehicle->vehicle_year,
+            'registration_date' => $vehicle->created_at->format('F d, Y'),
+        ]);
+
+        $gate_pass_details = $user->vehicles->map(fn($vehicle) => [
+            'gate_pass' => $vehicle->assigned_gate_pass,
+            'status' => $vehicle->status_badge,
+            'date_issued' => $vehicle->created_at->format('F d, Y'),
+            // expiry calculation to be added
+            'expiry_date' => $vehicle->created_at->format('F d, Y'),
+        ]);
+
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+            ['label' => 'Applicants', 'url' => route('admin.applicant')],
+            ['label' => $user->full_name]
+        ];
+
+        return view('admin.users.applicants.show', compact('user_details', 'breadcrumbs', 'vehicle_details', 'gate_pass_details'));
     }
 
     /**

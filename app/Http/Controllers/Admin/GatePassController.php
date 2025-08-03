@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
@@ -88,7 +88,7 @@ class GatePassController extends Controller
                 'id' => $vehicle->id,
                 'gate_pass' => $vehicle->assigned_gate_pass,
                 'status' => ['label' => ucfirst( $vehicle->status->status_name)],
-                'assigned_to' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
+                'assigned_to' => ApplicationDisplayHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name)
             ];
         }
 

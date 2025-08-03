@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\ApplicationTableHelper;
+use App\Helpers\ApplicationDisplayHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
@@ -85,8 +85,8 @@ class VehicleController extends Controller
         foreach($vehicles as $vehicle) {
             $rows[] = [
                 'id' => $vehicle->id,
-                'vehicle' => ApplicationTableHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
-                'owner' => ApplicationTableHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
+                'vehicle' => ApplicationDisplayHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),
+                'owner' => ApplicationDisplayHelper::getFullNameAttribute($vehicle->user->first_name, $vehicle->user->middle_name, $vehicle->user->last_name),
                 'registration_date' => $vehicle->created_at
             ];
         }

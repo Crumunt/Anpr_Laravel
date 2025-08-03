@@ -54,10 +54,10 @@
             $(document).on('click', 'nav[role=navigation] a', function (e) {
                 e.preventDefault();
                 const url = $(this).attr('href');
-                const search = 'search=' + $('#searchInput-table').val();
+                const search = $('#searchInput-table').serialize();
                 const filters = $('#statusFilter').serialize();
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
-                const query = '&' + filters + '&' + types + '&' + search
+                const query = `&${filters}&${types}&${search}`
 
                 fetchApplicants(url + '&' + query);
             });
@@ -67,8 +67,9 @@
                 e.preventDefault()
                 const url = "{{ route('admin.applicant') }}";
                 var filter = $(this).serialize();
+                const search = $('#searchInput-table').serialize();
                 const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
-                const query = types + '&' + filter;
+                const query = `${filter}&${search}&${types}`;
 
                 fetchApplicants(url + '?' + query);
 
@@ -106,8 +107,10 @@
             $(document).on('keyup', '#searchInput-table', function () {
                 if (debounceTimer) clearTimeout(debounceTimer)
                 const url = "{{ route('admin.applicant') }}";
-                var search = $(this).val();
-                var query = 'search=' + search;
+                var search = $(this).serialize();
+                const filters = $('#statusFilter').serialize();
+                const types = $('#applicantTypeFilterDropdown input[type="checkbox"]').serialize();
+                var query = `${search}&${filters}&${types}`;
                 showLoadModal = false
                 debounceTimer = setTimeout(function () {
                     $('#activeFilters').empty();

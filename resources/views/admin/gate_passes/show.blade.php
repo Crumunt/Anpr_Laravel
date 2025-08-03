@@ -1,7 +1,7 @@
 <x-details.layout title="Vehicle Details" type="gate_pass" :id="$id">
   @php
 $breadcrumbItems = [
-    ['label' => 'Dashboard', 'url' => route('admin.welcome')],
+    ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
     ['label' => 'RFID', 'url' => route('admin.gate_passes.index')],
     ['label' => 'RFID Details']
 ];

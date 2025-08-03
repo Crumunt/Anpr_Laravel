@@ -1,7 +1,7 @@
 <x-details.layout title="Vehicle Details" type="vehicle" :id="$id">
   @php
   $breadcrumbItems = [
-      ['label' => 'Dashboard', 'url' => route('admin.welcome')],
+      ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
       ['label' => 'Vehicles', 'url' => route('admin.vehicles')],
       ['label' => 'Toyota Fortuner (ABC-1234)']
   ];
