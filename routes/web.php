@@ -48,14 +48,12 @@ Route::prefix('gate-pass')->name('gate-pass.')->group(function () {
 // })->name('gate-pass.application');
 
 // Form submission handler
-Route::post('/gate-pass/submit', 'App\Http\Controllers\RfidApplicationController@submit')->name('rfid.submit');
 // $typeRouteMap = [
 //     'applicant' => ['route' => 'admin.applicants', 'label' => 'Applicants'],
 //     'rfid' => ['route' => 'admin.rfid', 'label' => 'rfid'],
 //     'vehicle' => ['route' => 'admin.vehicles', 'label' => 'Vehicles']
 
 // ];
-// In your routes/web.php file
-Route::put('/applicants/{id}/update/{section}', 'ApplicantController@update')->name('applicant.update');
+
 
 

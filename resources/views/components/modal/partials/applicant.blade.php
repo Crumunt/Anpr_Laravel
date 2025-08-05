@@ -1,6 +1,6 @@
 @props(['id'])
 
-<div>
+<div x-data="locationSelector()">
     <template x-if="currentStep === 1">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -27,8 +27,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input type="tel" name="phone" x-model="formData.phone"
-                    placeholder="09123456789"
+                <input type="tel" name="phone" x-model="formData.phone" placeholder="09123456789"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-500 placeholder:italic placeholder:text-sm"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.phone}" required>
                 <p x-show="errors.phone" x-text="errors.phone" class="mt-1 text-sm text-red-600"></p>
@@ -41,11 +40,71 @@
                 <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department</label>
-                <input type="text" name="college_unit_department" x-model="formData.email"
+                <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+                <input type="text" name="college_unit_department"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
                 <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Region</label>
+                    <select x-model="selected.region" @change="onRegionChange()"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
+                        <option value="">Select Region</option>
+                        <template x-for="(region, index) in regions" :key="region.code">
+                            <option :value="region.code" x-text="region.region_name"></option>
+                        </template>
+                    </select>
+                    <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Province</label>
+                    <select x-model="selected.province" @change="onProvinceChange()"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
+                        <option value="">Select province</option>
+                        <template x-for="(province_data, province_name) in provinces" :key="province_name">
+                            <option :value="province_name" x-text="province_name"></option>
+                        </template>
+                    </select>
+                    <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">City</label>
+                    <select x-model="selected.citymun" @change="onCityMunChange()"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
+                        <option value="">Select city</option>
+                        <template x-for="(city_data, city_name) in cityMunicipalities" :key="city_name">
+                            <option :value="city_name" x-text="city_name"></option>
+                        </template>
+                    </select>
+                    <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Barangay</label>
+                    <select x-model="selected.barangay"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.applicant_type}">
+                        <option value="">Select barangay</option>
+                        <template x-for="barangay_name in barangays" :key="barangay_name">
+                            <option :value="barangay_name" x-text="barangay_name"></option>
+                        </template>
+                    </select>
+                    <p x-show="errors.applicant_type" x-text="errors.applicant_type" class="mt-1 text-sm text-red-600">
+                    </p>
+                </div>
             </div>
             <div class="space-y-6">
                 <div class="space-y-2">
@@ -68,6 +127,20 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.clsu_id}" required>
                 <p x-show="errors.clsu_id" x-text="errors.clsu_id" class="mt-1 text-sm text-red-600"></p>
+            </div>
+            <div x-show="['student','faculty', 'staff'].includes(formData.applicant_type)" x-transition.duration-250>
+                <label class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department</label>
+                <input type="text" name="college_unit_department"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
+                <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
+            </div>
+            <div x-show="['faculty', 'staff'].includes(formData.applicant_type)" x-transition.duration-300>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Designation/Position</label>
+                <input type="text" name="college_unit_department"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.email}" required>
+                <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
             </div>
         </div>
     </template>

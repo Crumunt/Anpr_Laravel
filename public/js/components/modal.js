@@ -10,7 +10,6 @@ function entityFormHandler(type, entityId, modalId) {
         fileInput: [],
         currentStep: 1,
 
-
         init() {
             this.initializeFormData();
         },
@@ -88,12 +87,12 @@ function entityFormHandler(type, entityId, modalId) {
         },
 
         handleFileChange(event) {
-            console.log(this.filePreview)
+            console.log(this.filePreview);
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             this.errors.file = null;
-            this.filePreview = []; 
+            this.filePreview = [];
             this.fileInput = [];
 
             for (let i = 0; i < files.length; i++) {
@@ -102,13 +101,12 @@ function entityFormHandler(type, entityId, modalId) {
                 // Check size limit
                 if (file.size > 10 * 1024 * 1024) {
                     this.errors.file = "File size should not exceed 10MB";
-                    event.target.value = ""; 
+                    event.target.value = "";
                     this.filePreview = [];
                     this.fileInput = [];
                     return;
                 }
 
-               
                 const type = this.getFileType(file.name);
                 const formattedSize = this.formatFileSize(file.size);
 
@@ -407,6 +405,71 @@ function entityFormHandler(type, entityId, modalId) {
             if (this.currentStep < 4) {
                 this.currentStep++;
             }
+        },
+    };
+}
+
+function locationSelector() {
+    return {
+        regions: [],
+        provinces: [],
+        cityMunicipalities: [],
+        barangays: [],
+        selected: {
+            region: "",
+            province: "",
+            citymun: "",
+            barangay: "",
+        },
+
+        async init() {
+            try {
+                console.log("location selector has been initialized");
+
+                const res = await fetch("/Anpr_Laravel/public/api/regions");
+
+                this.regions = await res.json();
+            } catch (error) {
+                console.log(`Something went wrong!. ${error}`);
+            }
+        },
+
+        async onRegionChange() {
+            this.selected.province = "";
+            this.selected.citymun = "";
+            this.selected.barangay = "";
+            this.provinces = [];
+            this.cityMunicipalities = [];
+            this.barangays = [];
+            if (!this.selected.region) return;
+            const res = await fetch(
+                `/Anpr_Laravel/public/api/provinces?region_name=${this.selected.region}`
+            );
+            this.provinces = await res.json();
+        },
+
+        async onProvinceChange() {
+            this.selected.citymun = "";
+            this.selected.barangay = "";
+            this.cityMunicipalities = [];
+            this.barangays = [];
+            if (!this.selected.province) return;
+            const res = await fetch(
+                `/Anpr_Laravel/public/api/city-municipalities?province_name=${this.selected.province}`
+            );
+            this.cityMunicipalities = await res.json();
+        },
+
+        async onCityMunChange() {
+            this.selected.barangay = "";
+            this.barangays = [];
+            if (!this.selected.citymun) return;
+            const res = await fetch(
+                `/Anpr_Laravel/public/api/barangays?citymun_name=${this.selected.citymun}`
+            );
+            this.barangays = await res.json();
+            
+            console.log(this.barangays)
         },
     };
 }
