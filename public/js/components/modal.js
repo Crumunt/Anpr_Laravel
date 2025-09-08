@@ -406,6 +406,15 @@ function entityFormHandler(type, entityId, modalId) {
                 this.currentStep++;
             }
         },
+
+        resetForm() {
+            this.formData = {};
+            this.isSubmitting = false;
+            this.errors = {};
+            this.filePreview = [];
+            this.fileInput = [];
+            this.currentStep = 1;
+        },
     };
 }
 
@@ -425,7 +434,6 @@ function locationSelector() {
         async init() {
             try {
                 console.log("location selector has been initialized");
-
                 const res = await fetch("/Anpr_Laravel/public/api/regions");
 
                 this.regions = await res.json();
@@ -468,8 +476,22 @@ function locationSelector() {
                 `/Anpr_Laravel/public/api/barangays?citymun_name=${this.selected.citymun}`
             );
             this.barangays = await res.json();
-            
-            console.log(this.barangays)
+
+            console.log(this.barangays);
+        },
+
+        refreshSelection() {
+            console.log("I was returned!");
+            (this.regions = []),
+                (this.provinces = []),
+                (this.cityMunicipalities = []),
+                (this.barangays = []),
+                (this.selected = {
+                    region: "",
+                    province: "",
+                    citymun: "",
+                    barangay: "",
+                });
         },
     };
 }

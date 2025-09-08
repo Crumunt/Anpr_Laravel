@@ -11,8 +11,12 @@ class LocationController extends Controller
 
     protected function loadJson()
     {
-        $raw = file_get_contents(storage_path('app/json/cluster.json'));
-        $data = json_decode($raw, true);
+        static $data = null;
+        if (!$data) {
+            $raw = file_get_contents(storage_path('app/json/cluster.json'));
+            $data = json_decode($raw, true);
+        }
+
         return $data;
     }
 
@@ -43,7 +47,7 @@ class LocationController extends Controller
             ->flatMap(fn($r) => $r['province_list'])
             ->get($request->province_name);
 
-        if(!$province) {
+        if (!$province) {
             return response()->json([], 404);
         }
 
@@ -63,7 +67,7 @@ class LocationController extends Controller
             // get the city with matching name from request
             ->get($request->citymun_name);
 
-        if(!$cityMun) {
+        if (!$cityMun) {
             return response()->json([], 404);
         }
 

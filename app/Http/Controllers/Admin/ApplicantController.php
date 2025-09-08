@@ -4,66 +4,92 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\ApplicationDisplayHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ApplicantIndexRequest;
+use App\Http\Resources\ApplicantResource;
 use App\Models\User;
-use App\Models\Vehicle\Vehicle;
+use App\Services\ApplicantService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ApplicantController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    protected ApplicantService $applicantService;
 
-    public function index(Request $request)
+    public function __construct(ApplicantService $applicantService) {
+        $this->applicantService = $applicantService;
+    }
+
+    public function index(ApplicantIndexRequest $request)
     {
+        try {
+            $users = $this->applicantService->getApplicants(
+                $request->validated(),
+                $request->validated('per_page', 10)
+            );
 
-        $users = User::with(['vehicles', 'roles', 'details.status'])
-            ->applicant()
-            ->when($request->filled('status'), fn($q) => $q->withStatusCode($request->status))
-            ->when($request->filled('search'), fn($q) => $q->searchTerm($request->search))
-            ->when($request->filled('applicant_types'), fn($q) => $q->applicantType($request->input('applicant_types')))
-            ->when(
-                $request->filled('sort_by'),
-                fn($q) => $q->sortApplicant($request->sort_by),
-                fn($q) => $q->orderBy('created_at', 'desc')
-            )
-            ->paginate(10);
+            $userDetails = $this->applicantService->formatApplicantsForDisplay($users);
 
-        $userDetails = $users->map(
-            fn($user) =>
-            [
-                'id' => $user->id,
-                'user_id' => $user->details?->clsu_id ?? '-',
-                'name' => ApplicationDisplayHelper::getFullNameAttribute(
-                    $user->first_name,
-                    $user->middle_name,
-                    $user->last_name
-                ),
-                'email' => $user->email,
-                'phone_number' => ApplicationDisplayHelper::formatPhoneNumber($user->details?->phone_number),
-                'status' => [
-                    'label' => ucfirst($user->details?->status?->status_name)
-                ],
-                'submitted_date' => $user->created_at->format('F d, Y'),
-                'vehicles' => $user->vehicles->count()
-            ]
-        );
+            // AJAX REQUEST WAS MADE?
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'rows' => view('components.table.partials.data-rows', [
+                        'rows' => $userDetails,
+                        'showCheckboxes' => true,
+                        'showActions' => true,
+                        'headers' => ApplicationDisplayHelper::headerHelper('user_applicant', '')
+                    ])->render(),
+                    'pagination' => view('components.pagination', ['pagination' => $users])->render()
+                ]);
+            }
 
-        // AJAX REQUEST WAS MADE?
-        if ($request->ajax()) {
-            return response()->json([
-                'rows' => view('components.table.partials.data-rows', [
-                    'rows' => $userDetails,
-                    'showCheckboxes' => true,
-                    'showActions' => true,
-                    'headers' => ApplicationDisplayHelper::headerHelper('user_applicant', '')
-                ])->render(),
-                'pagination' => view('components.pagination', ['pagination' => $users])->render()
+            // DEFAULT NO AJAX REQUEST
+            // return view('admin.users.applicants.index', compact('userDetails', 'users'));
+            return view('users.index', [
+                'userDetails' => $userDetails,
+                'pagination' => $users,
+                'routeName' => 'admin.applicant',
+                'pageTitle' => 'Applicant Management',
+                'showAdmin' => false,
+                'tableCaption' => 'All Applicants'
             ]);
-        }
+        } catch (ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'toast' => view('components.toast', [
+                        'type' => 'error',
+                        'message' => 'Failed to load data. Please try again.'
+                    ])->render()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (Exception $e) {
+            Log::error('Failed to load applicant data', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                // 'user_id' => auth()->id(),
+                'request_data' => $request->validated(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        // DEFAULT NO AJAX REQUEST
-        return view('admin.users.applicants.index', compact('userDetails', 'users'));
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'toast' => view('components.toast', [
+                        'type' => 'error',
+                        'message' => 'Failed to load data. Please try again.'
+                    ])->render()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Failed to load data. Please try again.');
+        }
     }
 
     /**

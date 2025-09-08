@@ -4,7 +4,7 @@
     <template x-if="currentStep === 1">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                 <input type="text" name="full_name" x-model="formData.full_name"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     :class="{'border-red-300 focus:ring-red-500 focus:border-red-500': errors.full_name}" required>

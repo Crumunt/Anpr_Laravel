@@ -30,7 +30,7 @@ $formId = "{$type}-form";
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ $id }}-title"
-    x-data="entityFormHandler('{{ $type }}', '{{ $entityId }}', '{{ $id }}')">
+    x-data="entityFormHandler('{{ $type }}', '{{ $entityId }}', '{{ $id }}')" x-ref="formParent">
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
         <div class="absolute inset-0 bg-gray-800/70 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 modal-backdrop"></div>
     </div>
@@ -40,6 +40,7 @@ $formId = "{$type}-form";
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <h2 id="{{ $id }}-title" class="text-xl font-semibold text-gray-800">{{ $title }}</h2>
                 <button
+                    @click="resetForm()"
                     class="text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-150 ease-in-out close-modal-btn focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full p-2"
                     data-modal="{{ $id }}"
                     aria-label="Close">
