@@ -188,7 +188,7 @@
         @endforeach
       </div>
       <div class="mt-4 flex justify-end">
-        <a href="{{ route('admin.applicant.show-details', ['id' => 1]) }}" class="text-green-600 hover:text-green-700 text-sm font-medium">
+        <a href="{{ route('admin.applicant.show', ['id' => 1]) }}" class="text-green-600 hover:text-green-700 text-sm font-medium">
           <i class="fas fa-external-link-alt mr-1"></i> View Owner Details
         </a>
       </div>

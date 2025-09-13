@@ -20,7 +20,8 @@ class ApplicantController extends Controller
      */
     protected ApplicantService $applicantService;
 
-    public function __construct(ApplicantService $applicantService) {
+    public function __construct(ApplicantService $applicantService)
+    {
         $this->applicantService = $applicantService;
     }
 
@@ -32,7 +33,8 @@ class ApplicantController extends Controller
                 $request->validated('per_page', 10)
             );
 
-            $userDetails = $this->applicantService->formatApplicantsForDisplay($users);
+            $dashboardCardData = $this->applicantService->getDashboardCounts();
+            $userDetails = $this->applicantService->formatApplicantsForList($users);
 
             // AJAX REQUEST WAS MADE?
             if ($request->ajax()) {
@@ -52,6 +54,7 @@ class ApplicantController extends Controller
             // return view('admin.users.applicants.index', compact('userDetails', 'users'));
             return view('users.index', [
                 'userDetails' => $userDetails,
+                'dashboardData' => $dashboardCardData,
                 'pagination' => $users,
                 'routeName' => 'admin.applicant',
                 'pageTitle' => 'Applicant Management',
@@ -113,40 +116,11 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with(['details', 'vehicles'])->findOrFail($id);
+        $user = User::with(relations: ['details', 'vehicles'])->findOrFail($id);
 
-        $user_details = [
-            'clsu_id' => $user->details?->clsu_id,
-            'full_name' => $user->full_name,
-            'name_initials' => $user->name_initial,
-            'email_address' => $user->email,
-            'phone_number' => $user->details?->phone_number,
-            'license_number' => $user->details?->license_number,
-            'applicant_type' => $user->details?->applicant_type,
-            'curr_address' => $user->details?->current_address,
-            'city_municipality' => $user->details?->city_municipality,
-            'province' => $user->details?->province,
-            'postal_code' => $user->details?->postal_code,
-            'country' => $user->details?->country,
-            'status_name' => $user->details?->status_name,
-            'status_badge' => $user->details?->status_badge,
-            'submitted_date' => $user->details?->created_at->format('F d, Y')
-        ];
+        $applicant_details = $this->applicantService->formatApplicantForDetail($user);
 
-        $vehicle_details = $user->vehicles->map(fn($vehicle) => [
-            'plate_number' => $vehicle->license_plate,
-            'vehicle_make_model' => $vehicle->vehicle_make_model,
-            'vehicle_year' => $vehicle->vehicle_year,
-            'registration_date' => $vehicle->created_at->format('F d, Y'),
-        ]);
-
-        $gate_pass_details = $user->vehicles->map(fn($vehicle) => [
-            'gate_pass' => $vehicle->assigned_gate_pass,
-            'status' => $vehicle->status_badge,
-            'date_issued' => $vehicle->created_at->format('F d, Y'),
-            // expiry calculation to be added
-            'expiry_date' => $vehicle->created_at->format('F d, Y'),
-        ]);
+        $extracted_data = $this->extractApplicantData($applicant_details);
 
         $breadcrumbs = [
             ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
@@ -154,7 +128,20 @@ class ApplicantController extends Controller
             ['label' => $user->full_name]
         ];
 
-        return view('admin.users.applicants.show', compact('user_details', 'breadcrumbs', 'vehicle_details', 'gate_pass_details'));
+        return view('admin.users.applicants.show', [
+            ...$extracted_data, 
+            'breadcrumbs' => $breadcrumbs
+        ]);
+    }
+
+    private function extractApplicantData(array $applicant_details): array
+    {
+        return [
+            'applicant_details' => $applicant_details,
+            'user_details' => $applicant_details['user_details'] ?? [],
+            'vehicle_details' => $applicant_details['vehicle_details'] ?? [],
+            'gate_pass_details' => $applicant_details['gate_pass_details'] ?? [],
+        ];
     }
 
     /**

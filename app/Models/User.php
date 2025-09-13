@@ -92,6 +92,11 @@ class User extends Authenticatable
         );
     }
 
+    public function getPhoneNumberAttribute()
+    {
+        return ApplicationDisplayHelper::formatPhoneNumber($this->details?->phone_number);
+    }
+
     public function getNameInitialAttribute()
     {
         return ApplicationDisplayHelper::generateNameThumbnail($this->first_name, $this->last_name);
@@ -100,6 +105,17 @@ class User extends Authenticatable
     public function scopeApplicant($query)
     {
         return $query->whereHas('roles', fn($q) => $q->where('name', 'applicant'));
+    }
+
+    public function scopeApplicantCount($query)
+    {
+        $baseQuery = $query->whereHas('details.status');
+
+        return (object) [
+            'total' => $baseQuery->count(),
+            'active' => $baseQuery->whereHas('details.status', fn($q) => $q->where('code', 'approved'))->count(),
+            'rejected' => $baseQuery->whereHas('details.status', fn($q) => $q->where('code', 'rejected'))->count(),
+        ];
     }
 
     public function scopeWithStatusCode($query, string $status)
@@ -148,7 +164,8 @@ class User extends Authenticatable
         return $query->whereHas('details', fn($q) => $q->whereIn('applicant_type', $types));
     }
 
-    public function scopeSortApplicant($query, $option) {
+    public function scopeSortApplicant($query, $option)
+    {
         $sortOptions = [
             'newest' => ['created_at', 'desc'],
             'oldest' => ['created_at', 'asc'],
@@ -156,7 +173,7 @@ class User extends Authenticatable
             'z-a' => ['first_name', 'desc'],
         ];
 
-        if(isset($sortOptions[$option])) {
+        if (isset($sortOptions[$option])) {
             [$column, $direction] = $sortOptions[$option];
             return $query->orderBy($column, $direction);
         }

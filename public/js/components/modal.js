@@ -431,10 +431,13 @@ function locationSelector() {
             barangay: "",
         },
 
+        API_BASE_URL: "http://keenpass.test",
+
         async init() {
+
             try {
                 console.log("location selector has been initialized");
-                const res = await fetch("/Anpr_Laravel/public/api/regions");
+                const res = await fetch(`${this.API_BASE_URL}/api/regions`);
 
                 this.regions = await res.json();
             } catch (error) {
@@ -451,7 +454,7 @@ function locationSelector() {
             this.barangays = [];
             if (!this.selected.region) return;
             const res = await fetch(
-                `/Anpr_Laravel/public/api/provinces?region_name=${this.selected.region}`
+                `${this.API_BASE_URL}/api/provinces?region_name=${this.selected.region}`
             );
             this.provinces = await res.json();
         },
@@ -463,7 +466,7 @@ function locationSelector() {
             this.barangays = [];
             if (!this.selected.province) return;
             const res = await fetch(
-                `/Anpr_Laravel/public/api/city-municipalities?province_name=${this.selected.province}`
+                `${this.API_BASE_URL}/api/city-municipalities?province_name=${this.selected.province}`
             );
             this.cityMunicipalities = await res.json();
         },
@@ -473,7 +476,7 @@ function locationSelector() {
             this.barangays = [];
             if (!this.selected.citymun) return;
             const res = await fetch(
-                `/Anpr_Laravel/public/api/barangays?citymun_name=${this.selected.citymun}`
+                `${this.API_BASE_URL}/api/barangays?citymun_name=${this.selected.citymun}`
             );
             this.barangays = await res.json();
 

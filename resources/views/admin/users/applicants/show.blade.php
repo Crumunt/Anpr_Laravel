@@ -1,14 +1,14 @@
 <x-details.layout title="Applicant Details" type="applicant">
   @php
 
-  $rfidHeaders = ['Tag Number', 'Status', 'Issue Date', 'Expiry Date'];
-  $rfidRows = [];
+    $rfidHeaders = ['Tag Number', 'Status', 'Issue Date', 'Expiry Date'];
+    $rfidRows = [];
 
-  $vehicleHeaders = ['Plate Number', 'Make & Model', 'Year', 'Registration Date'];
+    $vehicleHeaders = ['Plate Number', 'Make & Model', 'Year', 'Registration Date'];
 
-  $documents = [];
-  $accessRecords = [];
-  $activities = [];
+    $documents = [];
+    $accessRecords = [];
+    $activities = [];
   @endphp
 
   <x-slot name="breadcrumb">
@@ -16,18 +16,18 @@
   </x-slot>
 
   <x-slot name="header">
-    <x-details.parts.profile-header title="{{ $user_details['full_name'] }}"
-      initials="{{ $user_details['name_initials'] }}" status="{{ $user_details['status_name'] }}"
-      statusClass="{{ $user_details['status_badge'] }}" user_id="{{ $user_details['clsu_id'] }}" :isActive="true" />
+    <x-details.parts.profile-header title="{{ $applicant_details['name'] }}"
+      initials="{{ $applicant_details['user_details']['name_initials'] }}" status="{{ $applicant_details['status']['label'] }}"
+      statusClass="{{ $applicant_details['user_details']['status_badge'] }}" user_id="{{ $applicant_details['clsu_id'] }}" :isActive="true" />
   </x-slot>
 
   <x-slot name="mainContent">
     <!-- Personal Information Card -->
     <x-details.parts.info-card title="Personal Information" editId="edit-personal-info-btn">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <x-details.parts.info-field label="Full Name" :value="$user_details['full_name']" :span="$info['span'] ?? 1" />
-        <x-details.parts.info-field label="Email Address" :value="$user_details['email_address']" :span="$info['span'] ?? 1" />
-        <x-details.parts.info-field label="Phone Number" :value="$user_details['phone_number']" :span="$info['span'] ?? 1" />
+        <x-details.parts.info-field label="Full Name" :value="$applicant_details['name']" :span="$info['span'] ?? 1" />
+        <x-details.parts.info-field label="Email Address" :value="$applicant_details['email']" :span="$info['span'] ?? 1" />
+        <x-details.parts.info-field label="Phone Number" :value="$applicant_details['phone_number']" :span="$info['span'] ?? 1" />
         <x-details.parts.info-field label="License Number" :value="$user_details['license_number']" :span="$info['span'] ?? 1" />
       </div>
     </x-details.parts.info-card>
@@ -69,8 +69,8 @@
 
   <x-slot name="sideContent">
     <!-- Status Card -->
-    <x-details.parts.status-card status="{{ $user_details['status_name'] }}"
-      statusClass="{{ $user_details['status_badge'] }}" applicationDate="{{ $user_details['submitted_date'] }}"
+    <x-details.parts.status-card status="{{ $applicant_details['status']['label'] }}"
+      statusClass="{{ $user_details['status_badge'] }}" applicationDate="{{ $applicant_details['submitted_date'] }}"
       approvalDate="Jan 15, 2023" approvedBy="Admin User" />
 
     <!-- Documents Card -->
