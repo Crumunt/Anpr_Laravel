@@ -78,7 +78,7 @@ class AdminController extends Controller
 
     private function getUsers()
     {
-        $users = User::with(relations: ['details', 'roles'])
+        $users = User::with(['details', 'roles'])
             ->whereHas('roles', function ($q) {
                 $q->whereIn('name', ['admin_viewer','admin_editor', 'encoder','super_admin','security','maintenance']);
             })->paginate(10);

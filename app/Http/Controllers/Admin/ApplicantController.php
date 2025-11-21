@@ -116,7 +116,7 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with(relations: ['details', 'vehicles'])->findOrFail($id);
+        $user = User::with(['details', 'vehicles'])->findOrFail($id);
 
         $applicant_details = $this->applicantService->formatApplicantForDetail($user);
 
@@ -129,7 +129,7 @@ class ApplicantController extends Controller
         ];
 
         return view('admin.users.applicants.show', [
-            ...$extracted_data, 
+            ...$extracted_data,
             'breadcrumbs' => $breadcrumbs
         ]);
     }

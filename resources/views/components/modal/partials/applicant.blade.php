@@ -318,12 +318,12 @@
     <div class="flex justify-center gap-4 mt-8">
         <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
             x-show="currentStep === 1" @click="closeModal('{{ $id }}')">Cancel</button>
-        <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
+        <!-- <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
             x-show="currentStep > 1" @click="prevStep">Back</button>
         <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
-            x-show="currentStep < 4" @click="nextStep">Next</button>
+            x-show="currentStep < 4" @click="nextStep">Next</button> -->
         <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
-            x-show="currentStep === 4 && !isSubmitting" @click="submitForm">Save</button>
+            x-show="!isSubmitting" @click="submitForm">Save</button>
         <span x-show="isSubmitting" class="flex items-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
