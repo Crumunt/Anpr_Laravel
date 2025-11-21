@@ -11,6 +11,7 @@ $maxWidth = match($maxWidth) {
 'lg' => 'max-w-lg',
 'xl' => 'max-w-xl',
 '2xl' => 'max-w-2xl',
+'3xl' => 'max-w-3xl',
 'full' => 'max-w-full',
 default => 'max-w-md'
 };
@@ -52,9 +53,11 @@ $formId = "{$type}-form";
             <div class="p-6 max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <form id="{{ $formId }}" @submit.prevent="submitForm">
                     @if ($type == 'applicant')
-                        @include('components.modal.partials.applicant')                    
+                        @include('components.modal.partials.applicant')
                     @elseif($type == 'admin')
                         @include('components.modal.partials.admin')
+                    @elseif($type == 'vehicle')
+                        @include('components.modal.partials.vehicle')
                     @else
                         @include('components.modal.partials.document-upload')
                     @endif

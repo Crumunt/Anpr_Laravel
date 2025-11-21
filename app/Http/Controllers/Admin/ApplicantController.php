@@ -44,7 +44,8 @@ class ApplicantController extends Controller
                         'rows' => $userDetails,
                         'showCheckboxes' => true,
                         'showActions' => true,
-                        'headers' => ApplicationDisplayHelper::headerHelper('user_applicant', '')
+                        'headers' => ApplicationDisplayHelper::headerHelper('user_applicant', ''),
+                        'type' => 'applicant',
                     ])->render(),
                     'pagination' => view('components.pagination', ['pagination' => $users])->render()
                 ]);
@@ -116,7 +117,7 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with(['details', 'vehicles'])->findOrFail($id);
+        $user = User::with(relations: ['details', 'vehicles'])->findOrFail($id);
 
         $applicant_details = $this->applicantService->formatApplicantForDetail($user);
 
@@ -167,4 +168,35 @@ class ApplicantController extends Controller
     {
         //
     }
+
+    /**
+     * Lightweight search for applicants/users used by vehicle owner selection.
+     */
+    public function search(Request $request)
+    {
+        $q = $request->get('q', '');
+        if (trim($q) === '') {
+            return response()->json(['data' => []]);
+        }
+
+        $users = User::query()
+            ->with('details')
+            ->searchTerm($q)
+            ->limit(10)
+            ->get()
+            ->map(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->full_name,
+                    'clsu_id' => $user->details?->clsu_id,
+                    'email' => $user->email,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'data' => $users,
+        ]);
+    }
+
 }

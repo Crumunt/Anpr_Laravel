@@ -9,9 +9,43 @@ function entityFormHandler(type, entityId, modalId) {
         filePreview: [],
         fileInput: [],
         currentStep: 1,
+        // vehicle owner search state
+        searchQuery: "",
+        isSearching: false,
+        searchResults: [],
+        selectedOwnerId: null,
 
         init() {
             this.initializeFormData();
+        },
+
+        async searchUsers() {
+            const q = (this.searchQuery || "").trim();
+            if (q.length < 2) {
+                this.searchResults = [];
+                return;
+            }
+            this.isSearching = true;
+            try {
+                const res = await fetch(`/admin/users/search?q=${encodeURIComponent(q)}`, {
+                    headers: { Accept: "application/json" },
+                    credentials: "same-origin",
+                });
+                if (!res.ok) throw new Error("Search failed");
+                const data = await res.json();
+                this.searchResults = (data && data.data) || [];
+            } catch (e) {
+                console.error(e);
+                this.searchResults = [];
+            } finally {
+                this.isSearching = false;
+            }
+        },
+
+        selectUser(user) {
+            this.selectedOwnerId = user.id;
+            this.formData.owner = user.name;
+            if (this.currentStep === 1) this.nextStep();
         },
 
         initializeFormData() {
@@ -44,6 +78,10 @@ function entityFormHandler(type, entityId, modalId) {
                             .toISOString()
                             .split("T")[0],
                     };
+                    this.searchQuery = "";
+                    this.isSearching = false;
+                    this.searchResults = [];
+                    this.selectedOwnerId = null;
                     break;
                 case "rfid":
                     this.formData = {
@@ -85,6 +123,7 @@ function entityFormHandler(type, entityId, modalId) {
                     break;
             }
         },
+
 
         handleFileChange(event) {
             console.log(this.filePreview);
@@ -375,13 +414,47 @@ function entityFormHandler(type, entityId, modalId) {
                 const loader = SweetAlertHelper.showLoading();
                 this.isSubmitting = true;
 
-                // Simulate API call
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-
-                SweetAlertHelper.showSuccessMessage(action, 1, entityName);
-                this.initializeFormData();
-                if (this.type === "document_upload") this.removeFile();
-                closeModal(this.modalId);
+                if (this.type === "vehicle") {
+                    const csrf =
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute("content") || "";
+                    const payload = {
+                        owner_id: this.selectedOwnerId,
+                        license_plate: this.formData.license_plate,
+                        vehicle_type: this.formData.vehicle_type,
+                        vehicle_make: this.formData.make,
+                        vehicle_model: this.formData.model,
+                        vehicle_year: this.formData.year,
+                        assigned_gate_pass: "",
+                        registration_date: this.formData.registration_date,
+                    };
+                    const res = await fetch("/admin/vehicles", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": csrf,
+                        },
+                        body: JSON.stringify(payload),
+                        credentials: "same-origin",
+                    });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.message || "Failed to create vehicle");
+                    }
+                    await SweetAlertHelper.showSuccessMessage(action, 1, entityName);
+                    this.initializeFormData();
+                    closeModal(this.modalId);
+                    window.location.reload();
+                } else {
+                    // Simulate API for other entities
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+                    SweetAlertHelper.showSuccessMessage(action, 1, entityName);
+                    this.initializeFormData();
+                    if (this.type === "document_upload") this.removeFile();
+                    closeModal(this.modalId);
+                }
             } catch (error) {
                 Swal.fire({
                     title: "Error!",

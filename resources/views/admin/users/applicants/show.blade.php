@@ -76,7 +76,14 @@
     <!-- Documents Card -->
     <x-details.parts.documents-card :documents="$documents" />
 
+<<<<<<< HEAD
     <!-- Activity Log Card -->
     <x-details.parts.activity-log :activities="$activities" />
+=======
+    <!-- Activity Log Card (excluded from print) -->
+    <div class="no-print">
+      <x-details.parts.activity-log :activities="$activities" />
+    </div>
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
   </x-slot>
 </x-details.layout>

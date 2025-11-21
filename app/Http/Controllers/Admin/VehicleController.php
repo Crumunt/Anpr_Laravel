@@ -16,7 +16,8 @@ class VehicleController extends Controller
 
     private $faker;
 
-    function __construct() {
+    function __construct()
+    {
         $this->faker = Faker::create();
     }
 
@@ -41,7 +42,45 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'owner_id' => ['required', 'exists:users,id'],
+            'license_plate' => ['required', 'string', 'max:255'],
+            'vehicle_type' => ['required', 'string', 'max:50'],
+            'vehicle_make' => ['required', 'string', 'max:100'],
+            'vehicle_model' => ['required', 'string', 'max:100'],
+            'vehicle_year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'assigned_gate_pass' => ['nullable', 'string', 'max:255'],
+            'registration_date' => ['required', 'date'],
+        ]);
+
+        $status = \App\Models\Status::where('code', 'active')->first();
+
+        $vehicle = Vehicle::create([
+            'owner_id' => $validated['owner_id'],
+            'license_plate' => $validated['license_plate'],
+            'vehicle_type' => $validated['vehicle_type'],
+            'vehicle_make' => $validated['vehicle_make'],
+            'vehicle_model' => $validated['vehicle_model'],
+            'vehicle_year' => $validated['vehicle_year'],
+            'assigned_gate_pass' => $validated['assigned_gate_pass'] ?? '',
+            'status_id' => $status?->id ?? \App\Models\Status::firstOrFail()->id,
+        ]);
+
+        // Optional: use registration_date for created_at override if needed
+        if (!empty($validated['registration_date'])) {
+            $vehicle->created_at = $validated['registration_date'];
+            $vehicle->save();
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle created successfully.',
+                'vehicle_id' => $vehicle->id,
+            ]);
+        }
+
+        return redirect()->route('admin.vehicles')->with('success', 'Vehicle created successfully.');
     }
 
     /**
@@ -82,7 +121,7 @@ class VehicleController extends Controller
         $vehicles = Vehicle::with('user')->paginate(10);
 
         $rows = [];
-        foreach($vehicles as $vehicle) {
+        foreach ($vehicles as $vehicle) {
             $rows[] = [
                 'id' => $vehicle->id,
                 'vehicle' => ApplicationDisplayHelper::getVehicleName($vehicle->vehicle_make, $vehicle->vehicle_model),

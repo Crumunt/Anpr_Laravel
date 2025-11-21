@@ -1,6 +1,5 @@
 @forelse ($rows as $index => $row)
-    <tr @click="toggleRow({{ $index }}, $event)"
-        x-data="toggleDeselectAll()"
+    <tr @click="toggleRow({{ $index }}, $event)" x-data="toggleDeselectAll()"
         class="group relative cursor-pointer transition-all duration-300 hover:bg-green-50/80 hover:shadow-sm hover:-translate-y-0.5"
         :class="{ 'bg-green-50/60': isSelected({{ $index }}) }">
 
@@ -25,7 +24,7 @@
         @endforeach
         @if ($showActions)
             <x-table.data-cell class="text-right">
-                <x-row-action-menu :index="$index" :uid="$row['id']"/>
+                <x-row-action-menu :index="$index" :uid="$row['id']" :type="$type" />
             </x-table.data-cell>
         @endif
     </tr>

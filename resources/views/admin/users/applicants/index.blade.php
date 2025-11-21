@@ -30,7 +30,11 @@
                         </div>
                     </div>
 
+<<<<<<< HEAD
                     <x-modal.modal id="applicant_modal" type="applicant" action="add" />
+=======
+                    <x-modal.modal id="applicant_modal" type="applicant" action="add" maxWidth="3xl" />
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
                     <!-- Moved search filter inside the space-y-6 container -->
                     <x-dashboard.search-filter :showType="'applicant'" />
 

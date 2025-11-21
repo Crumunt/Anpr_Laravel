@@ -2,7 +2,11 @@
 
 <div x-data="locationSelector()">
     <template x-if="currentStep === 1">
+<<<<<<< HEAD
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+=======
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                 <input type="text" name="full_name" x-model="formData.full_name"
@@ -145,7 +149,11 @@
         </div>
     </template>
     <template x-if="currentStep === 2">
+<<<<<<< HEAD
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+=======
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
                 <select name="vehicle_type" x-model="formData.vehicle_type"
@@ -318,12 +326,21 @@
     <div class="flex justify-center gap-4 mt-8">
         <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
             x-show="currentStep === 1" @click="closeModal('{{ $id }}')">Cancel</button>
+<<<<<<< HEAD
         <!-- <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
             x-show="currentStep > 1" @click="prevStep">Back</button>
         <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
             x-show="currentStep < 4" @click="nextStep">Next</button> -->
         <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
             x-show="!isSubmitting" @click="submitForm">Save</button>
+=======
+        <button type="button" class="px-6 py-2 bg-gray-200 text-gray-700 rounded shadow-sm hover:bg-gray-300 transition"
+            x-show="currentStep > 1" @click="prevStep">Back</button>
+        <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
+            x-show="currentStep < 4" @click="nextStep">Next</button>
+        <button type="button" class="px-6 py-2 bg-green-600 text-white rounded shadow-sm hover:bg-green-700 transition"
+            x-show="currentStep === 4 && !isSubmitting" @click="submitForm">Save</button>
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
         <span x-show="isSubmitting" class="flex items-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

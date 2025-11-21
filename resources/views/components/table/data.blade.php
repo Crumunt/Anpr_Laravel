@@ -163,18 +163,12 @@
                 @if ($type === 'admin')
                     <!-- Admin-specific actions -->
                     @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action, ['view', 'approve']))
-                            @continue
-                        @endif
                         <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
 
                     @endforeach
                 @else
                     <!-- Default actions for non-admin types -->
                     @foreach ($actionOptions as $action => $data)
-                        @if (in_array($action, ['edit', 'deactivate', 'reset_password']))
-                            @continue
-                        @endif
                         <x-ui.action-button :action="$action" :label="$data['label']" :click="'handleRowAction(\'' . $action . '\', selectedRow, $event)'" />
                     @endforeach
 

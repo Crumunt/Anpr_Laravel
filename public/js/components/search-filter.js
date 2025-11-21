@@ -513,7 +513,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             } else {
                 if (filterType === "status" && statusFilter)
-                    statusFilter.value = "all";
+                    statusFilter.value = "";
                 if (filterType === "admin_status" && adminStatusFilter)
                     adminStatusFilter.value = "all";
                 if (filterType === "sortBy" && sortByFilter)
@@ -590,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function () {
         activeFiltersList = [];
 
         // Status filter
-        if (statusFilter && statusFilter.value !== "all") {
+        if (statusFilter && statusFilter.value !== "" && statusFilter.value !== "all") {
             activeFiltersList.push({
                 type: "status",
                 value: statusFilter.value,

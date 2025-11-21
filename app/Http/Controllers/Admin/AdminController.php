@@ -80,7 +80,7 @@ class AdminController extends Controller
     {
         $users = User::with(['details', 'roles'])
             ->whereHas('roles', function ($q) {
-                $q->whereIn('name', ['admin_viewer','admin_editor', 'encoder','super_admin','security','maintenance']);
+                $q->whereIn('name', ['admin_viewer', 'admin_editor', 'encoder', 'super_admin', 'security', 'maintenance']);
             })->paginate(10);
 
         $all = [];
@@ -94,7 +94,7 @@ class AdminController extends Controller
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->details->phone_number,
-                'role' => ucwords(str_replace('_',' ',$user->roles->first()?->name)),
+                'role' => ucwords(str_replace('_', ' ', $user->roles->first()?->name)),
                 'status' => ['label' => $user->details?->status?->status_name],
                 'lastLogin' => $this->faker->date(),
             ];

@@ -249,8 +249,11 @@
                     </div>
                 </div>
                 
+<<<<<<< HEAD
                 <!-- Search Button -->
                 <x-dashboard.buttons type="search" icon="true" text="Search" class="min-w-[100px] h-11"/>
+=======
+>>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
             </div>
         </form>
         

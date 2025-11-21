@@ -22,12 +22,12 @@
             <x-dashboard.card title="Inactive {{$userType}}" totalNumber="{{ $dashboardData['inactive']['count'] ?? 0 }}"
                 percent="{{ $dashboardData['inactive']['percentage'] ?? 0 }}" description="Currently inactive users" icon="ban" />
             @if($showAdminCard)
-                <x-dashboard.card 
-                    title="Super {{ ucfirst($userType) }}s" 
-                    color="blue" 
+                <x-dashboard.card
+                    title="Super {{ ucfirst($userType) }}s"
+                    color="blue"
                     totalNumber="{{ $stats['super'] ?? 0 }}"
-                    percent="{{ $stats['super_change'] ?? '0' }}" 
-                    description="Super administrators" 
+                    percent="{{ $stats['super_change'] ?? '0' }}"
+                    description="Super administrators"
                     icon="shield" />
             @endif
         </div>
@@ -61,7 +61,7 @@
                     </div>
 
                     @if ($userType === 'applicant')
-                        <x-modal.modal id="applicant-modal" type="applicant" action="add" />
+                        <x-modal.modal id="applicant-modal" type="applicant" action="add" maxWidth="3xl" />
                     @else
                         <x-modal.modal id="admin-modal" type="admin" action="add" />
                     @endif
@@ -72,7 +72,7 @@
                     <!-- Table container -->
                     <div class="w-full space-y-6" id="table_wrapper">
                         <!-- All Users Tab Content -->
-                        <x-table.data :type="'user'" context="user_{{ $userType }}" :rows="$userDetails"
+                        <x-table.data :type="$userType" context="user_{{ $userType }}" :rows="$userDetails"
                             caption="{{ $tableCaption }}" />
                     </div>
 
