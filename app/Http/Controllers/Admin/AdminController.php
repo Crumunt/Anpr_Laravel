@@ -90,7 +90,7 @@ class AdminController extends Controller
         foreach ($users as $user) {
             $all[] = [
                 'id' => $user->id,
-                'user_id' => $user->details->clsu_id,
+                'clsu_id' => $user->details->clsu_id,
                 'name' => $user->first_name,
                 'email' => $user->email,
                 'phone_number' => $user->details->phone_number,

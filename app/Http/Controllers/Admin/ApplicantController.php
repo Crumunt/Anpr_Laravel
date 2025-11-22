@@ -53,7 +53,7 @@ class ApplicantController extends Controller
 
             // DEFAULT NO AJAX REQUEST
             // return view('admin.users.applicants.index', compact('userDetails', 'users'));
-            return view('users.index', [
+            return view('admin.users.applicants.index', [
                 'userDetails' => $userDetails,
                 'dashboardData' => $dashboardCardData,
                 'pagination' => $users,

@@ -3,34 +3,16 @@
 
     <div class="flex-1 md:ml-64 p-6 pt-24">
         <!-- Dashboard Cards -->
-<<<<<<< HEAD
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <x-dashboard.card title="Total Admins" totalNumber="42" percent="+2" description="Total administrators"
-                icon="users" />
-            <x-dashboard.card title="Active Admins" totalNumber="36" percent="+1" description="Currently active admins"
-                icon="check" />
-            <x-dashboard.card title="Inactive Admins" totalNumber="6" percent="-3" description="Currently inactive admins"
-                icon="ban" />
-=======
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <x-dashboard.card title="Total Admins" totalNumber="42" percent="+2" description="Total administrators"
                 icon="users" />
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
             <x-dashboard.card title="Super Admins" color="blue" totalNumber="3" percent="0"
                 description="System super administrators" icon="shield" />
         </div>
 
-<<<<<<< HEAD
-        <!-- Admin tabs container -->
-        <div x-data="{ activeTab: 'All Admins' }" @tab-changed="activeTab = $event.detail"
-            class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
-            <div dir="ltr" class="w-full">
-                <x-dashboard.navigation-tabs :tabs="['All Admins', 'Active', 'Inactive']" />
-            </div>
-=======
         <!-- Admin container -->
-        <div class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
+        <div
+            class="w-full bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
             <div class="p-6">
                 <div class="w-full space-y-6">
                     <!-- Header -->
@@ -64,28 +46,8 @@
                     <x-dashboard.search-filter showType="admins" />
                     <!-- Table container -->
                     <div class="w-full space-y-6 mt-6">
-<<<<<<< HEAD
-                        <!-- All Admins Tab Content -->
-                        <div x-show="activeTab === 'All Admins'" x-transition>
-                            <x-table.data :type="'admin'" context="user_admin" :rows="$users['all']"
-                                caption="All Administrators" />
-                        </div>
-
-                        <!-- Active Admins Tab Content -->
-                        <div x-show="activeTab === 'Active'" x-transition>
-                            <x-table.data :type="'admin'" context="user_admin" tab="active" :rows="$users['active']"
-                                caption="Active Administrators" />
-                        </div>
-
-                        <!-- Inactive Admins Tab Content -->
-                        <div x-show="activeTab === 'Inactive'" x-transition>
-                            <x-table.data :type="'admin'" context="user_admin" tab="inactive" :rows="$users['inactive']"
-                                caption="Inactive Administrators" />
-                        </div>
-=======
                         <x-table.data :type="'admin'" context="user_admin" :rows="$users['all']"
                             caption="All Administrators" />
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
 
                         <div id="pagination">
                             <x-pagination :pagination="$users['paginate']" />

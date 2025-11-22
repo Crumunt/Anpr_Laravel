@@ -10,7 +10,7 @@ class ApplicationDisplayHelper
     public static function headerHelper($context = 'user_admin', $tab = '')
     {
         $base = [
-            ['key' => 'user_id', 'label' => 'ID', 'width' => '200px'],
+            ['key' => 'clsu_id', 'label' => 'ID', 'width' => '200px'],
             ['key' => 'name', 'label' => 'Name', 'width' => '200px'],
             ['key' => 'email', 'label' => 'Email', 'width' => '250px'],
             ['key' => 'phone_number', 'label' => 'Phone', 'width' => '150px'],
@@ -149,7 +149,8 @@ class ApplicationDisplayHelper
 
     }
 
-    public static function generateNameThumbnail($first_name, $last_name) {
+    public static function generateNameThumbnail($first_name, $last_name)
+    {
         return "$first_name[0]$last_name[0]";
     }
 

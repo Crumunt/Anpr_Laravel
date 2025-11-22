@@ -23,6 +23,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
+    @livewireStyles
+
+    @livewireScripts
 </head>
 
 <body style="background-color: #f9fafb;" class="@yield('body-class')">

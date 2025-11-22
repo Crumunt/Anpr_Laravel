@@ -15,7 +15,7 @@
                 $value = $row[$key] ?? null;
             @endphp
 
-            <x-table.data-cell :class="$key == 'user_id' ? 'font-medium' : ''">
+            <x-table.data-cell :class="$key == 'clsu_id' ? 'font-medium' : ''">
 
                 <x-table.cell-renderer :value="$value" />
 
@@ -24,7 +24,7 @@
         @endforeach
         @if ($showActions)
             <x-table.data-cell class="text-right">
-                <x-row-action-menu :index="$index" :uid="$row['id']" :type="$type" />
+                <x-row-action-menu :index="$index" :uid="$row['id']" :type="$type" :status="$row['status']['label']" />
             </x-table.data-cell>
         @endif
     </tr>

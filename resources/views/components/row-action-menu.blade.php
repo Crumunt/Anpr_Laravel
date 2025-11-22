@@ -1,6 +1,10 @@
 <!-- Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less. - Marie Curie -->
 
-@props(['index', 'uid', 'type' => 'applicant'])
+@props(['index', 'uid', 'type' => 'applicant', 'status'])
+
+@php
+    $status = strtolower($status);
+@endphp
 
 <div class="row-action-wrapper flex justify-end">
     @if ($type === 'applicant')
@@ -10,11 +14,25 @@
                 <x-icons.view />
                 View
             </button>
-            <button @click.stop="handleRowAction('approve', '{{ $uid }}', $event)"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-white border border-green-200 rounded-md hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500/30">
-                <x-icons.approve />
-                Approve
-            </button>
+            @if (in_array($status, ['rejected', 'pending']))
+                <button @click.stop="handleRowAction('approve', '{{ $uid }}', $event)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-white border border-green-200 rounded-md hover:bg-green-50 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500/30">
+                    <x-icons.approve />
+                    Approve
+                </button>
+            @elseif ($status === 'under review')
+                <button disabled @click.stop="handleRowAction('approve', '{{ $uid }}', $event)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-yellow-700 bg-white border border-yellow-200 rounded-md hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500/30">
+                    <x-icons.edit />
+                    Under Review
+                </button>
+            @else
+                <button @click.stop="handleRowAction('approve', '{{ $uid }}', $event)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-md hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/30">
+                    <x-icons.deactivate />
+                    Reject
+                </button>
+            @endif
             <button @click.stop="handleRowAction('delete', '{{ $uid }}', $event)"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-md hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/30">
                 <x-icons.delete />

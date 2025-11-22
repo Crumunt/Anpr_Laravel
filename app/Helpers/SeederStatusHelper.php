@@ -14,7 +14,6 @@ class SeederStatusHelper
             'pending',
             'approved',
             'rejected',
-            'under_review',
         ]);
 
         return Status::where('code', $code)->firstOrFail();

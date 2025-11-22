@@ -61,11 +61,11 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-    
+
     .type-dropdown {
         max-height: 150px;
     }
-    
+
     /* Make form elements easier to tap */
     select, input, button, .type-dropdown label {
         min-height: 44px;
@@ -100,14 +100,14 @@
                 id="table"
                 class="w-full md:w-auto"
                 clearButtonId="clearSearchBtn" />
-                
+
             <!-- Filter Buttons -->
             <div class="flex flex-wrap items-center gap-3">
                 @if($showReset)
                 <!-- Reset Button -->
                 <x-dashboard.reset-button />
                 @endif
-                
+
                 <!-- Filter Dropdown -->
                 <div class="relative">
                     <button
@@ -125,7 +125,7 @@
                         </span>
                         <i class="fas fa-chevron-down text-gray-400 ml-1 transition-transform duration-200"></i>
                     </button>
-                    
+
                     <!-- Filter Dropdown Content -->
                     <div
                         id="filterDropdown"
@@ -170,26 +170,26 @@
                                     <x-dashboard.search-filter-dropdown id="role" :option="$roleOptions" :skipKeys="['all']"/>
                                 </div>
                             </div>
-                                                    
+
                                 @if($showTypeFilter)
                                 <!-- Dynamic Type Filter -->
                                 <div class="space-y-2" x-show="activeFilterType !== 'admins'">
                                     <label class="text-xs font-medium text-gray-600" x-text="
-                                        activeFilterType === 'applicant' ? 'Applicant Type' : 
-                                        activeFilterType === 'vehicle' ? 'Vehicle Type' : 
+                                        activeFilterType === 'applicant' ? 'Applicant Type' :
+                                        activeFilterType === 'vehicle' ? 'Vehicle Type' :
                                         'Gate Pass Type'
                                     "></label>
-                                    
+
                                     <!-- Applicant Type Dropdown - Only shown for applicant tab -->
                                     <div x-show="activeFilterType === 'applicant'" class="relative">
                                         <x-dashboard.search-filter-dropdown id="applicant" :option="$typeOptions" />
                                     </div>
-                                    
+
                                     <!-- Vehicle Type Dropdown - Only shown for vehicles tab -->
                                     <div x-show="activeFilterType === 'vehicle'" class="relative">
                                         <x-dashboard.search-filter-dropdown id="vehicle" :option="$typeOptions" />
                                     </div>
-                                    
+
                                     <!-- RFID Type Dropdown - Only shown for RFID tab -->
                                     <div x-show="activeFilterType === 'gatePass'" class="relative">
                                         <x-dashboard.search-filter-dropdown id="gatePass" :option="$typeOptions" />
@@ -201,7 +201,7 @@
                                     </div>
                                 </div>
                                 @endif
-                                
+
                                 @if($showDateRange)
                                 <!-- Date Range Filter -->
                                 <div class="space-y-2">
@@ -212,7 +212,7 @@
                                             id="dateRangePicker"
                                             name="date_range"
                                             class="w-full rounded-lg border px-3 py-2 pl-9 text-sm shadow-sm transition-all duration-300 bg-gray-50 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/50 focus:shadow-md"
-                                            value="{{ request('date_range') }}" 
+                                            value="{{ request('date_range') }}"
                                             placeholder="Select date range..." />
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <i class="fas fa-calendar-alt text-gray-400"></i>
@@ -220,7 +220,7 @@
                                     </div>
                                 </div>
                                 @endif
-                                
+
                                 @if($showSortBy)
                                 <!-- Sort By Filter -->
                                 <div class="space-y-2">
@@ -243,20 +243,15 @@
                                     </div>
                                 </div>
                                 @endif
-                                
+
                             </div>
                         </div>
                     </div>
                 </div>
-                
-<<<<<<< HEAD
-                <!-- Search Button -->
-                <x-dashboard.buttons type="search" icon="true" text="Search" class="min-w-[100px] h-11"/>
-=======
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
+
             </div>
         </form>
-        
+
         <!-- Active Filter Badges -->
         <div
             id="activeFilters"

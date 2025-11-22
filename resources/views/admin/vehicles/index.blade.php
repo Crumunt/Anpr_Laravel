@@ -8,8 +8,6 @@
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Vehicle Management</h2>
-<<<<<<< HEAD
-=======
                         <div class="flex space-x-2">
                             <x-dashboard.buttons :icon="false" class="bg-emerald-600 hover:bg-emerald-700"
                                 data-open-modal="vehicle-modal">
@@ -25,7 +23,6 @@
                                 <span>Add Vehicle</span>
                             </x-dashboard.buttons>
                         </div>
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
                     </div>
 
                     <!-- Moved search filter inside the space-y-6 container -->
@@ -43,9 +40,6 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
-=======
     <x-modal.modal id="vehicle-modal" type="vehicle" maxWidth="2xl" />
->>>>>>> b9a42a6ee6a4bcd1afa37d466361da6ab061895d
     <x-footer.footer></x-footer.footer>
 @endsection
