@@ -5,33 +5,27 @@ namespace App\Models\Vehicle;
 use App\Helpers\ApplicationDisplayHelper;
 use App\Models\Status;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Vehicle extends Model
 {
     //
+    use HasUlids;
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
         'owner_id',
         'license_plate',
-        'vehicle_type',
-        'vehicle_make',
-        'vehicle_model',
-        'vehicle_year',
+        'type',
+        'make',
+        'model',
+        'year',
+        'color',
         'assigned_gate_pass',
         'status_id'
     ];
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (!$model->id) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
 
     public function user()
     {

@@ -22,18 +22,17 @@
                     </div>
 
                     <!-- Search Filter -->
-                    <x-dashboard.search-filter userType="applicant" />
+                    @livewire('table.partials.search-filter')
 
                     <!-- Table container -->
                     <div class="w-full space-y-6" id="table_wrapper">
                         <!-- All Users Tab Content -->
-                        <x-table.data type="applicant" context="user_applicant" :rows="$userDetails"
-                            caption="{{ $tableCaption }}" />
+                        <livewire:table.data-table caption="All Applicants" type="applicant" />
                     </div>
 
                     <!-- Pagination -->
                     <div id="pagination">
-                        <x-pagination :pagination="$pagination" />
+                        <livewire:table.partials.pagination />
                     </div>
                 </div>
             </div>
@@ -43,7 +42,7 @@
     <x-footer.footer></x-footer.footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    {{-- <script>
         $(document).ready(function () {
             // Set search filter type
             if (document.querySelector('searchFilter')) {
@@ -194,5 +193,5 @@
                 });
             }
         });
-    </script>
+    </script> --}}
 @endsection

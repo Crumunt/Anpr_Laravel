@@ -4,11 +4,14 @@ namespace App\Models;
 
 use App\ApplicantType;
 use App\Helpers\ApplicationDisplayHelper;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
 class UserDetails extends Model
 {
     //
+    use HasUlids;
+
     public $incrementing = false;
     protected $primaryKey = 'user_id';
     protected $keyType = 'string';
@@ -19,19 +22,18 @@ class UserDetails extends Model
     protected $fillable = [
         'user_id',
         'clsu_id',
-        'current_address',
-        'street_address',
-        'barangay',
-        'city_municipality',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'region',
         'province',
-        'postal_code',
-        'country',
-        'license_number',
-        'college_unit_department',
+        'municipality',
+        'barangay',
+        'zip_code',
         'phone_number',
-        'applicant_type',
-        'approved_by',
-        'status_id',
+        'college_unit_department',
+        'position',
     ];
 
 
@@ -43,11 +45,6 @@ class UserDetails extends Model
     public function approvedBy()
     {
         return $this->belongsTo(UserDetails::class, 'approved_by', 'id');
-    }
-
-    public function status()
-    {
-        return $this->belongsTo(Status::class, 'status_id');
     }
 
     public function setStatusByCode(string $code)
@@ -66,5 +63,14 @@ class UserDetails extends Model
     {
         return ApplicationDisplayHelper::renderBadgeClass($this->status_name)
             ?? null;
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return ApplicationDisplayHelper::getFullNameAttribute(
+            $this->first_name,
+            $this->middle_name,
+            $this->last_name
+        );
     }
 }

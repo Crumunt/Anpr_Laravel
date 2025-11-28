@@ -9,21 +9,20 @@ class ApplicantStatCards extends Component
 {
     private $applicantService;
     public $increment = 0;
+    public $dashboardData = [];
 
     public function boot(ApplicantService $applicantService)
     {
         $this->applicantService = $applicantService;
     }
 
-    public function count() {
-        $this->increment++;
+    public function mount()
+    {
+        $this->dashboardData = $this->applicantService->getDashboardCounts();
     }
 
     public function render()
     {
-        $userType = 'applicant';
-        $dashboardData = $this->applicantService->getDashboardCounts();
-
-        return view('livewire.admin.applicant.applicant-stat-cards', compact('dashboardData', 'userType'));
+        return view("livewire.admin.applicant.applicant-stat-cards");
     }
 }

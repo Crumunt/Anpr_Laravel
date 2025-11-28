@@ -29,19 +29,19 @@ class UserSeeder extends Seeder
 
         // SuperAdmin
         $super_admin = ModelsUser::create([
+            'email' => $faker->email(),
+            'password' => Hash::make('password123'),
+            'must_change_password' => false,
+            'is_active' => true
+        ]);
+
+
+        $super_admin->details()->create([
             'first_name' => $faker->firstName(),
             'middle_name' => $faker->lastName(),
             'last_name' => $faker->lastName(),
-            'email' => $faker->email(),
-            'password' => Hash::make('password123'),
+            'clsu_id' => $faker->numerify('EMP-#######'),
         ]);
-
-        $super_admin_status =
-
-            $super_admin->details()->create([
-                'clsu_id' => $faker->numerify('EMP-#######'),
-                'status_id' => $status->id,
-            ]);
 
         $super_admin->refresh();
         if (Role::where('name', 'super_admin')->exists()) {
@@ -62,17 +62,18 @@ class UserSeeder extends Seeder
             $status = SeederStatusHelper::generateRandomStatus();
 
             $admin = ModelsUser::create([
-                'first_name' => $faker->firstName(),
-                'middle_name' => $faker->lastName(),
-                'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
+                'must_change_password' => false,
+                'is_active' => $faker->randomElement([false, true])
             ]);
 
             $admin->details()->create([
                 'clsu_id' => $faker->numerify('EMP-#####'),
-                'phone_number' => $faker->numerify('09#########'),
-                'status_id' => $status->id,
+                'first_name' => $faker->firstName(),
+                'middle_name' => $faker->lastName(),
+                'last_name' => $faker->lastName(),
+                'phone_number' => $faker->numerify('09#########')
             ]);
 
             $admin->refresh();
@@ -95,9 +96,6 @@ class UserSeeder extends Seeder
             $status = SeederStatusHelper::generateRandomStatus();
 
             $applicant = ModelsUser::create([
-                'first_name' => $faker->firstName(),
-                'middle_name' => $faker->optional(0.3)->lastName(),
-                'last_name' => $faker->lastName(),
                 'email' => $faker->email(),
                 'password' => Hash::make('password123'),
                 'created_at' => $random_date,
@@ -107,30 +105,39 @@ class UserSeeder extends Seeder
                     $faker->numerify('##-####'),
                     $faker->numerify('EMP-###') . $faker->randomNumber(3),
                 ]),
-                'current_address' => $faker->address(),
-                'street_address' => $faker->streetAddress(),
-                'barangay' => $faker->streetAddress(),
-                'city_municipality' => $faker->city(),
+                'first_name' => $faker->firstName(),
+                'middle_name' => $faker->optional(0.3)->lastName(),
+                'last_name' => $faker->lastName(),
+
+                'region' => $faker->address(),
                 'province' => $faker->city(),
-                'postal_code' => $faker->postcode(),
-                'country' => $faker->country(),
-                'license_number' => $faker->randomNumber(9),
-                'college_unit_department' => $faker->word(),
+                'municipality' => $faker->city(),
+                'barangay' => $faker->streetAddress(),
+                'zip_code' => $faker->postcode(),
+
                 'phone_number' => $faker->numerify('09#########'),
-                'applicant_type' => collect(ApplicantType::cases())->random(),
-                'status_id' => $status->id,
+
+                'college_unit_department' => $faker->word(),
+                'position' => $faker->optional(0.3)->randomElement(['instructor']),
                 'created_at' => $random_date
+            ]);
+
+            $applicant->applications()->create([
+                'applicant_type' => collect(ApplicantType::cases())->random(),
+                'license_number' => $faker->randomNumber(9),
+                'status_id' => $status->id,
             ]);
 
             // VEHICLE SEEDER
             $make = $faker->randomElement($vehicleMakes);
             $applicant->vehicles()->create([
-                'license_plate' => strtoupper(Str::random(3)) . ' ' . $faker->numberBetween(100, 9999),
-                'vehicle_type' => $faker->randomElement($vehicleTypes),
-                'vehicle_make' => $make,
-                'vehicle_model' => $faker->word(),
-                'vehicle_year' => $faker->numberBetween(2000, 2023),
+                'plate_number' => strtoupper(Str::random(3)) . ' ' . $faker->numberBetween(100, 9999),
+                'type' => $faker->randomElement($vehicleTypes),
+                'make' => $make,
+                'model' => $faker->word(),
+                'year' => $faker->numberBetween(2000, 2023),
                 'assigned_gate_pass' => $faker->numberBetween(100, 9999),
+                'color' => $faker->safeColorName(),
                 'status_id' => $status->id,
                 'created_at' => $random_date,
             ]);

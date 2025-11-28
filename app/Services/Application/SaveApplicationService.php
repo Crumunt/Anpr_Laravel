@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Services\Application;
+
+use App\Models\Documents;
+use App\Models\Status;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class SaveApplicationService
+{
+    public function handle(array $payload, array $uploadedTempPaths = [])
+    {
+        $created = null;
+        try {
+            $created = DB::transaction(function () use (
+                $payload,
+                $uploadedTempPaths,
+            ) {
+                $application_status = Status::applicationPending();
+                $vehicle_status = Status::vehiclePending();
+
+                $applicant = User::create([
+                    "email" => $payload["email"],
+                    "password" => Str::random(10),
+                    "must_change_password" => true,
+                ]);
+
+                $applicant->details()->create([
+                    "first_name" => $payload["first_name"],
+                    "middle_name" => $payload["middle_name"] ?? null,
+                    "last_name" => $payload["last_name"],
+                    "suffix" => $payload["suffix"] ?? null,
+                    "region" => $payload["selectedRegion"],
+                    "province" => $payload["selectedProvince"],
+                    "municipality" => $payload["selectedMunicipality"],
+                    "barangay" => $payload["selectedBarangay"],
+                    "zip_code" => $payload["zip_code"],
+                    "phone_number" => $payload["phone"],
+                    "clsu_id" => $payload["clsu_id"],
+                    "college_unit_department" =>
+                        $payload["department"],
+                    "position" => $payload["position"] ?? null,
+                ]);
+
+                $application = $applicant->applications()->create([
+                    "license_number" => $payload['license_number'] ?? null,
+                    "applicant_type" => $payload["applicant_type"],
+                    "status_id" => $application_status->id,
+                ]);
+
+
+                $applicant->vehicles()->create([
+                    "plate_number" => $payload["plate_number"],
+                    "type" => $payload["vehicle_type"] ?? 'test',
+                    "make" => $payload["make"],
+                    "model" => $payload["model"],
+                    "year" => $payload["year"],
+                    'color' => $payload['color'],
+                    "status_id" => $vehicle_status->id,
+                ]);
+
+                $fileRecords = [];
+                foreach ($uploadedTempPaths as $tmpFiles) {
+                    $fileRecords[] = [
+                        "type" => $tmpFiles['type'],
+                        "file_path" => $tmpFiles['tmp_path'],
+                        "created_at" => now(),
+                        "updated_at" => now(),
+                    ];
+                }
+
+                if (!empty($fileRecords)) {
+                    $application->documents()->createMany($fileRecords);
+                }
+            });
+        } catch (\Throwable $e) {
+            foreach ($uploadedTempPaths as $p) {
+                if (Storage::disk("local")->exists($p)) {
+                    Storage::disk("local")->delete($p);
+                }
+            }
+
+            throw $e;
+        }
+
+        if($created) {
+            $created->refresh();
+            $created->assignRole('applicant');
+        }
+
+        if($created && !empty($uploadedTempPaths)) {
+            foreach($uploadedTempPaths as $tmpPath) {
+                $finalPath = 'application/' . $created->id . '/' . basename($tmpPath);
+                Storage::move($tmpPath, $finalPath);
+
+                Documents::where('path', $tmpPath)->update(['path' => $finalPath]);
+            }
+        }
+
+        return $created;
+    }
+}

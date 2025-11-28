@@ -12,17 +12,13 @@ class Badge extends Component
     /**
      * Create a new component instance.
      */
-
     public string $label;
     public string $class;
 
-    public function __construct($label)
+    public function __construct($badge)
     {
-        //
-
-        $this->label = $label ?? 'test';
-
-        $this->class = $this->resolveClass($label);
+        $this->label = $badge['badge_label'];
+        $this->class = $this->resolveClass($badge['badge_label']);
     }
 
     private function resolveClass($label) {

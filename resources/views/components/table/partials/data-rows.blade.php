@@ -1,13 +1,6 @@
 @forelse ($rows as $index => $row)
-    <tr @click="toggleRow({{ $index }}, $event)" x-data="toggleDeselectAll()"
-        class="group relative cursor-pointer transition-all duration-300 hover:bg-green-50/80 hover:shadow-sm hover:-translate-y-0.5"
-        :class="{ 'bg-green-50/60': isSelected({{ $index }}) }">
-
-        @if ($showCheckboxes)
-            <x-table.data-cell>
-                <x-table.checkbox-cell :data-id="$row['id']" :index="$index" :is-selected="'isSelected'" />
-            </x-table.data-cell>
-        @endif
+    <tr
+        class="group relative cursor-pointer transition-all duration-300 hover:bg-green-50/80 hover:shadow-sm hover:-translate-y-0.5">
 
         @foreach ($headers as $header)
             @php
@@ -24,7 +17,7 @@
         @endforeach
         @if ($showActions)
             <x-table.data-cell class="text-right">
-                <x-row-action-menu :index="$index" :uid="$row['id']" :type="$type" :status="$row['status']['label']" />
+                <x-row-action-menu :index="$index" :uid="$row['id']" :type="$type" status="approved" />
             </x-table.data-cell>
         @endif
     </tr>

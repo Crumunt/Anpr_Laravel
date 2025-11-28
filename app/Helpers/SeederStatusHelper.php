@@ -11,7 +11,7 @@ class SeederStatusHelper
     public static function generateRandomStatus()
     {
         $code = Arr::random([
-            'pending',
+            'under_review',
             'approved',
             'rejected',
         ]);

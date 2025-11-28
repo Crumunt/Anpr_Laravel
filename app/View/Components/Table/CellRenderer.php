@@ -16,15 +16,17 @@ class CellRenderer extends Component
     public $value;
     public $row;
     public $type;
+    public $isBold;
+    public $index;
 
 
 
-    public function __construct($value)
+    public function __construct($value, $index = null, $isBold = false)
     {
         //
         $this->value = $value;
-
-
+        $this->index = $index;
+        $this->isBold = $isBold;
     }
 
     /**

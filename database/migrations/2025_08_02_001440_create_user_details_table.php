@@ -12,35 +12,26 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('user_details', function (Blueprint $table) {
-            $table->uuid('user_id')->primary();
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->cascadeOnDelete();
+            $table->ulid('user_id')->primary();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
 
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('suffix')->nullable();
+
+            $table->string('region')->nullable();
+            $table->string('province')->nullable();
+            $table->string('municipality')->nullable();
+            $table->string('barangay')->nullable();
+            $table->string('zip_code')->nullable();
+
+            $table->string('phone_number')->nullable();
 
             $table->string('clsu_id');
-            $table->string('current_address')->nullable();
-            $table->string('street_address')->nullable();
-            $table->string('barangay')->nullable();
-            $table->string('city_municipality')->nullable();
-            $table->string('province')->nullable();
-            $table->string('postal_code')->nullable();
-            $table->string('country')->nullable();
-            $table->string('license_number')->nullable();
             $table->string('college_unit_department')->nullable();
-            $table->string('phone_number')->nullable();
-            $table->enum('applicant_type', ApplicantType::values())
-                ->nullable();
+            $table->string('position')->nullable();
 
-            // admin approved by
-            $table->uuid('approved_by')->nullable();
-            $table->foreign('approved_by')
-                ->references('id')
-                ->on('users')
-                ->nullOnDelete();
-
-            $table->foreignId('status_id')->references('id')->on('statuses');
             $table->timestamps();
         });
     }

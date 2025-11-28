@@ -19,25 +19,20 @@ class ApplicantService
         //
     }
 
-    public function getApplicants(array $filters, int $perPage = 10)
+    public function getApplicants(array $filters)
     {
         // SELECTING ONLY REQUIRED DATA FOR SPEED
-        return User::select(['id', 'email', 'first_name', 'middle_name', 'last_name', 'suffix', 'created_at'])
-            ->with([
-                'details:user_id,clsu_id,phone_number,status_id',
-                'details.status:id,status_name'
-            ])
+        return User::select(['id', 'email', 'created_at'])
             ->applicant()
-            ->withCount('vehicles')
+            ->withApplicationCounts()
             ->when($filters['status'] ?? null, fn($q) => $q->withStatusCode($filters['status']))
             ->when($filters['search'] ?? null, fn($q) => $q->searchTerm($filters['search']))
             ->when($filters['applicant_types'] ?? null, fn($q) => $q->applicantType($filters['applicant_types']))
             ->when(
                 $filters['sort_by'] ?? null,
                 fn($q) => $q->sortApplicant($filters['sort_by']),
-                fn($q) => $q->orderBy('created_at', 'desc')
-            )
-            ->paginate($perPage);
+                fn($q) => $q->orderBy('created_at','asc')
+            );
     }
 
     public function getDashboardCounts()

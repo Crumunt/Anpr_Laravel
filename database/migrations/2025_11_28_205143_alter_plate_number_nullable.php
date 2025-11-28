@@ -12,13 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         //
-        Schema::create('statuses', function (Blueprint $table) {
-            $table->id();
-            $table->enum('type',['application','vehicle','anpr']);
-            $table->string('code')->unique();
-            $table->string('status_name');
-            $table->string('description');
-            $table->timestamps();
+        Schema::table('vehicles', function (Blueprint $table) {
+            $table->string('plate_number')->nullable()->change();
         });
     }
 
@@ -28,6 +23,5 @@ return new class extends Migration
     public function down(): void
     {
         //
-        Schema::dropIfExists('status');
     }
 };

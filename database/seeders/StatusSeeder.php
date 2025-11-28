@@ -14,36 +14,130 @@ class StatusSeeder extends Seeder
     public function run(): void
     {
         $statuses = [
-            // General workflow
-            ['code' => 'pending', 'status_name' => 'Pending', 'description' => 'Awaiting review or approval.'],
-            ['code' => 'under_review', 'status_name' => 'Under Review', 'description' => 'Currently being checked by the admin.'],
-            ['code' => 'approved', 'status_name' => 'Approved', 'description' => 'Approved and allowed to proceed.'],
-            ['code' => 'rejected', 'status_name' => 'Rejected', 'description' => 'Rejected due to invalid or incomplete requirements.'],
-            ['code' => 'active', 'status_name' => 'Active', 'description' => 'Currently active in the system.'],
-            ['code' => 'inactive', 'status_name' => 'Inactive', 'description' => 'Temporarily disabled.'],
-            ['code' => 'expired', 'status_name' => 'Expired', 'description' => 'Validity period has expired.'],
-            ['code' => 'revoked', 'status_name' => 'Revoked', 'description' => 'Previously approved but access has been revoked.'],
+            "application" => [
+                [
+                    "code" => "draft",
+                    "status_name" => "Draft",
+                    "description" =>
+                        "Applicant started but hasn’t submitted yet",
+                ],
+                [
+                    "code" => "submitted",
+                    "status_name" => "Submitted",
+                    "description" =>
+                        "Application submitted, waiting for review",
+                ],
+                [
+                    "code" => "under_review",
+                    "status_name" => "Under Review",
+                    "description" => "Admin reviewing the application",
+                ],
+                [
+                    "code" => "approved",
+                    "status_name" => "Approved",
+                    "description" => "Application approved by admin",
+                ],
+                [
+                    "code" => "rejected",
+                    "status_name" => "Rejected",
+                    "description" => "Application rejected by admin",
+                ],
+                [
+                    "code" => "expired",
+                    "status_name" => "Expired",
+                    "description" => "Application expired (if time-limited)",
+                ],
+                [
+                    "code" => "cancelled",
+                    "status_name" => "Cancelled",
+                    "description" => "Applicant cancelled the request",
+                ],
+                [
+                    "code" => "needs_revision",
+                    "status_name" => "Needs Revision",
+                    "description" => "Admin requested changes from applicant",
+                ],
+            ],
 
-            // Security / enforcement
-            ['code' => 'blacklisted', 'status_name' => 'Blacklisted', 'description' => 'Banned from entering the premises.'],
-            ['code' => 'flagged', 'status_name' => 'Flagged', 'description' => 'Requires manual inspection before entry.'],
+            "vehicle" => [
+                [
+                    "code" => "active",
+                    "status_name" => "Active",
+                    "description" => "Vehicle approved and usable",
+                ],
+                [
+                    "code" => "inactive",
+                    "status_name" => "Inactive",
+                    "description" =>
+                        "Vehicle temporarily inactive or suspended",
+                ],
+                [
+                    "code" => "pending_verification",
+                    "status_name" => "Pending Verification",
+                    "description" => "Vehicle registration awaiting approval",
+                ],
+                [
+                    "code" => "blacklisted",
+                    "status_name" => "Blacklisted",
+                    "description" => "Vehicle flagged for repeated violations",
+                ],
+                [
+                    "code" => "decommissioned",
+                    "status_name" => "Decommissioned",
+                    "description" => "Vehicle removed or permanently inactive",
+                ],
+            ],
 
-            // Asset tracking
-            ['code' => 'lost', 'status_name' => 'Lost', 'description' => 'RFID tag or plate reported lost.'],
-            ['code' => 'stolen', 'status_name' => 'Stolen', 'description' => 'Vehicle reported stolen.'],
-
-            // System
-            ['code' => 'maintenance', 'status_name' => 'Maintenance', 'description' => 'System, gate, or camera under maintenance.'],
+            "anpr" => [
+                [
+                    "code" => "entered",
+                    "status_name" => "Entered",
+                    "description" => "Vehicle successfully entered",
+                ],
+                [
+                    "code" => "exited",
+                    "status_name" => "Exited",
+                    "description" => "Vehicle successfully exited",
+                ],
+                [
+                    "code" => "violation_flagged",
+                    "status_name" => "Violation Flagged",
+                    "description" => "Vehicle triggered a violation",
+                ],
+                [
+                    "code" => "denied",
+                    "status_name" => "Denied",
+                    "description" => "Entry denied (unauthorized vehicle)",
+                ],
+                [
+                    "code" => "pending",
+                    "status_name" => "Pending",
+                    "description" => "Entry attempted, pending manual review",
+                ],
+                [
+                    "code" => "overstayed",
+                    "status_name" => "Overstayed",
+                    "description" => "Vehicle stayed beyond allowed time",
+                ],
+                [
+                    "code" => "restricted_area",
+                    "status_name" => "Restricted Area",
+                    "description" =>
+                        "Vehicle attempted entry into restricted area",
+                ],
+            ],
         ];
 
-        foreach ($statuses as $status) {
-            Status::updateOrCreate(
-                ['code' => $status['code']],
-                [
-                    'status_name' => $status['status_name'],
-                    'description' => $status['description'],
-                ]
-            );
+        foreach ($statuses as $type => $statusList) {
+            foreach ($statusList as $status) {
+                Status::updateOrCreate(
+                    ["type" => $type, "code" => $status["code"]],
+                    [
+                        "status_name" => $status["status_name"],
+                        "description" => $status["description"] ?? null,
+                    ]
+                );
+            }
         }
     }
 }

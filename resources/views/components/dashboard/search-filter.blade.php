@@ -221,7 +221,7 @@
                                 </div>
                                 @endif
 
-                                @if($showSortBy)
+                                @if($showSortFilter)
                                 <!-- Sort By Filter -->
                                 <div class="space-y-2">
                                     <label class="text-xs font-medium text-gray-600">Sort By</label>

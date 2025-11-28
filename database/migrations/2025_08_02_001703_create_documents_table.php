@@ -11,14 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-
-            $table->foreignUuid('user_id')
-                ->constrained('users', 'id')
-                ->cascadeOnDelete();
-
-            $table->string('document_name');
-            $table->string('document_path');
+            $table->ulid('id')->primary();
+            $table->foreignUlid('application_id')->constrained()->cascadeOnDelete();
+            $table->enum('type',['vehicle_registration', 'license', 'proof_of_identity']);
+            $table->string('file_path');
             $table->timestamps();
         });
     }
