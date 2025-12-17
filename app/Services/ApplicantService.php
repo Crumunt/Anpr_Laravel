@@ -31,7 +31,7 @@ class ApplicantService
             ->when(
                 $filters['sort_by'] ?? null,
                 fn($q) => $q->sortApplicant($filters['sort_by']),
-                fn($q) => $q->orderBy('created_at','asc')
+                fn($q) => $q->orderBy('created_at','desc')
             );
     }
 
@@ -109,35 +109,6 @@ class ApplicantService
             return round((($current - $previous) / $previous) * 100, 2);
         }
         return $current > 0 ? 100 : 0;
-    }
-
-    private function getPercentage($model)
-    {
-
-        $cloneModel = (clone $model);
-
-        $startOfLastMonth = Carbon::now()->subMonth()->startOfMonth();
-        $endOfLastMonth = Carbon::now()->subMonth()->endOfMonth();
-        $startOfThisMonth = Carbon::now()->startOfMonth();
-        $endOfThisMonth = Carbon::now()->endOfMonth();
-
-        $percentageChange = 0;
-        $lastMonthCount = 0;
-        $currentMonthCount = 0;
-
-
-        $lastMonthCount += $cloneModel->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
-        $currentMonthCount += $cloneModel->whereBetween('created_at', [$startOfThisMonth, $endOfThisMonth])->count();
-
-
-
-        if ($lastMonthCount > 0) {
-            $percentageChange = (($currentMonthCount - $lastMonthCount) / max($lastMonthCount, 1)) * 100;
-        } else {
-            $percentageChange = $currentMonthCount > 0 ? 100 : 0;
-        }
-
-        return round($percentageChange, 2);
     }
 
     public function formatApplicantsForList(LengthAwarePaginator $users): Collection

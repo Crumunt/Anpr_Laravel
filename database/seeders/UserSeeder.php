@@ -119,12 +119,12 @@ class UserSeeder extends Seeder
 
                 'college_unit_department' => $faker->word(),
                 'position' => $faker->optional(0.3)->randomElement(['instructor']),
+                'license_number' => $faker->randomNumber(9),
                 'created_at' => $random_date
             ]);
 
             $applicant->applications()->create([
                 'applicant_type' => collect(ApplicantType::cases())->random(),
-                'license_number' => $faker->randomNumber(9),
                 'status_id' => $status->id,
             ]);
 

@@ -32,6 +32,8 @@ return new class extends Migration {
             $table->string('college_unit_department')->nullable();
             $table->string('position')->nullable();
 
+            $table->string('license_number')->nullable();
+
             $table->timestamps();
         });
     }

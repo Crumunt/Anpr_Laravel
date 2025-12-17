@@ -10,12 +10,34 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->foreignUlid('application_id')->constrained()->cascadeOnDelete();
-            $table->enum('type',['vehicle_registration', 'license', 'proof_of_identity']);
-            $table->string('file_path');
+        Schema::create("documents", function (Blueprint $table) {
+            $table->ulid("id")->primary();
+            $table
+                ->foreignUlid("application_id")
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->enum("type", [
+                "vehicle_registration",
+                "license",
+                "proof_of_identity",
+            ]);
+            $table->string("file_path");
+            $table->string('mime_type')->nullable();
+            $table->integer('file_size')->nullable();
+            $table->foreignId("status_id")->constrained("statuses");
+            $table->text("rejection_reason")->nullable();
+            $table->foreignUlid("reviewed_by")->nullable()->constrained("users");
+            $table->timestamp("reviewed_at")->nullable();
+            $table->integer("version")->default(1);
+            $table
+                ->foreignUlid("replaced_by")
+                ->nullable()
+                ->constrained("documents");
+            $table->boolean("is_current")->default(true);
             $table->timestamps();
+
+            $table->index(["application_id", "is_current"]);
+            $table->index("type");
         });
     }
 
@@ -24,6 +46,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists("documents");
     }
 };

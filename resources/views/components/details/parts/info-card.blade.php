@@ -6,13 +6,18 @@
     'editId' => 'edit-info-btn',
     'cardId' => null
 ])
-<div id="{{ $cardId ?? 'card-'.Str::slug($title) }}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
+
+@php
+$uid = uniqid();
+@endphp
+
+<div id="{{ $cardId ?? 'card-' . Str::slug($title) }}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
   <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
     <h2 class="text-lg font-semibold text-gray-800">{{ $title }}</h2>
     @if($editButton)
     <div class="card-actions">
       <!-- View mode button -->
-      <button 
+      <button
         type="button"
         class="edit-button inline-flex items-center px-3 py-1.5 border border-green-600 text-sm font-medium rounded-md text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
       >
@@ -21,7 +26,7 @@
         </svg>
         Edit
       </button>
-      
+
       <!-- Edit mode buttons (hidden by default) -->
       <div class="edit-actions hidden space-x-2">
         <button type="button" class="save-button inline-flex items-center px-3 py-1.5 border border-green-600 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none">
@@ -49,17 +54,17 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const editableCards = document.querySelectorAll('.card-form');
-    
+
     editableCards.forEach(card => {
         const cardContainer = card.closest('[id^="card-"]');
         if (!cardContainer) return;
-        
+
         const editButton = cardContainer.querySelector('.edit-button');
         const saveButton = cardContainer.querySelector('.save-button');
         const cancelButton = cardContainer.querySelector('.cancel-button');
         const editActions = cardContainer.querySelector('.edit-actions');
         const cardTitle = cardContainer.querySelector('h2');
-        const originalTitle = cardTitle ? cardTitle.textContent : '';
+        const originalTitle = "{{ $title }}";
         let originalValues = {};
 
         // Edit Mode Toggle
@@ -166,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.querySelectorAll('.info-field').forEach(field => {
                         const input = field.querySelector('input, textarea, select');
                         const display = field.querySelector('.info-value');
-                        
+
                         if (input && display) {
-                            display.textContent = input.tagName === 'SELECT' 
-                                ? input.options[input.selectedIndex].text 
+                            display.textContent = input.tagName === 'SELECT'
+                                ? input.options[input.selectedIndex].text
                                 : input.value;
                         }
                     });
@@ -197,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.querySelectorAll('input[type="color"]').forEach(colorInput => {
             const textInput = colorInput.parentNode.querySelector('[data-color-input]');
             if (!textInput) return;
-            
+
             colorInput.addEventListener('input', () => textInput.value = colorInput.value);
             textInput.addEventListener('input', () => {
                 if (/^#[0-9A-F]{6}$/i.test(textInput.value)) {
@@ -231,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     el.classList.remove('hidden');
                     setTimeout(() => el.classList.remove('opacity-0'), 50);
                 });
-                
+
                 card.querySelectorAll('.info-field').forEach(field => {
                     field.classList.remove('bg-green-50', 'p-2', 'rounded-md', '-m-2');
                 });

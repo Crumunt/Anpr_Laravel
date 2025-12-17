@@ -88,7 +88,7 @@
             </div>
         </div>
     @elseif(is_array($value) && array_key_exists('badge_label', $value))
-        <x-ui.badge :badge="$value" />
+        <x-ui.badge :label="$value['badge_label']" />
     @elseif(filter_var($value, FILTER_VALIDATE_URL))
         <a href="{{ $value }}"
            target="_blank"

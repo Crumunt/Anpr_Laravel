@@ -73,7 +73,7 @@ class SearchFilter extends Component
 
         $this->fetchActiveFiltersCount();
 
-        $this->dispatch("table-filter", filters: $this->filters);
+        $this->dispatch("filterTableData", filters: $this->filters);
     }
 
     public function fetchActiveFiltersCount()

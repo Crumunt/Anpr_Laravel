@@ -2,23 +2,32 @@
 
 namespace App\Livewire\Admin\Applicant;
 
+use App\Services\Admin\Applicants\ApplicantReadService;
 use App\Services\ApplicantService;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ApplicantStatCards extends Component
 {
-    private $applicantService;
     public $increment = 0;
     public $dashboardData = [];
 
-    public function boot(ApplicantService $applicantService)
-    {
-        $this->applicantService = $applicantService;
-    }
-
     public function mount()
     {
-        $this->dashboardData = $this->applicantService->getDashboardCounts();
+        $this->fetchCardData();
+    }
+
+    #[On("fetchCardData")]
+    public function fetchCardData()
+    {
+        $service = $this->fetchReadService();
+
+        $this->dashboardData = $service->getDashboardCounts();
+    }
+
+    private function fetchReadService()
+    {
+        return app(ApplicantReadService::class);
     }
 
     public function render()

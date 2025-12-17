@@ -6,14 +6,10 @@ namespace App\Models;
 
 use App\Helpers\ApplicationDisplayHelper;
 use App\Models\Vehicle\Vehicle;
-use Dom\Document;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -66,6 +62,18 @@ class User extends Authenticatable
         return $this->hasMany(Application::class, "user_id", "id");
     }
 
+    public function documents()
+    {
+        return $this->hasManyThrough(
+            Documents::class,
+            Application::class,
+            "user_id",
+            "application_id",
+            "id",
+            "id",
+        );
+    }
+
     public function approvedDetailes()
     {
         return $this->hasMany(UserDetails::class, "approved_by", "uuid");
@@ -86,9 +94,37 @@ class User extends Authenticatable
     public function getNameInitialAttribute()
     {
         return ApplicationDisplayHelper::generateNameThumbnail(
-            $this->first_name,
-            $this->last_name,
+            $this->details?->first_name,
+            $this->details?->last_name,
         );
+    }
+
+    // applicant details card details
+    public function getCardDetails($context = "default")
+    {
+        $data = [];
+
+        if($context === 'default') {
+            $data = [
+                "first_name" => "First Name",
+                "middle_name" => "Middle Name",
+                "last_name" => "Last Name",
+                "suffix" => "Suffix",
+                "email" => "Email",
+                "phone_number" => "Phone Number",
+                "license_number" => "License Number",
+            ];
+        }elseif($context === 'address') {
+            $data = [
+                'region_name' => 'Region',
+                'province' => 'Province',
+                'municipality' => 'City/Municipality',
+                'barangay' => 'Barangay',
+                'zip_code' => 'Zip Code'
+            ];
+        }
+
+        return $data;
     }
 
     public function scopeApplicant($query)
@@ -198,8 +234,8 @@ class User extends Authenticatable
     public function scopeSortApplicant($query, $option)
     {
         $sortOptions = [
-            "newest" => ["created_at", "asc"],
-            "oldest" => ["created_at", "desc"],
+            "newest" => ["created_at", "desc"],
+            "oldest" => ["created_at", "asc"],
             "a-z" => ["first_name", "asc"],
             "z-a" => ["first_name", "desc"],
         ];

@@ -133,7 +133,7 @@
             <tbody class="divide-y divide-gray-100 bg-white" id="user_data">
                 @forelse ($rows as $index => $row)
                     @php
-                        $isSelected = in_array($row['id'], $selectedRows);
+                        $isSelected = isset($selectedRows[$row['id']]);
                         $rowCount = count($rows);
                     @endphp
 
@@ -146,7 +146,7 @@
                         <td class="px-4 py-4 align-middle">
                             <div class="flex items-center justify-center">
                                 <input type="checkbox"
-                                       :checked="{{ in_array($row['id'], $selectedRows) ? 'true' : 'false' }}"
+                                       :checked="{{ $isSelected ? 'true' : 'false' }}"
                                        wire:click="toggleRow('{{$row['id']}}')"
                                        value="{{ $row['id'] }}"
                                        id="checkbox-{{ $row['id'] }}"

@@ -17,7 +17,7 @@ class Vehicle extends Model
     protected $keyType = 'string';
     protected $fillable = [
         'owner_id',
-        'license_plate',
+        'plate_number',
         'type',
         'make',
         'model',
@@ -37,11 +37,12 @@ class Vehicle extends Model
         return $this->belongsTo(Status::class, 'status_id');
     }
 
-    public function getVehicleMakeModelAttribute(): string
+    public function getVehicleInfoAttribute(): string
     {
-        $make = $this->vehicle_make ?? '';
-        $model = $this->vehicle_model ?? '';
-        return trim("$make $model");
+        $year = $this->year ?? '';
+        $make = $this->make ?? '';
+        $model = $this->model ?? '';
+        return trim("$year $make $model");
     }
 
     public function getStatusBadgeAttribute() {

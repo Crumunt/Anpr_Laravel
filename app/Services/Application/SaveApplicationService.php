@@ -40,33 +40,37 @@ class SaveApplicationService
                     "zip_code" => $payload["zip_code"],
                     "phone_number" => $payload["phone"],
                     "clsu_id" => $payload["clsu_id"],
-                    "college_unit_department" =>
-                        $payload["department"],
+                    "college_unit_department" => $payload["department"],
                     "position" => $payload["position"] ?? null,
                 ]);
 
                 $application = $applicant->applications()->create([
-                    "license_number" => $payload['license_number'] ?? null,
+                    "license_number" => $payload["license_number"] ?? null,
                     "applicant_type" => $payload["applicant_type"],
                     "status_id" => $application_status->id,
                 ]);
 
-
                 $applicant->vehicles()->create([
                     "plate_number" => $payload["plate_number"],
-                    "type" => $payload["vehicle_type"] ?? 'test',
+                    "type" => $payload["vehicle_type"] ?? "test",
                     "make" => $payload["make"],
                     "model" => $payload["model"],
                     "year" => $payload["year"],
-                    'color' => $payload['color'],
+                    "color" => $payload["color"],
                     "status_id" => $vehicle_status->id,
                 ]);
 
-                $fileRecords = [];
-                foreach ($uploadedTempPaths as $tmpFiles) {
-                    $fileRecords[] = [
-                        "type" => $tmpFiles['type'],
-                        "file_path" => $tmpFiles['tmp_path'],
+                $file_records = [];
+                foreach ($uploadedTempPaths as $tmp_file) {
+                    $filename = Str::uuid() . '.' . $tmp_file['tmp_path']->getClientOriginalExtension();
+
+                    $store_path = "application/{$applicant->id}/{$application->id}";
+                    $final_path = "{$store_path}/" . $filename;
+                    $tmp_file['tmp_path']->storeAs($store_path, $filename, 'local');
+
+                    $file_records[] = [
+                        "type" => $tmp_file["type"],
+                        "file_path" => $final_path,
                         "created_at" => now(),
                         "updated_at" => now(),
                     ];
@@ -75,29 +79,15 @@ class SaveApplicationService
                 if (!empty($fileRecords)) {
                     $application->documents()->createMany($fileRecords);
                 }
+
+                return $applicant;
             });
         } catch (\Throwable $e) {
-            foreach ($uploadedTempPaths as $p) {
-                if (Storage::disk("local")->exists($p)) {
-                    Storage::disk("local")->delete($p);
-                }
-            }
-
             throw $e;
         }
 
-        if($created) {
-            $created->refresh();
-            $created->assignRole('applicant');
-        }
-
-        if($created && !empty($uploadedTempPaths)) {
-            foreach($uploadedTempPaths as $tmpPath) {
-                $finalPath = 'application/' . $created->id . '/' . basename($tmpPath);
-                Storage::move($tmpPath, $finalPath);
-
-                Documents::where('path', $tmpPath)->update(['path' => $finalPath]);
-            }
+        if ($created) {
+            $created->assignRole("applicant");
         }
 
         return $created;

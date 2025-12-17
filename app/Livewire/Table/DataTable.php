@@ -2,75 +2,97 @@
 
 namespace App\Livewire\Table;
 
-use App\Http\Resources\ApplicantResource;
-use App\Services\ApplicantService;
+use App\Exceptions\ApplicantNotFoundException;
+use App\Services\Admin\Applicants\ApplicantReadService;
+use App\Services\Admin\Applicants\ApplicantWriteService;
 use App\Helpers\ApplicationDisplayHelper;
+use Exception;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
+use Log;
 
 class DataTable extends Component
 {
     use WithPagination;
 
     // REFERS TO TABLE TYPE: applicant, admin etc.
-    public $type;
+    #[Locked]
+    public string $type;
 
-    public $headers = [];
-    public $rows = [];
-    public $selectedRows = [];
-    public $selectedAll = false;
-    public $bulkActionBtns = [];
-    public $caption;
-    public $showCheckboxes = true;
-    public $showActions = true;
+    public array $headers = [];
+    public Collection $rows;
+    #[Validate("array")]
+    public array $selectedRows = [];
+
+    #[Validate("boolean")]
+    public bool $selectedAll = false;
+
+    #[Validate("array")]
+    public array $bulkActionBtns = [];
+    public ?string $caption = null;
+
+    #[Validate("boolean")]
+    public bool $showCheckboxes = true;
+
+    #[Validate("boolean")]
+    public bool $showActions = true;
 
     protected $queryString = ["page"];
 
-    // SERVICES
-    protected $applicantService;
-    // HELPERS
-    protected $applicationDisplayHelper;
+    private const CONFIG_HELPER = "helper_class";
+    private const CONFIG_READ_SERVICE = "read_service_class";
+    private const CONFIG_WRITE_SERVICE = "write_service_class";
+    private const CONFIG_METHODS = "method";
+
+    // PAGINATION
+    private const PER_PAGE = 10;
 
     protected array $tableTypes = [
         "applicant" => [
-            "helper" => "applicationDisplayHelper",
-            "service" => "applicantService",
-            "method" => "getApplicants",
-            "format" => "formatApplicantsForList",
+            self::CONFIG_HELPER => ApplicationDisplayHelper::class,
+            self::CONFIG_READ_SERVICE => ApplicantReadService::class,
+            self::CONFIG_WRITE_SERVICE => ApplicantWriteService::class,
+            self::CONFIG_METHODS => [
+                "fetch" => "getApplicants",
+                "delete" => "delete",
+                "format" => "formatApplicantsForList",
+            ],
         ],
     ];
 
-    public function boot(ApplicantService $applicantService, ApplicationDisplayHelper $applicationDisplayHelper)
+    public function mount(): void
     {
-        $this->applicantService = $applicantService;
-        $this->applicationDisplayHelper = $applicationDisplayHelper;
-    }
-
-    public function mount()
-    {
+        $this->rows = collect();
         $this->bulkActionBtns = $this->defaultBulkActions();
 
         $this->fetchTableHeaders();
         $this->fetchTableRows();
     }
 
-    public function updatedSelectedAll($value)
+    public function updatedSelectedAll(bool $value): void
     {
-        $this->selectedRows = $value ? $this->rows->pluck("id")->toArray() : [];
-    }
-
-    public function toggleRow($id)
-    {
-        if (in_array($id, $this->selectedRows)) {
-            $this->selectedRows = array_diff($this->selectedRows, [$id]);
-            $this->selectedAll = false;
-        } else {
-            $this->selectedRows[] = $id;
+        if($value) {
+            $this->selectedRows = $this->rows->pluck('id')->mapWithKeys(fn($id) => [$id => true])->toArray();
+        }else {
+            $this->selectedRows = [];
         }
     }
 
-    public function clearSelection()
+    public function toggleRow(?string $id): void
+    {
+        if (isset($this->selectedRows[$id])) {
+            unset($this->selectedRows[$id]);
+            $this->selectedAll = false;
+        } else {
+            $this->selectedRows[$id] = true;
+        }
+    }
+
+    public function clearSelection(): void
     {
         $this->selectedRows = [];
         $this->selectedAll = false;
@@ -87,66 +109,137 @@ class DataTable extends Component
     }
 
     #[On("page-changed")]
-    public function changePage($filters)
+    public function changePage(array $filters = []): void
     {
         $this->reset("selectedRows", "selectedAll");
-        // $this->dispatch('log-action', [$this->selectedRows, $this->selectedAll]);
         $this->fetchTableRows($filters);
     }
 
-    public function fetchTableHeaders()
+    public function fetchTableHeaders(): void
     {
-        $type = $this->type ?? "applicant";
+        $config = $this->tableTypes[$this->type] ?? null;
 
-        if (!isset($this->tableTypes[$type])) {
+        if (!$config) {
+            $this->headers = [];
             return;
         }
 
-        $config = $this->tableTypes[$type];
-        $helper = $this->{$config["helper"]};
+        $helperClass = $config[self::CONFIG_HELPER];
 
-        $headers = $helper::headerHelper("user_{$type}", "");
+        $headers = $helperClass::headerHelper("user_{$this->type}", "");
 
-        $this->headers = $headers;
+        $this->headers = $headers ?? [];
     }
 
-    #[On("table-filter")]
-    public function fetchTableRows($filters = [])
+    private function fetchReadService(): ?ApplicantReadService
     {
-        $type = $filters["filter_type"] ?? $this->type;
+        $config = $this->tableTypes[$this->type] ?? null;
 
-        if (!isset($this->tableTypes[$type])) {
+        if (!$config) {
+            return null;
+        }
+
+        return app($config[self::CONFIG_READ_SERVICE]);
+    }
+
+    private function fetchWriteService(): ?ApplicantWriteService
+    {
+        $config = $this->tableTypes[$this->type] ?? null;
+
+        if (!$config) {
+            return null;
+        }
+
+        return app($config[self::CONFIG_WRITE_SERVICE]);
+    }
+
+    #[On("filterTableData")]
+    public function fetchTableRows(array $filters = []): void
+    {
+        $service = $this->fetchReadService();
+
+        if (!$service) {
+            $this->rows = collect();
             return;
         }
 
-        $config = $this->tableTypes[$type];
-        $service = $this->{$config["service"]};
+        $config = $this->tableTypes[$this->type];
+        $paginatedTableRows = $service
+            ->{$config[self::CONFIG_METHODS]["fetch"]}($filters)
+            ->paginate(self::PER_PAGE, ["*"], "page", $filters["page"] ?? 1);
 
-        $paginatorRows = $service
-            ->{$config["method"]}($filters)
-            ->paginate(10, ["*"], "page", $filters["page"] ?? 1);
-
-        if (isset($config["format"])) {
-            $rows = $service->{$config["format"]}($paginatorRows);
+        $formattedTableRows = $paginatedTableRows;
+        if (isset($config[self::CONFIG_METHODS]["format"])) {
+            $formattedTableRows = $service->{$config[self::CONFIG_METHODS][
+                "format"
+            ]}($paginatedTableRows);
         }
 
-        $this->rows = $rows;
+        $this->rows = $formattedTableRows;
 
         $this->dispatch(
             "pagination-updated",
-            currentPage: $paginatorRows->currentPage(),
-            lastPage: $paginatorRows->lastPage(),
-            perPage: $paginatorRows->perPage(),
-            total: $paginatorRows->total(),
-            from: $paginatorRows->firstItem(),
-            to: $paginatorRows->lastItem(),
-            path: $paginatorRows->path(),
+            currentPage: $paginatedTableRows->currentPage(),
+            lastPage: $paginatedTableRows->lastPage(),
+            perPage: $paginatedTableRows->perPage(),
+            total: $paginatedTableRows->total(),
+            from: $paginatedTableRows->firstItem(),
+            to: $paginatedTableRows->lastItem(),
+            path: $paginatedTableRows->path(),
         );
-
-        $this->dispatch("log-action", $filters["page"] ?? 1);
     }
 
-    public function render()
+    #[On("refetchTableData")]
+    public function refetchTableRows(): void
+    {
+        $this->fetchTableRows();
+    }
+
+    public function deleteRow(?string $id): void
+    {
+        try {
+            $service = $this->fetchWriteService();
+
+            if (!$service) {
+                $this->dispatch("notify", [
+                    "message" => "Invalid Configuration",
+                    "type" => "error",
+                ]);
+                return;
+            }
+
+            $config = $this->tableTypes[$this->type];
+
+            $service->{$config[self::CONFIG_METHODS]["delete"]}($id);
+
+            $this->dispatch(
+                "notify",
+                message: "Deleted Successfully",
+                type: "success",
+            );
+            $this->dispatch("fetchCardData");
+            $this->fetchTableRows();
+        } catch (ApplicantNotFoundException $e) {
+            $this->dispatch(
+                "notify",
+                message: "Record not found",
+                type: "error",
+            );
+        } catch (Exception $e) {
+            Log::error("Delete failed in Livewire", [
+                "id" => $id,
+                "error" => $e->getMessage(),
+            ]);
+
+            $this->dispatch(
+                "notify",
+                message: "An error occurred. Please try again.",
+                type: "error",
+            );
+        }
+    }
+
+    public function render(): \Illuminate\View\View
     {
         return view("livewire.table.data-table");
     }

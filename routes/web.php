@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ApplicantController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GatePassController;
+use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn() => view('auth.login'));
 
 Route::get('/test', fn() => view('testing'));
+
+Route::get('/documents/{document}/view', [DocumentController::class, 'view'])->name('documents.view');
 
 Route::prefix('admin')->name('admin.')->group(function () {
 

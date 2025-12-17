@@ -20,7 +20,6 @@ class Application extends Model
 
     protected $fillable = [
         "user_id",
-        "license_number",
         "applicant_type",
         "approved_by",
         "status_id",

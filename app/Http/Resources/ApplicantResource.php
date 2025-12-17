@@ -23,99 +23,119 @@ class ApplicantResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $baseData = [
+        return [
             "id" => $this->id,
             "email" => $this->email,
             "submitted_date" => $this->created_at->format("F d, Y"),
+
+            ...$this->relationLoaded("details") && $this->context !== "detail"
+                ? [
+                    "name" => $this->details?->full_name,
+                    "clsu_id" => $this->details?->clsu_id ?? "-",
+                    "phone_number" => $this->phone_number,
+                ]
+                : [],
+
+            ...$this->relationLoaded("applications")
+                ? $this->getApplicationsData()
+                : [],
+
+            ...$this->context === "detail" ? $this->getDetailData() : [],
+        ];
+    }
+
+    private function getApplicationsData()
+    {
+        $data = [];
+        $applicant_type = $this->applications->first()?->applicant_type->name;
+
+        $data["applicant_type"] = [
+            "badge_label" => $applicant_type,
         ];
 
+        $data["applications"] = [
+            "overview" => str_pad(
+                $this->applications_count,
+                2,
+                "0",
+                STR_PAD_LEFT,
+            ),
+            "tooltip" => [
+                "active" => $this->active_applications_count ?? 0,
+                "pending" => $this->pending_applications_count ?? 0,
+                "rejected" => $this->rejected_applications_count ?? 0,
+            ],
+        ];
+
+        return $data;
+    }
+
+    private function getDetailData()
+    {
+        $data = [];
+
+        if ($this->relationLoaded("vehicles")) {
+            $data["vehicle_details"] = VehicleResource::collection(
+                $this->vehicles,
+            )->resolve();
+            $data[
+                "application_details"
+            ] = ApplicationDetailsResource::collection(
+                $this->applications,
+            )->resolve();
+        }
+
+        // Details
         if ($this->relationLoaded("details")) {
-            $baseData = array_merge($baseData, [
-                "name" => $this->details?->full_name,
-                "clsu_id" => $this->details?->clsu_id ?? "-",
-                "phone_number" => $this->phone_number,
-            ]);
+            $details = $this->getDetailedUserInfo();
+
+            $data["personal_information"] = $details["personal_information"];
+            $data["address_information"] = $details["address_information"];
         }
 
-        if ($this->relationLoaded("applications")) {
-            $applicant_type = $this->applications->first()?->applicant_type
-                ->name;
-            $baseData["applicant_type"] = [
-                "badge_label" => $applicant_type,
-                "badge_class" => ApplicationDisplayHelper::renderBadgeClass($applicant_type)
-            ];
-
-            if (isset($this->applications_count)) {
-                $baseData["applications"] = [
-                    "overview" => str_pad(
-                        $this->applications_count,
-                        2,
-                        "0",
-                        STR_PAD_LEFT,
-                    ),
-                    "tooltip" => [
-                        "active" => $this->active_applications_count ?? 0,
-                        "pending" => $this->pending_applications_count ?? 0,
-                        "rejected" => $this->rejected_applications_count ?? 0,
-                    ],
-                ];
-            }
+        if ($this->relationLoaded("documents")) {
+            $data["documents"] = ApplicantDocumentResource::collection(
+                $this->applications,
+            )->resolve();
         }
 
-        if ($this->context === "detail") {
-            $baseData = array_merge($baseData, [
-                $this->mergeWhen($this->relationLoaded("vehicles"), [
-                    "vehicle_details" => $this->getVehicleDetails(),
-                    "gate_pass_details" => $this->getGatePassDetails(),
-                ]),
-
-                $this->mergeWhen($this->relationLoaded("details"), [
-                    "user_details" => $this->getDetailedUserInfo(),
-                ]),
-            ]);
-        }
-
-        return $baseData;
+        return $data;
     }
 
     private function getDetailedUserInfo()
     {
-        return [
+        $active_status = $this->is_active ? "Active" : "Inactive";
+        $data = [];
+
+        $data["personal_information"] = [
+            "id" => $this->id,
             "name_initials" => $this->name_initial,
-            "license_number" => $this->details?->license_number,
+            "full_name" => $this->details?->full_name,
+            "first_name" => $this->details?->first_name,
+            "middle_name" => $this->details?->middle_name ?? "",
+            "last_name" => $this->details?->last_name,
+            "suffix" => $this->details?->suffix ?? "",
+            "email" => $this->email,
+            "clsu_id" => $this->details?->clsu_id ?? "",
+            "active_status" => $active_status,
+            "badge_class" => ApplicationDisplayHelper::renderBadgeClass(
+                $active_status,
+            ),
+            "phone_number" => $this->details?->phone_number ?? "",
+            "license_number" => $this->details?->license_number ?? "",
             "applicant_type" => $this->details?->applicant_type,
-            "curr_address" => $this->details?->current_address,
-            "city_municipality" => $this->details?->city_municipality,
-            "province" => $this->details?->province,
-            "postal_code" => $this->details?->postal_code,
-            "country" => $this->details?->country,
-            "status_badge" => $this->details?->status_badge,
         ];
-    }
 
-    private function getVehicleDetails()
-    {
-        return $this->vehicles->map(
-            fn($vehicle) => [
-                "plate_number" => $vehicle->license_plate,
-                "vehicle_make_model" => $vehicle->vehicle_make_model,
-                "vehicle_year" => $vehicle->vehicle_year,
-                "registration_date" => $vehicle->created_at->format("F d, Y"),
-            ],
-        );
-    }
+        $data["address_information"] = [
+            "id" => $this->id,
+            "region" => $this->details?->region_name,
+            "city_municipality" => $this->details?->municipality,
+            "province" => $this->details?->province,
+            "barangay" => $this->details?->barangay,
+            "zip_code" => $this->details?->zip_code,
+        ];
 
-    private function getGatePassDetails()
-    {
-        return $this->vehicles->map(
-            fn($vehicle) => [
-                "gate_pass" => $vehicle->assigned_gate_pass,
-                "status" => $vehicle->status_badge,
-                "date_issued" => $vehicle->created_at->format("F d, Y"),
-                // expiry calculation to be added
-                "expiry_date" => $vehicle->created_at->format("F d, Y"),
-            ],
-        );
+        return $data;
     }
 
     public static function forList($resource)

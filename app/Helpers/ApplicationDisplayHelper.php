@@ -124,14 +124,22 @@ class ApplicationDisplayHelper
             "Stolen" => "bg-gray-200/80 text-gray-900 hover:bg-gray-300/60",
             "Maintenance" => "bg-sky-100/80 text-sky-800 hover:bg-sky-200/60",
             // Roles
-            'Super Admin' => 'bg-purple-100/80 text-purple-800 hover:bg-purple-200/60',
-            'Admin Editor' => 'bg-blue-100/80 text-blue-800 hover:bg-blue-200/60',
-            'Admin Viewer' => 'bg-teal-100/80 text-teal-800 hover:bg-teal-200/60',
-            'Admin' => 'bg-sky-100/80 text-sky-800 hover:bg-sky-200/60',
-            'Encoder' => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
-            'Staff' => 'bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60',
-            'Faculty' => 'bg-green-100/80 text-green-800 hover:bg-green-200/60',   // new
-            'Student' => 'bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60', // new
+            "Super Admin"
+                => "bg-purple-100/80 text-purple-800 hover:bg-purple-200/60",
+            "Admin Editor"
+                => "bg-blue-100/80 text-blue-800 hover:bg-blue-200/60",
+            "Admin Viewer"
+                => "bg-teal-100/80 text-teal-800 hover:bg-teal-200/60",
+            "Admin" => "bg-sky-100/80 text-sky-800 hover:bg-sky-200/60",
+            "Encoder"
+                => "bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60",
+            "Staff"
+                => "bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60",
+            "Faculty"
+                => "bg-green-100/80 text-green-800 hover:bg-green-200/60", // new
+            "Student"
+                => "bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60", // new
+            // new
             // Fallback
             default => "bg-red-100 text-red-800 hover:bg-red-200/60",
         };
@@ -175,12 +183,19 @@ class ApplicationDisplayHelper
     }
 
     public static function getFullNameAttribute(
-        $first_name,
-        $middle_name,
-        $last_name,
+        string $first_name,
+        ?string $middle_name,
+        string $last_name,
+        ?string $suffix,
     ) {
         $middle_initial = self::getMiddleInitialsAttribute($middle_name);
-        return $first_name . " " . $middle_initial . " " . $last_name;
+        return $first_name .
+            " " .
+            $middle_initial .
+            " " .
+            $last_name .
+            " " .
+            $suffix;
     }
 
     private static function getMiddleInitialsAttribute($middle_name)

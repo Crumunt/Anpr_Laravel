@@ -122,7 +122,7 @@
                                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                                         <option value="">Select Region</option>
                                                         @foreach ($regions as $code => $region)
-                                                        <option value="{{ $code }}">{{ $region['region_name'] }}</option>
+                                                        <option value="{{ $code }}">{{ $region }}</option>
                                                         @endforeach
                                                     </select>
                                                     @error('selectedRegion') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
@@ -501,3 +501,27 @@
     @endif
 
 </div>
+
+@script
+<script>
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
+
+Livewire.on('notify', (data) => {
+    console.log(data);
+    Toast.fire({
+        icon: data.type,
+        title: data.message
+    });
+})
+</script>
+@endscript

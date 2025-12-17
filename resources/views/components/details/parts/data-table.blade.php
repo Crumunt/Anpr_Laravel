@@ -3,6 +3,7 @@
     'rows' => [],
     'actions' => true
 ])
+
 <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
   <div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
@@ -19,7 +20,7 @@
             </div>
           </th>
           @endforeach
-          
+
           @if($actions)
           <th scope="col" class="px-6 py-3.5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
             Actions
@@ -27,7 +28,7 @@
           @endif
         </tr>
       </thead>
-      
+
       <!-- Enhanced Body -->
       <tbody class="bg-white divide-y divide-gray-200">
         @forelse($rows as $rowIndex => $row)
@@ -36,14 +37,7 @@
             @if($key !== 'actions')
               <td class="px-6 py-4 whitespace-nowrap {{ $key === 'status' ? '' : ($loop->first ? 'font-medium text-gray-900' : 'text-gray-500') }}">
                 @if($key === 'status')
-                  <span class="{{ $cell['class'] ?? 'bg-gray-100 text-gray-800' }} inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                    @if(isset($cell['icon']))
-                      <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 8 8">
-                        <circle cx="4" cy="4" r="3" />
-                      </svg>
-                    @endif
-                    {{ $cell['label'] ?? $cell }}
-                  </span>
+                 <x-ui.badge :label="$cell" />
                 @elseif($key === 'name' || $loop->first)
                   <div class="flex items-center">
                     @if(isset($cell['avatar']))
@@ -77,7 +71,7 @@
               </td>
             @endif
           @endforeach
-          
+
           @if($actions)
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex items-center justify-end space-x-3">
@@ -95,9 +89,9 @@
               </button>
               <!-- Fixed dropdown menu with proper overlay -->
               <div class="relative" x-data="{ open: false }">
-                <button 
-                  @click="open = !open" 
-                  @keydown.escape.window="open = false" 
+                <button
+                  @click="open = !open"
+                  @keydown.escape.window="open = false"
                   @click.away="open = false"
                   class="text-gray-500 hover:text-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-full p-1"
                 >
@@ -106,15 +100,15 @@
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                   </svg>
                 </button>
-                
-                <div 
-                  x-show="open" 
-                  x-transition:enter="transition ease-out duration-100" 
-                  x-transition:enter-start="transform opacity-0 scale-95" 
-                  x-transition:enter-end="transform opacity-100 scale-100" 
-                  x-transition:leave="transition ease-in duration-75" 
-                  x-transition:leave-start="transform opacity-100 scale-100" 
-                  x-transition:leave-end="transform opacity-0 scale-95" 
+
+                <div
+                  x-show="open"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="transform opacity-0 scale-95"
+                  x-transition:enter-end="transform opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="transform opacity-100 scale-100"
+                  x-transition:leave-end="transform opacity-0 scale-95"
                   class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                   style="position: absolute; top: 100%; right: 0;"
                 >

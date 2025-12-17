@@ -53,7 +53,9 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with(relations: ["details", "vehicles"])->findOrFail($id);
+        $user = User::with(
+            relations: ["details", "vehicles", "applications", "documents"],
+        )->findOrFail($id);
 
         $applicant_details = $this->applicantService->formatApplicantForDetail(
             $user,
@@ -64,7 +66,7 @@ class ApplicantController extends Controller
         $breadcrumbs = [
             ["label" => "Dashboard", "url" => route("admin.dashboard")],
             ["label" => "Applicants", "url" => route("admin.applicant")],
-            ["label" => $user->full_name],
+            ["label" => $user->details?->full_name],
         ];
 
         return view("admin.users.applicants.show", [
@@ -77,10 +79,12 @@ class ApplicantController extends Controller
     {
         return [
             "applicant_details" => $applicant_details,
-            "user_details" => $applicant_details["user_details"] ?? [],
+            "personal_information" => $applicant_details["personal_information"] ?? [],
+            "address_information" => $applicant_details['address_information'] ?? [],
             "vehicle_details" => $applicant_details["vehicle_details"] ?? [],
-            "gate_pass_details" =>
-                $applicant_details["gate_pass_details"] ?? [],
+            "application_details" =>
+                $applicant_details["application_details"] ?? [],
+            "application_documents" => $applicant_details["documents"],
         ];
     }
 
@@ -106,35 +110,5 @@ class ApplicantController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    /**
-     * Lightweight search for applicants/users used by vehicle owner selection.
-     */
-    public function search(Request $request)
-    {
-        $q = $request->get("q", "");
-        if (trim($q) === "") {
-            return response()->json(["data" => []]);
-        }
-
-        $users = User::query()
-            ->with("details")
-            ->searchTerm($q)
-            ->limit(10)
-            ->get()
-            ->map(function (User $user) {
-                return [
-                    "id" => $user->id,
-                    "name" => $user->full_name,
-                    "clsu_id" => $user->details?->clsu_id,
-                    "email" => $user->email,
-                ];
-            })
-            ->values();
-
-        return response()->json([
-            "data" => $users,
-        ]);
     }
 }

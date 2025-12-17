@@ -2,28 +2,23 @@
 
 namespace App\Livewire\Admin\Modal;
 
+use App\Services\Admin\Applicants\ApplicantWriteService;
 use App\Services\Application\SaveApplicationService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Traits\HasPhilippineAddress;
 
 class Modal extends Component
 {
     use WithFileUploads;
+    use HasPhilippineAddress;
 
     public $showModal = false;
     public $currentStep = 1;
 
     // Form data
     public $first_name, $middle_name, $last_name, $suffix, $phone, $email;
-    public $regions = [],
-        $provinces = [],
-        $municipalities = [],
-        $barangays = [];
-    public $selectedRegion = null,
-        $selectedProvince = null,
-        $selectedMunicipality = null,
-        $selectedBarangay = null,
-        $zip_code;
+    public $zip_code;
     public $clsu_id, $department, $position, $applicant_type;
     public $vehicle_type, $make, $model, $color, $year, $plate_number;
     public $vehicle_registration = [],
@@ -39,7 +34,7 @@ class Modal extends Component
         "last_name" => "required|string|max:255",
         "suffix" => "nullable|string|max:10",
         "phone" => "required|string|max:20",
-        "email" => "required|email",
+        "email" => "required|email|unique:users",
 
         // Location
         "selectedRegion" => "required|string",
@@ -73,69 +68,13 @@ class Modal extends Component
             "required|file|mimes:pdf,jpg,jpeg,png|max:10240", // 10MB max per file
     ];
 
-    protected $saveApplicationService;
+    protected $applicantWriteService;
 
-    public function boot(SaveApplicationService $saveApplicationService)
+    public function boot(ApplicantWriteService $applicantWriteService)
     {
-        $this->saveApplicationService = $saveApplicationService;
+        $this->applicantWriteService = $applicantWriteService;
     }
 
-    public function mount()
-    {
-        $raw = file_get_contents(storage_path("app/json/cluster.json"));
-        $this->regions = json_decode($raw, true);
-    }
-
-    public function updatedSelectedRegion($value)
-    {
-        if (!isset($this->regions[$value])) {
-            $this->provinces = [];
-            return;
-        }
-
-        $this->provinces = array_keys($this->regions[$value]["province_list"]);
-    }
-
-    public function updatedSelectedProvince($value)
-    {
-        if (
-            !$this->selectedRegion ||
-            !isset(
-                $this->regions[$this->selectedRegion]["province_list"][$value],
-            )
-        ) {
-            $this->municipalities = [];
-            return;
-        }
-
-        $this->municipalities = array_keys(
-            $this->regions[$this->selectedRegion]["province_list"][$value][
-                "municipality_list"
-            ],
-        );
-    }
-
-    public function updatedSelectedMunicipality($value)
-    {
-        if (
-            !$this->selectedProvince ||
-            !isset(
-                $this->regions[$this->selectedRegion]["province_list"][
-                    $this->selectedProvince
-                ]["municipality_list"][$value],
-            )
-        ) {
-            $this->barangays = [];
-            return;
-        }
-
-        $this->barangays =
-            $this->regions[$this->selectedRegion]["province_list"][
-                $this->selectedProvince
-            ]["municipality_list"][$this->selectedMunicipality][
-                "barangay_list"
-            ];
-    }
 
     public function updatedVehicleRegistration($value)
     {
@@ -181,24 +120,39 @@ class Modal extends Component
     public function submitForm()
     {
         $validated = $this->validate();
-
         // TODO: Save applicant and files
         $uploadedTempPaths = [];
         foreach ($this->files as $file_type => $files) {
             foreach ($files as $file) {
                 $uploadedTempPaths[] = [
-                    'type' => $file_type,
-                    'tmp_path' => $file->getRealPath()
+                    "type" => $file_type,
+                    "file" => $file,
+                    "mime_type" => $file->getMimeType(),
+                    "file_size" => $file->getSize(),
                 ];
             }
         }
 
-        $created = $this->saveApplicationService->handle($validated, $uploadedTempPaths);
+        $created = $this->applicantWriteService->create(
+            $validated,
+            $uploadedTempPaths,
+        );
+
+        if (!$created->hasRole("applicant")) {
+            $this->dispatch("log-action", $created->role);
+            return;
+        }
 
         $this->resetForm();
         $this->showModal = false;
+        $this->dispatch(
+            "notify",
+            message: "Applicant added successfully!",
+            type: "success",
+        );
 
-        session()->flash("message", "Applicant successfully added!");
+        $this->dispatch("fetchCardData");
+        $this->dispatch("refetchTableData");
     }
 
     public function resetForm()

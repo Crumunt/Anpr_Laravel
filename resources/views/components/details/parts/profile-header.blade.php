@@ -26,7 +26,7 @@
           <span>{{ $initials }}</span>
         </div>
       @endif
-      
+
       <!-- Enhanced Status Indicator -->
       <div class="absolute -bottom-1 -right-1 flex items-center justify-center">
         <span class="relative flex h-5 w-5">
@@ -35,7 +35,7 @@
         </span>
       </div>
     </div>
-    
+
     <!-- Enhanced Profile Information -->
     <div>
       <div class="flex items-center space-x-2">
@@ -46,22 +46,15 @@
         </svg>
         @endif
       </div>
-      
+
       @if($subtitle)
         <p class="text-gray-600 mt-0.5">{{ $subtitle }}</p>
       @endif
-      
+
       <div class="flex flex-wrap items-center mt-2 gap-2">
         <!-- Status Badge -->
-        <span class="inline-flex items-center {{ $statusClass }} text-xs px-2.5 py-1 rounded-full font-medium">
-          @if($statusIcon)
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $statusIcon }}" />
-            </svg>
-          @endif
-          {{ $status }}
-        </span>
-        
+        <x-ui.badge :label="$status" />
+
         <!-- ID Badge -->
         <span class="inline-flex items-center bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +62,7 @@
           </svg>
           {{ $user_id }}
         </span>
-        
+
         <!-- Last Active Indicator if Available -->
         @if($isActive && $lastActive)
         <span class="inline-flex items-center text-xs text-gray-500">
@@ -79,7 +72,7 @@
           Active {{ $lastActive }}
         </span>
         @endif
-        
+
         <!-- Tags if Available -->
         @foreach($tags as $tag)
         <span class="inline-flex items-center bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full font-medium">
@@ -89,7 +82,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Enhanced Action Buttons with Dropdown -->
   <div class="flex flex-wrap gap-2">
     <!-- <button id="edit-applicant-btn" class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 text-sm font-medium text-gray-700">
@@ -98,18 +91,18 @@
       </svg>
       Edit
     </button> -->
-    
+
     <button id="print-btn" class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 text-sm font-medium text-gray-700">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
       </svg>
       Print
     </button>
-    
+
     <!-- Enhanced Dropdown Menu -->
     <div class="relative" x-data="{ open: false }">
-      <button 
-        @click="open = !open" 
+      <button
+        @click="open = !open"
         @keydown.escape.window="open = false"
         class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 text-sm font-medium text-gray-700"
       >
@@ -118,17 +111,17 @@
         </svg>
         More Actions
       </button>
-      
+
       <!-- Dropdown Menu with Enhanced Styling -->
-      <div 
-        x-show="open" 
-        @click.away="open = false" 
-        x-transition:enter="transition ease-out duration-100" 
-        x-transition:enter-start="transform opacity-0 scale-95" 
-        x-transition:enter-end="transform opacity-100 scale-100" 
-        x-transition:leave="transition ease-in duration-75" 
-        x-transition:leave-start="transform opacity-100 scale-100" 
-        x-transition:leave-end="transform opacity-0 scale-95" 
+      <div
+        x-show="open"
+        @click.away="open = false"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
         class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-10 ring-1 ring-black ring-opacity-5 focus:outline-none"
         style="display: none;"
       >
@@ -149,7 +142,7 @@
                 return message
             }
         });
-        
+
         if (result) {
             // Add your email sending logic here
             Swal.fire('Sent!', 'Email has been sent successfully.', 'success');
@@ -179,7 +172,7 @@
 
     deleteItem() {
         this.confirmAction(
-            'delete', 
+            'delete',
             'permanently delete this item',
             'warning',
             '#dc2626'
@@ -196,7 +189,7 @@
 
     <!-- Approve Button -->
     <button @click.prevent="confirmAction(
-        'approve', 
+        'approve',
         'mark this item as approved',
         'question',
         '#10b981'
@@ -209,7 +202,7 @@
 
     <!-- Reject Button -->
     <button @click.prevent="confirmAction(
-        'reject', 
+        'reject',
         'mark this item as rejected',
         'error',
         '#ef4444'
@@ -232,7 +225,7 @@
 </div>
       </div>
     </div>
-    
+
     <!-- Primary Action Button -->
     <button class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 text-sm font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

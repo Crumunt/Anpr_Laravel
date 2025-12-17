@@ -17,7 +17,7 @@ return new class extends Migration {
                 ->foreignUlid("owner_id")
                 ->constrained("users")
                 ->cascadeOnDelete();
-            $table->string("plate_number");
+            $table->string("plate_number")->nullable();
             $table->string("type");
             $table->string("make");
             $table->string("model");

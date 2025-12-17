@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('applications', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('user_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->string('license_number');
             $table->enum('applicant_type', ApplicantType::values())->nullable();
             $table->ulid('approved_by')->nullable();
             $table->foreign('approved_by')->references('id')->on('users')->nullOnDelete();
