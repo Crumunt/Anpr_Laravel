@@ -20,9 +20,11 @@ class ApplicantDocumentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            "application_id" => $this->id,
             "application_number" => $this->createApplicationNumber(),
             "applicant_type" => ucfirst($this->user->getRoleNames()->first()),
             "status" => $this->status->code,
+            "created_at" => $this->created_at,
             "date" => date_format($this->created_at, "M d, Y"),
 
             "documents" => $this->user->documents->map(function ($doc) {

@@ -2,13 +2,18 @@
 
 namespace App\Services\Admin\Applicants;
 
+use App\Http\Resources\ApplicantDocumentResource;
 use App\Http\Resources\ApplicantResource;
+use App\Models\Application;
 use App\Models\User;
+use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
-class ApplicantReadService {
+class ApplicantReadService
+{
 
     public function getApplicants(array $filters)
     {
@@ -22,7 +27,7 @@ class ApplicantReadService {
             ->when(
                 $filters['sort_by'] ?? null,
                 fn($q) => $q->sortApplicant($filters['sort_by']),
-                fn($q) => $q->orderBy('created_at','desc')
+                fn($q) => $q->orderBy('created_at', 'desc')
             );
     }
 
@@ -122,4 +127,16 @@ class ApplicantReadService {
         });
     }
 
+    public function fetchApplication($application_id)
+    {
+        try {
+            $application = Application::findOrFail($application_id);
+
+            return $application;
+        } catch (Exception $e) {
+            Log::error('Failed to fetch application: ' . $e->getMessage());
+
+            throw $e;
+        }
+    }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Livewire\Admin\Applicant\Details\Documents;
 
+use App\Models\Documents;
+use App\Models\Status;
+use Dom\Document;
 use Livewire\Attributes\Js;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -37,14 +40,67 @@ class DocumentViewer extends Component
 
     public function approveDocument()
     {
-        // Your server-side logic here (database update, etc.)
-        $docId = $this->currentDocument['id'];
+        $approved_status = Status::select('id')->where('code', 'approved')->first();
 
-        // Dispatch an event to update the parent list
-        $this->dispatch('documentUpdated', id: $docId, status: 'approved');
+        // Your server-side logic here (database update, etc.)
+        $docId = $this->currentDocument['document_id'];
+
+        if (!$docId) {
+            $this->dispatch('documentUpdated', id: $docId, message: 'Something went wrong', type: 'error');
+            return;
+        }
+
+        try {
+            $document = Documents::findOrFail($docId);
+
+            $document->status_id = $approved_status->id;
+
+            $application_id = $document->application_id;
+
+            $document->save();
+
+            // Dispatch an event to update the parent list
+            $this->dispatch('documentUpdated', applicationId: $application_id);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
 
         // Close and reset the component state
         $this->closeAndClear();
+    }
+
+    public function rejectDocument()
+    {
+
+        $rejected_status = Status::select('id')->where('code', 'rejected')->first();
+
+        $docId = $this->currentDocument['document_id'];
+
+        if (!$docId) {
+            $this->dispatch('documentUpdated', id: $docId, message: 'Something went wrong', type: 'error');
+            return;
+        }
+
+        try {
+            $document = Documents::findOrFail($docId);
+
+            $document->status_id = $rejected_status->id;
+
+            $application_id = $document->application_id;
+
+            $document->save();
+
+
+            // Close and reset the component state
+            $this->closeAndClear();
+
+
+            // Dispatch an event to update the parent list
+            $this->dispatch('documentUpdated', applicationId: $application_id);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     // ... other action methods (rejectDocument, markAsPending) ...
@@ -59,7 +115,8 @@ class DocumentViewer extends Component
         // We use $this->skipRender() here to prevent the component from re-rendering
         // with null data before the modal is hidden.
         // $this->skipRender();
-        $this->dispatch('clear-cached-document');
+        $this->currentDocument = null;
+        // $this->dispatch('clear-cached-document');
     }
 
     public function resetRejectForm()
