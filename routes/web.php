@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/vehicles/{id}', fn($id) => view('admin.vehicles.show', ['id' => $id]))->name('vehicles.show');
 
     Route::get('/admins', [AdminController::class, 'index'])->name('admins');
+    Route::get('/admins/{id}', [AdminController::class, 'show'])->name('admins.show');
 
     // Lightweight applicant search for vehicle owner selection
     Route::get('/users/search', [ApplicantController::class, 'search'])->name('users.search');
@@ -44,6 +45,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Settings
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
     Route::put('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+
+    // Account Settings (Manage My Account)
+    Route::get('/account', \App\Livewire\Admin\Applicant\AccountSettings::class)->name('account');
 
 });
 

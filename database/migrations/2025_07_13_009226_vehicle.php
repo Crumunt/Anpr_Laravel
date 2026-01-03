@@ -13,6 +13,7 @@ return new class extends Migration {
         //
         Schema::create("vehicles", function (Blueprint $table) {
             $table->ulid("id")->primary();
+            $table->foreignUlid('application_id')->constrained('applications')->cascadeOnDelete();
             $table
                 ->foreignUlid("owner_id")
                 ->constrained("users")

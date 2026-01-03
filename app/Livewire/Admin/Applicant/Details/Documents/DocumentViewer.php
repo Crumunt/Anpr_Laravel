@@ -62,6 +62,7 @@ class DocumentViewer extends Component
             // Dispatch an event to update the parent list
             $this->dispatch('documentUpdated', applicationId: $application_id);
         } catch (\Throwable $th) {
+            dd(true);
             throw $th;
         }
 

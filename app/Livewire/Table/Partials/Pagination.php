@@ -9,6 +9,7 @@ use Livewire\Component;
 class Pagination extends Component
 {
     // Pagination metadata
+
     public $currentPage;
     public $lastPage;
     public $total;
@@ -19,6 +20,8 @@ class Pagination extends Component
 
     // Component identifier for targeting specific tables
     public $targetComponent = "applicant-table";
+    public $parentId = '';
+    public $targetTable = '';
 
     public $pages = [];
     public $onEachSide = 2;
@@ -42,6 +45,11 @@ class Pagination extends Component
         $path,
         $targetComponent = "applicant-table",
     ) {
+
+        if ($targetComponent !== $this->targetTable) {
+            return;
+        }
+
         $this->currentPage = $currentPage;
         $this->lastPage = $lastPage;
         $this->total = $total;
@@ -102,7 +110,12 @@ class Pagination extends Component
 
         $this->filters['page'] = $page;
 
+        $this->filters['target'] = $this->targetTable;
+
+
         $this->dispatch("log-action", $this->filters);
+
+
 
         // Dispatch event to parent/table component
         $this->dispatch("page-changed", filters: $this->filters);

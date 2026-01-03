@@ -138,6 +138,30 @@ class User extends Authenticatable
             ]);
     }
 
+    public function scopeAdmin($query)
+    {
+        // Fetch all admin roles except security and applicant
+        return $query
+            ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["security", "applicant"]))
+            ->with([
+                "details:user_id,clsu_id,phone_number,first_name,middle_name,last_name,suffix",
+                "roles:id,name",
+            ]);
+    }
+
+    public function scopeAdminCount($query)
+    {
+        return (object) [
+            "total" => (clone $query)->count(),
+            "super_admin" => (clone $query)
+                ->whereHas("roles", fn($q) => $q->where("name", "super_admin"))
+                ->count(),
+            "admin" => (clone $query)
+                ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["super_admin", "security", "applicant"]))
+                ->count(),
+        ];
+    }
+
     public function scopeApplicantCount($query)
     {
         $baseQuery = $query->whereHas("applications.status");

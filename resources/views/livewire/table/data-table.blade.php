@@ -191,15 +191,22 @@
                                      class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
 
                                     <div class="py-1">
-                                        <button wire:click="viewRow('{{ $row['id'] }}')"
+                                        @php
+                                            $viewRoute = match($type) {
+                                                'admin' => route('admin.admins.show', $row['id']),
+                                                'applicant' => route('admin.applicant.show', $row['id']),
+                                                default => route('admin.applicant.show', $row['id']),
+                                            };
+                                        @endphp
+                                        <a      href="{{ $viewRoute }}"
                                                 @click="open = false"
-                                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2">
+                                                class="w-full text-left px-4 py-2 text-sm cursor-pointer text-gray-700 hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                             View Details
-                                        </button>
+                                        </a>
 
                                         <button wire:click="editRow('{{ $row['id'] }}')"
                                                 @click="open = false"

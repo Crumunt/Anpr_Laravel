@@ -5,6 +5,8 @@ namespace App\Livewire\Table;
 use App\Exceptions\ApplicantNotFoundException;
 use App\Services\Admin\Applicants\ApplicantReadService;
 use App\Services\Admin\Applicants\ApplicantWriteService;
+use App\Services\Admin\Admins\AdminReadService;
+use App\Services\Admin\Admins\AdminWriteService;
 use App\Helpers\ApplicationDisplayHelper;
 use Exception;
 use Illuminate\Support\Collection;
@@ -13,7 +15,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class DataTable extends Component
 {
@@ -62,6 +64,16 @@ class DataTable extends Component
                 "format" => "formatApplicantsForList",
             ],
         ],
+        "admin" => [
+            self::CONFIG_HELPER => ApplicationDisplayHelper::class,
+            self::CONFIG_READ_SERVICE => AdminReadService::class,
+            self::CONFIG_WRITE_SERVICE => AdminWriteService::class,
+            self::CONFIG_METHODS => [
+                "fetch" => "getAdmins",
+                "delete" => "delete",
+                "format" => "formatAdminsForList",
+            ],
+        ],
     ];
 
     public function mount(): void
@@ -71,6 +83,18 @@ class DataTable extends Component
 
         $this->fetchTableHeaders();
         $this->fetchTableRows();
+    }
+
+    /**
+     * Get the target table identifier based on type
+     */
+    private function getTargetTable(): string
+    {
+        return match($this->type) {
+            'admin' => 'admins_table',
+            'applicant' => 'applications_table',
+            default => 'applications_table',
+        };
     }
 
     public function updatedSelectedAll(bool $value): void
@@ -111,6 +135,11 @@ class DataTable extends Component
     #[On("page-changed")]
     public function changePage(array $filters = []): void
     {
+        // Only respond to page changes for this table's target
+        if (isset($filters['target']) && $filters['target'] !== $this->getTargetTable()) {
+            return;
+        }
+
         $this->reset("selectedRows", "selectedAll");
         $this->fetchTableRows($filters);
     }
@@ -131,7 +160,7 @@ class DataTable extends Component
         $this->headers = $headers ?? [];
     }
 
-    private function fetchReadService(): ?ApplicantReadService
+    private function fetchReadService(): mixed
     {
         $config = $this->tableTypes[$this->type] ?? null;
 
@@ -142,7 +171,7 @@ class DataTable extends Component
         return app($config[self::CONFIG_READ_SERVICE]);
     }
 
-    private function fetchWriteService(): ?ApplicantWriteService
+    private function fetchWriteService(): mixed
     {
         $config = $this->tableTypes[$this->type] ?? null;
 
@@ -156,6 +185,11 @@ class DataTable extends Component
     #[On("filterTableData")]
     public function fetchTableRows(array $filters = []): void
     {
+        // Only respond to filter events for this table's target (if specified)
+        if (isset($filters['target']) && $filters['target'] !== $this->getTargetTable()) {
+            return;
+        }
+
         $service = $this->fetchReadService();
 
         if (!$service) {
@@ -186,6 +220,7 @@ class DataTable extends Component
             from: $paginatedTableRows->firstItem(),
             to: $paginatedTableRows->lastItem(),
             path: $paginatedTableRows->path(),
+            targetComponent: $this->getTargetTable()
         );
     }
 
@@ -195,16 +230,25 @@ class DataTable extends Component
         $this->fetchTableRows();
     }
 
+    public function editRow(?string $id): void
+    {
+        // Dispatch event to open the edit modal with the admin ID
+        $eventName = match($this->type) {
+            'admin' => 'openEditAdminModal',
+            'applicant' => 'openEditApplicantModal',
+            default => 'openEditModal',
+        };
+
+        $this->dispatch($eventName, id: $id);
+    }
+
     public function deleteRow(?string $id): void
     {
         try {
             $service = $this->fetchWriteService();
 
             if (!$service) {
-                $this->dispatch("notify", [
-                    "message" => "Invalid Configuration",
-                    "type" => "error",
-                ]);
+                $this->dispatch("toast", type: "error", message: "Invalid Configuration");
                 return;
             }
 
@@ -212,30 +256,18 @@ class DataTable extends Component
 
             $service->{$config[self::CONFIG_METHODS]["delete"]}($id);
 
-            $this->dispatch(
-                "notify",
-                message: "Deleted Successfully",
-                type: "success",
-            );
+            $this->dispatch("toast", type: "success", message: "Deleted Successfully");
             $this->dispatch("fetchCardData");
             $this->fetchTableRows();
         } catch (ApplicantNotFoundException $e) {
-            $this->dispatch(
-                "notify",
-                message: "Record not found",
-                type: "error",
-            );
+            $this->dispatch("toast", type: "error", message: "Record not found");
         } catch (Exception $e) {
             Log::error("Delete failed in Livewire", [
                 "id" => $id,
                 "error" => $e->getMessage(),
             ]);
 
-            $this->dispatch(
-                "notify",
-                message: "An error occurred. Please try again.",
-                type: "error",
-            );
+            $this->dispatch("toast", type: "error", message: "An error occurred. Please try again.");
         }
     }
 

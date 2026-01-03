@@ -22,10 +22,8 @@ class AdminController extends Controller
 
     public function index()
     {
-        //
-        $users = $this->getUsers();
-
-        return view('admin.users.admins.index', compact('users'));
+        // Data is now handled by Livewire components
+        return view('admin.users.admins.index');
     }
 
     /**
@@ -49,7 +47,9 @@ class AdminController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // For now, redirect to applicant show page or create a dedicated admin view
+        // TODO: Create dedicated admin detail view
+        return view('admin.users.admins.show', ['id' => $id]);
     }
 
     /**

@@ -73,14 +73,21 @@
                                 @forelse($userResults as $u)
                                     <a href="{{ route('admin.applicant.show', $u->id) }}" class="flex items-start gap-3 px-4 py-3 hover:bg-green-50 transition border-b last:border-b-0">
                                         <div class="mt-0.5">
-                                            <i class="fas fa-user text-blue-500"></i>
+                                            <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center gap-2">
-                                                <div class="font-medium text-gray-800 truncate">{{ $u->full_name }}</div>
+                                                <div class="font-medium text-gray-800 truncate">{{ $u->details?->full_name ?? $u->email }}</div>
                                                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">Applicant</span>
                                             </div>
-                                            <div class="text-xs text-gray-500 truncate mt-0.5">{{ $u->email }}</div>
+                                            <div class="text-xs text-gray-500 truncate mt-0.5">
+                                                @if($u->details?->clsu_id)
+                                                    ID: {{ $u->details->clsu_id }} •
+                                                @endif
+                                                {{ $u->email }}
+                                            </div>
                                         </div>
                                     </a>
                                 @empty
@@ -95,16 +102,31 @@
                             </div>
                             <div class="rounded-xl border border-gray-100 overflow-hidden">
                                 @forelse($vehicleResults as $v)
-                                    <a href="{{ route('admin.vehicles.show', $v->id) }}" class="flex items-start gap-3 px-4 py-3 hover:bg-green-50 transition border-b last:border-b-0">
+                                    @php
+                                        $vehicleInfo = $v->vehicle_info ?: trim(($v->make ?? '') . ' ' . ($v->model ?? ''));
+                                        $ownerName = $v->user?->details?->full_name ?? 'Unknown Owner';
+                                        $ownerId = $v->user?->id;
+                                    @endphp
+                                    <a href="{{ $ownerId ? route('admin.applicant.show', $ownerId) : '#' }}" class="flex items-start gap-3 px-4 py-3 hover:bg-green-50 transition border-b last:border-b-0">
                                         <div class="mt-0.5">
-                                            <i class="fas fa-car text-yellow-500"></i>
+                                            <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                                            </svg>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="flex items-center gap-2">
-                                                <div class="font-medium text-gray-800 truncate">{{ trim(($v->vehicle_make ?? '') . ' ' . ($v->vehicle_model ?? '')) }}</div>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <div class="font-medium text-gray-800 truncate">{{ $vehicleInfo ?: 'Unknown Vehicle' }}</div>
                                                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-100">Vehicle</span>
+                                                @if($v->assigned_gate_pass)
+                                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-100">
+                                                        GP: {{ $v->assigned_gate_pass }}
+                                                    </span>
+                                                @endif
                                             </div>
-                                            <div class="text-xs text-gray-500 truncate mt-0.5">{{ $v->license_plate }}</div>
+                                            <div class="text-xs text-gray-500 truncate mt-0.5">
+                                                {{ $v->plate_number ?? 'No plate' }} • Owner: {{ $ownerName }}
+                                            </div>
                                         </div>
                                     </a>
                                 @empty

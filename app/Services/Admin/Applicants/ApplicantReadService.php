@@ -139,4 +139,15 @@ class ApplicantReadService
             throw $e;
         }
     }
+
+    public function fetchUserApplications($user_id) {
+
+        try {
+            $user = User::with('applications')->findOrFail($user_id);
+            return $user->applications ?? 'test';
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+    }
 }

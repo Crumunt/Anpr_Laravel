@@ -19,44 +19,67 @@ class SearchController extends Controller
 
 		$users = User::query()
 			->with('details')
-			->where(function ($qb) use ($q) {
+			->whereHas('details', function ($qb) use ($q) {
 				$qb->where('first_name', 'like', "{$q}%")
 					->orWhere('last_name', 'like', "{$q}%")
-					->orWhere('email', 'like', "%{$q}%")
-					->orWhereHas('details', fn($d) => $d->where('clsu_id', 'like', "{$q}%"));
+					->orWhere('middle_name', 'like', "{$q}%")
+					->orWhere('clsu_id', 'like', "{$q}%");
 			})
+			->orWhere('email', 'like', "%{$q}%")
 			->limit(5)
 			->get()
 			->map(function (User $u) {
+				$details = $u->details;
+				$fullName = $details ? $details->full_name : $u->email;
+				$clsuId = $details?->clsu_id;
+
 				return [
 					'type' => 'Applicant',
 					'id' => $u->id,
-					'label' => $u->full_name,
-					'sublabel' => $u->email,
+					'label' => $fullName,
+					'sublabel' => $clsuId ? "ID: {$clsuId} • {$u->email}" : $u->email,
 					'url' => route('admin.applicant.show', $u->id),
 				];
 			});
 
 		$vehicles = Vehicle::query()
-			->with('user')
+			->with(['user.details'])
 			->where(function ($qb) use ($q) {
-				$qb->where('license_plate', 'like', "%{$q}%")
-					->orWhere('vehicle_make', 'like', "%{$q}%")
-					->orWhere('vehicle_model', 'like', "%{$q}%");
+				$qb->where('plate_number', 'like', "%{$q}%")
+					->orWhere('make', 'like', "%{$q}%")
+					->orWhere('model', 'like', "%{$q}%")
+					->orWhere('assigned_gate_pass', 'like', "%{$q}%");
 			})
 			->limit(5)
 			->get()
 			->map(function (Vehicle $v) {
+				$vehicleInfo = $v->vehicle_info ?: trim(($v->make ?? '') . ' ' . ($v->model ?? ''));
+				$ownerName = $v->user?->details?->full_name ?? 'Unknown Owner';
+				$ownerId = $v->user?->id;
+				$gatePass = $v->assigned_gate_pass;
+
+				$sublabel = $v->plate_number ?? 'No plate';
+				if ($gatePass) {
+					$sublabel .= " • Gate Pass: {$gatePass}";
+				}
+				$sublabel .= " • {$ownerName}";
+
+				// Redirect to the vehicle owner's applicant page
+				$url = $ownerId
+					? route('admin.applicant.show', $ownerId)
+					: route('admin.applicant');
+
 				return [
 					'type' => 'Vehicle',
 					'id' => $v->id,
-					'label' => trim(($v->vehicle_make ?? '') . ' ' . ($v->vehicle_model ?? '')),
-					'sublabel' => $v->license_plate,
-					'url' => route('admin.vehicles.show', $v->id),
+					'label' => $vehicleInfo ?: 'Unknown Vehicle',
+					'sublabel' => $sublabel,
+					'gatePass' => $gatePass,
+					'url' => $url,
 				];
 			});
 
-		$results = $users->merge($vehicles)->take(5)->values();
+		$results = $users->concat($vehicles)->take(5)->values();
 
 		return response()->json(['results' => $results]);
 	}
@@ -71,21 +94,23 @@ class SearchController extends Controller
 		if ($q !== '') {
 			$userResults = User::query()
 				->with('details')
-				->where(function ($qb) use ($q) {
+				->whereHas('details', function ($qb) use ($q) {
 					$qb->where('first_name', 'like', "{$q}%")
 						->orWhere('last_name', 'like', "{$q}%")
-						->orWhere('email', 'like', "%{$q}%")
-						->orWhereHas('details', fn($d) => $d->where('clsu_id', 'like', "{$q}%"));
+						->orWhere('middle_name', 'like', "{$q}%")
+						->orWhere('clsu_id', 'like', "{$q}%");
 				})
+				->orWhere('email', 'like', "%{$q}%")
 				->limit(50)
 				->get();
 
 			$vehicleResults = Vehicle::query()
-				->with('user')
+				->with(['user.details'])
 				->where(function ($qb) use ($q) {
-					$qb->where('license_plate', 'like', "%{$q}%")
-						->orWhere('vehicle_make', 'like', "%{$q}%")
-						->orWhere('vehicle_model', 'like', "%{$q}%");
+					$qb->where('plate_number', 'like', "%{$q}%")
+						->orWhere('make', 'like', "%{$q}%")
+						->orWhere('model', 'like', "%{$q}%")
+						->orWhere('assigned_gate_pass', 'like', "%{$q}%");
 				})
 				->limit(50)
 				->get();

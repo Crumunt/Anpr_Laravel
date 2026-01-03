@@ -3,6 +3,7 @@
 namespace App\Models\Vehicle;
 
 use App\Helpers\ApplicationDisplayHelper;
+use App\Models\Application;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -16,6 +17,7 @@ class Vehicle extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
+        'application_id',
         'owner_id',
         'plate_number',
         'type',
@@ -30,6 +32,11 @@ class Vehicle extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function application()
+    {
+        return $this->belongsTo(Application::class);
     }
 
     public function status()

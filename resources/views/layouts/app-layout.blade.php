@@ -37,7 +37,12 @@
         <x-nav.navbar></x-nav.navbar>
     @endif
 
-    @yield('main-content')
+    {{-- Support both Livewire slot and Blade yield --}}
+    @hasSection('main-content')
+        @yield('main-content')
+    @else
+        {{ $slot ?? '' }}
+    @endif
 
     @stack('scripts')
 </body>

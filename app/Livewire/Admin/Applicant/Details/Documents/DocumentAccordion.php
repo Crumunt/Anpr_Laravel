@@ -30,7 +30,6 @@ class DocumentAccordion extends Component
 
         try {
             $application = $service->fetchApplication($this->application_id);
-
             return (new ApplicantDocumentResource($application))->resolve();
         } catch (Exception $e) {
             return;
@@ -61,9 +60,24 @@ class DocumentAccordion extends Component
     #[On('documentUpdated')]
     public function documentUpdated($applicationId)
     {
+
+        if($applicationId !== $this->application_id) return;
+
         $this->application_id = $applicationId;
-        $this->mount();
+        $this->resetComponentState();
         //do something
+    }
+
+    #[On('refreshApplicationCard')]
+    public function resetComponentState()
+    {
+        $this->application = $this->fetchDocuments();
+    }
+
+    #[On('refreshApplicationData')]
+    public function refreshTable()
+    {
+        $this->mount();
     }
 
     public function render()

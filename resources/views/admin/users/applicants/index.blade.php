@@ -32,7 +32,9 @@
 
                     <!-- Pagination -->
                     <div id="pagination">
-                        <livewire:table.partials.pagination />
+                        @livewire('table.partials.pagination', [
+                                'targetTable' => 'applications_table'
+                            ], key('applications_table'))
                     </div>
                 </div>
             </div>

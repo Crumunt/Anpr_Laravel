@@ -17,12 +17,12 @@ class InfoCard extends Component
     public string $context = "default";
 
     public string $first_name;
-    public string $middle_name;
+    public ?string $middle_name;
     public string $last_name;
-    public string $suffix;
+    public ?string $suffix;
     public string $email;
     public string $phone_number;
-    public string $license_number;
+    public ?string $license_number;
 
     public $selectedRegion = null;
     public $selectedProvince = null;
@@ -187,6 +187,7 @@ class InfoCard extends Component
         $this->selectedMunicipality = null;
         $this->selectedBarangay = null;
 
+
         if ($this->context === "address") {
             $this->dispatch("updateFormData", field: "Region", value: $value);
         }
@@ -277,7 +278,7 @@ class InfoCard extends Component
             } else {
                 $value = $isEmail
                     ? $user->{$fieldName}
-                    : $user->details?->{$fieldName};
+                    : $user->details?->{$fieldName} ?? '';
             }
 
             $fieldValues[$label] = $value;

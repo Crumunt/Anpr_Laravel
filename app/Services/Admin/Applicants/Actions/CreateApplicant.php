@@ -51,6 +51,7 @@ class CreateApplicant
                 ]);
 
                 $applicant->vehicles()->create([
+                    "application_id" => $application->id,
                     "plate_number" => $payload["plate_number"],
                     "type" => $payload["vehicle_type"] ?? "test",
                     "make" => $payload["make"],

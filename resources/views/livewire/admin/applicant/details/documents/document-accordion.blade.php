@@ -1,7 +1,7 @@
 <div class="border border-gray-200 rounded-lg overflow-hidden">
     <!-- Accordion Header -->
     <button
-        @click="openApplication = openApplication === {{ $index }} ? null : {{ $index }}"
+        @click=" openApplication=openApplication==={{ $index }} ? null : {{ $index }}"
         class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors duration-150">
         <div class="flex items-center space-x-3 min-w-0 flex-1">
             <!-- Chevron Icon -->

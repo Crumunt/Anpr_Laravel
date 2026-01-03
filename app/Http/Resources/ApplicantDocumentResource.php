@@ -27,7 +27,7 @@ class ApplicantDocumentResource extends JsonResource
             "created_at" => $this->created_at,
             "date" => date_format($this->created_at, "M d, Y"),
 
-            "documents" => $this->user->documents->map(function ($doc) {
+            "documents" => $this->documents->map(function ($doc) {
                 return [
                     'document_id' => $doc['id'],
                     "label" => $this->formatLabel($doc["type"]),

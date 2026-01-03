@@ -15,16 +15,11 @@ class ApplicationDisplayHelper
 
         return match ($context) {
             "user_admin" => match ($tab) {
-                "default" => array_merge($base, [
+                "", "default" => array_merge($base, [
                     ["key" => "role", "label" => "Role", "width" => "120px"],
                     [
-                        "key" => "status",
-                        "label" => "Status",
-                        "width" => "120px",
-                    ],
-                    [
-                        "key" => "lastLogin",
-                        "label" => "Last Login",
+                        "key" => "created_date",
+                        "label" => "Created",
                         "width" => "150px",
                     ],
                 ]),
