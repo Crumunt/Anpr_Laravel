@@ -5,11 +5,14 @@
         <!-- Dashboard Cards -->
         @livewire('admin.admins.admin-stat-cards')
 
-        <!-- Add Admin Modal -->
-        @livewire('admin.admins.add-admin-modal')
+        {{-- Modals - Only for users who can manage admins --}}
+        @if(auth()->user()->hasAnyRole(['super_admin', 'admin_editor']))
+            <!-- Add Admin Modal -->
+            @livewire('admin.admins.add-admin-modal')
 
-        <!-- Edit Admin Modal -->
-        @livewire('admin.admins.edit-admin-modal')
+            <!-- Edit Admin Modal -->
+            @livewire('admin.admins.edit-admin-modal')
+        @endif
 
         <!-- Admin Management Container -->
         <div
@@ -19,11 +22,28 @@
                 <div class="w-full space-y-6">
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 class="text-2xl font-bold text-gray-800">
-                            Admin Management
-                        </h2>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">
+                                Admin Management
+                            </h2>
+                            {{-- Role context indicator --}}
+                            @if(auth()->user()->hasRole('super_admin'))
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                        Super Admin Access
+                                    </span>
+                                </p>
+                            @elseif(auth()->user()->hasRole('admin_editor'))
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        Editor Access
+                                    </span>
+                                </p>
+                            @endif
+                        </div>
                         <div class="flex space-x-2">
-                            <!-- Add Admin Button -->
+                            {{-- Add Admin Button - Only for super_admin and admin_editor --}}
+                            @if(auth()->user()->hasAnyRole(['super_admin', 'admin_editor']))
                             <button
                                 onclick="Livewire.dispatch('openAddAdminModal')"
                                 class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
@@ -32,6 +52,7 @@
                                 </svg>
                                 Add Admin
                             </button>
+                            @endif
                         </div>
                     </div>
 

@@ -1,6 +1,5 @@
 <x-details.layout title="Applicant Details" type="applicant">
     @php
-
         $applicationHeaders = ['ID', 'Applicant Type', 'Status', 'Date Applied'];
         $rfidRows = [];
 
@@ -11,6 +10,11 @@
         $documents = [];
         $accessRecords = [];
         $activities = [];
+
+        // Permission-based editing
+        $canEditApplicants = auth()->user()->can('edit applicants');
+        $canApprove = auth()->user()->can('approve applicants');
+        $canDelete = auth()->user()->hasAnyRole(['super_admin', 'admin_editor']);
       @endphp
 
     <x-slot name="breadcrumb">
@@ -26,23 +30,28 @@
             :status="$personal_information['active_status']"
             :user_id="$personal_information['clsu_id']"
             :email="$personal_information['email'] ?? ''"
-            :isActive="$personal_information['active_status'] === 'Active'" />
+            :isActive="$personal_information['active_status'] === 'Active'"
+            :canEdit="$canEditApplicants"
+            :canApprove="$canApprove"
+            :canDelete="$canDelete" />
 
-        <!-- Hidden component to handle applicant account actions -->
+        <!-- Hidden component to handle applicant account actions - Only if user can manage -->
+        @if($canEditApplicants || $canApprove)
         <livewire:admin.applicant.applicant-account-manager :userId="$applicant_details['id']" />
+        @endif
     </x-slot>
 
     <x-slot name="mainContent">
         <!-- Personal Information Card -->
-        <livewire:admin.applicant.details.info-card modelName="User" cardTitle="Personal Information" :canEdit="true" :userId="$applicant_details['id']"/>
+        <livewire:admin.applicant.details.info-card modelName="User" cardTitle="Personal Information" :canEdit="$canEditApplicants" :userId="$applicant_details['id']"/>
 
         <!-- Address Information Card -->
-        <livewire:admin.applicant.details.info-card modelName="User" cardTitle="Address Information" :canEdit="true" :userId="$applicant_details['id']" context="address" />
+        <livewire:admin.applicant.details.info-card modelName="User" cardTitle="Address Information" :canEdit="$canEditApplicants" :userId="$applicant_details['id']" context="address" />
 
 
-        <livewire:admin.applicant.details.info-table :tableId="'application-table'" wire:key="'application-table'" cardTitle="Applications Submitted" :canCreate="true" :headers="$applicationHeaders" :rows="$application_details" :userId="$applicant_details['id']" />
+        <livewire:admin.applicant.details.info-table :tableId="'application-table'" wire:key="'application-table'" cardTitle="Applications Submitted" :canCreate="$canEditApplicants" :canApprove="$canApprove" :canDelete="$canDelete" :headers="$applicationHeaders" :rows="$application_details" :userId="$applicant_details['id']" />
 
-        <livewire:admin.applicant.details.info-table :tableId="'vehicles-table'" wire:key="'vehicles-table'" cardTitle="Registered Vehicles" :headers="$vehicleDataHeaders" :rows="$vehicle_details" :userId="$applicant_details['id']" type="vehicle"/>
+        <livewire:admin.applicant.details.info-table :tableId="'vehicles-table'" wire:key="'vehicles-table'" cardTitle="Registered Vehicles" :canCreate="$canEditApplicants" :canApprove="$canApprove" :canDelete="$canDelete" :headers="$vehicleDataHeaders" :rows="$vehicle_details" :userId="$applicant_details['id']" type="vehicle"/>
 
     </x-slot>
 

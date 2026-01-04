@@ -36,6 +36,8 @@ class InfoTable extends Component
     public array $headers = [];
     public $rows = [];
     public bool $canCreate = false;
+    public bool $canApprove = false;
+    public bool $canDelete = false;
     public string $userId = '';
     public string $type = 'applicant';
     public $page = 1;
@@ -69,6 +71,14 @@ class InfoTable extends Component
 
     public function mount()
     {
+        // Set permission defaults based on authenticated user if not explicitly passed
+        if (!$this->canApprove) {
+            $this->canApprove = auth()->user()->can('approve applicants');
+        }
+        if (!$this->canDelete) {
+            $this->canDelete = auth()->user()->hasAnyRole(['super_admin', 'admin_editor']);
+        }
+
         $this->loadData();
     }
 

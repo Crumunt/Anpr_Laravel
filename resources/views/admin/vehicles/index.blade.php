@@ -7,8 +7,26 @@
                 <div class="w-full space-y-6">
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 class="text-2xl font-bold text-gray-800">Vehicle Management</h2>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Vehicle Management</h2>
+                            {{-- Role indicator --}}
+                            @if(auth()->user()->hasRole('admin_viewer'))
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        View Only Mode
+                                    </span>
+                                </p>
+                            @elseif(auth()->user()->hasRole('security'))
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Security Access
+                                    </span>
+                                </p>
+                            @endif
+                        </div>
                         <div class="flex space-x-2">
+                            {{-- Add Vehicle button - Only for users who can create vehicles --}}
+                            @can('create vehicles')
                             <x-dashboard.buttons :icon="false" class="bg-emerald-600 hover:bg-emerald-700"
                                 data-open-modal="vehicle-modal">
                                 <span slot="icon" class="mr-2">
@@ -22,6 +40,7 @@
                                 </span>
                                 <span>Add Vehicle</span>
                             </x-dashboard.buttons>
+                            @endcan
                         </div>
                     </div>
 

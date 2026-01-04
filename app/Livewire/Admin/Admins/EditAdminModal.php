@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Admins;
 
 use App\Models\User;
 use App\Models\UserDetails;
+use App\Services\UserInvitationService;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
@@ -14,6 +15,9 @@ class EditAdminModal extends Component
 {
     public bool $showModal = false;
     public ?string $adminId = null;
+
+    // Track if user needs password setup
+    public bool $mustChangePassword = false;
 
     // Form fields
     #[Validate('required|string|max:255')]
@@ -44,6 +48,13 @@ class EditAdminModal extends Component
     public bool $is_active = true;
 
     public array $availableRoles = [];
+
+    protected UserInvitationService $invitationService;
+
+    public function boot(UserInvitationService $invitationService): void
+    {
+        $this->invitationService = $invitationService;
+    }
 
     public function mount(): void
     {
@@ -97,6 +108,7 @@ class EditAdminModal extends Component
         $this->phone_number = $admin->details?->phone_number ?? '';
         $this->role = $admin->roles->first()?->name ?? 'admin_viewer';
         $this->is_active = $admin->is_active;
+        $this->mustChangePassword = $admin->must_change_password ?? false;
     }
 
     public function closeModal(): void
@@ -108,6 +120,7 @@ class EditAdminModal extends Component
     public function resetForm(): void
     {
         $this->adminId = null;
+        $this->mustChangePassword = false;
         $this->reset([
             'first_name',
             'middle_name',
@@ -120,6 +133,41 @@ class EditAdminModal extends Component
         ]);
         $this->role = 'admin_viewer';
         $this->resetValidation();
+    }
+
+    /**
+     * Resend invitation email to admin who hasn't set their password
+     */
+    public function resendInvitation(): void
+    {
+        if (!$this->adminId) {
+            return;
+        }
+
+        try {
+            $admin = User::find($this->adminId);
+
+            if (!$admin) {
+                $this->dispatch('toast', type: 'error', message: 'Admin not found.');
+                return;
+            }
+
+            if (!$admin->must_change_password) {
+                $this->dispatch('toast', type: 'info', message: 'This admin has already set up their password.');
+                return;
+            }
+
+            $sent = $this->invitationService->resendWelcomeEmail($admin);
+
+            if ($sent) {
+                $this->dispatch('toast', type: 'success', message: 'Invitation email resent successfully.');
+            } else {
+                $this->dispatch('toast', type: 'error', message: 'Failed to resend invitation email.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to resend invitation', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', type: 'error', message: 'Failed to resend invitation email.');
+        }
     }
 
     public function updateAdmin(): void

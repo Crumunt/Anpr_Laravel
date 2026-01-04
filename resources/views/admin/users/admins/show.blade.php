@@ -76,14 +76,32 @@
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                <a href="{{ route('admin.admins') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                    Back to List
-                </a>
-                <button class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
-                    Edit Admin
-                </button>
+            <!-- Actions - Only show if user can manage admins -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                <div>
+                    {{-- Role indicator --}}
+                    @if(auth()->user()->hasRole('admin_viewer'))
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View Only
+                        </span>
+                    @endif
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ route('admin.admins') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Back to List
+                    </a>
+                    @if(auth()->user()->hasAnyRole(['super_admin', 'admin_editor']))
+                    <button
+                        onclick="Livewire.dispatch('openEditAdminModal', { adminId: '{{ $admin->id }}' })"
+                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
+                        Edit Admin
+                    </button>
+                    @endif
+                </div>
             </div>
         </div>
         @else
@@ -97,6 +115,11 @@
                 Back to Admin List
             </a>
         </div>
+        @endif
+
+        {{-- Edit Admin Modal - only load if user can manage admins --}}
+        @if(auth()->user()->hasAnyRole(['super_admin', 'admin_editor']))
+            @livewire('admin.admins.edit-admin-modal')
         @endif
     </div>
 </div>

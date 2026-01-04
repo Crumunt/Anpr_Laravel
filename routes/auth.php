@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SetupPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,16 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    // Password Setup Routes (for new users via invitation email)
+    Route::get('setup-password', [SetupPasswordController::class, 'create'])
+        ->name('password.setup');
+
+    Route::post('setup-password', [SetupPasswordController::class, 'store'])
+        ->name('password.setup.store');
+
+    Route::post('resend-invitation', [SetupPasswordController::class, 'resend'])
+        ->name('password.setup.resend');
 });
 
 Route::middleware('auth')->group(function () {

@@ -60,9 +60,11 @@
                                 </th>
                                 @endforeach
 
+                                @if($canApprove || $canDelete || $canCreate)
                                 <th scope="col" class="sticky right-0 bg-gray-50/95 backdrop-blur-sm px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.08)] z-10 border-l border-gray-200">
                                     Actions
                                 </th>
+                                @endif
                             </tr>
                         </thead>
 
@@ -135,8 +137,10 @@
                                 @endif
                                 @endforeach
 
+                                @if($canApprove || $canDelete || $canCreate)
                                 <td class="sticky right-0 bg-white group-hover:bg-blue-50/30 px-6 py-4 whitespace-nowrap text-right text-sm font-medium shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.08)] z-10 border-l border-gray-100 transition-colors duration-150">
                                     @if ($type === 'applicant')
+                                    @if($canApprove || $canDelete)
                                     <div x-data="{ open: false }" class="relative inline-block text-left">
                                         <button
                                             x-ref="menuButton"
@@ -170,6 +174,7 @@
                                                 role="menu"
                                                 aria-orientation="vertical">
 
+                                                @if($canApprove)
                                                 <div class="p-1.5">
                                                     {{-- Approve --}}
                                                     <button
@@ -239,7 +244,9 @@
                                                         </div>
                                                     </button>
                                                 </div>
+                                                @endif
 
+                                                @if($canDelete)
                                                 <div class="p-1.5">
                                                     {{-- Delete --}}
                                                     <button
@@ -276,14 +283,19 @@
                                                         </div>
                                                     </button>
                                                 </div>
+                                                @endif
                                             </div>
                                         </template>
                                     </div>
+                                    @else
+                                    {{-- View Only - No Actions Available --}}
+                                    <span class="text-xs text-gray-400 italic">View only</span>
+                                    @endif
 
                                     @elseif ($type === 'vehicle')
                                     @php
                                         $appStatus = $row['application_status'] ?? 'pending';
-                                        $canAssignPass = $appStatus === 'approved';
+                                        $canAssignPass = $appStatus === 'approved' && $canCreate;
                                     @endphp
 
                                     @if($canAssignPass)
@@ -310,10 +322,11 @@
                                     @endif
                                     @endif
                                 </td>
+                                @endif
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="{{ count($headers) + 1 }}" class="px-6 py-20">
+                                <td colspan="{{ count($headers) + ($canApprove || $canDelete || $canCreate ? 1 : 0) }}" class="px-6 py-20">
                                     <div class="flex flex-col items-center justify-center text-center">
                                         <div class="w-24 h-24 mb-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center shadow-lg">
                                             <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

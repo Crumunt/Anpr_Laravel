@@ -1,5 +1,82 @@
 <div class="w-full bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md border border-gray-100"> {{--removed overflow-hidden on root div--}}
 
+    <!-- Bulk Action Confirmation Modal -->
+    @if($showBulkConfirmation)
+    <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelBulkAction"></div>
+
+            <!-- Modal panel -->
+            <div class="relative inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <!-- Icon -->
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10
+                            {{ $bulkActionType === 'danger' ? 'bg-red-100' : ($bulkActionType === 'success' ? 'bg-green-100' : 'bg-yellow-100') }}">
+                            @if($bulkActionType === 'danger')
+                                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            @elseif($bulkActionType === 'success')
+                                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @else
+                                <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
+                            @endif
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-semibold text-gray-900" id="modal-title">
+                                {{ $bulkActionLabel }}
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    {{ $bulkActionDescription }}
+                                </p>
+                                <div class="mt-3 flex items-center gap-2 text-sm">
+                                    <span class="inline-flex items-center justify-center w-6 h-6 bg-gray-100 text-gray-700 rounded-full font-semibold text-xs">
+                                        {{ count($selectedRows) }}
+                                    </span>
+                                    <span class="text-gray-600">
+                                        {{ count($selectedRows) === 1 ? 'item' : 'items' }} will be affected
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button"
+                            wire:click="confirmBulkAction"
+                            wire:loading.attr="disabled"
+                            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm transition-all duration-200 disabled:opacity-50
+                                {{ $bulkActionType === 'danger' ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : ($bulkActionType === 'success' ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500') }}">
+                        <span wire:loading.remove wire:target="confirmBulkAction">Confirm</span>
+                        <span wire:loading wire:target="confirmBulkAction" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                        </span>
+                    </button>
+                    <button type="button"
+                            wire:click="cancelBulkAction"
+                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 sm:mt-0 sm:w-auto sm:text-sm transition-all duration-200">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Bulk Selection Bar -->
     @if(count($selectedRows))
     <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-6 py-3 flex items-center justify-between sticky top-0 z-40 backdrop-blur-sm">
@@ -57,11 +134,65 @@
                     </div>
 
                     <div class="py-1">
-                        @foreach ($bulkActionBtns as $action => $label)
+                        @foreach ($bulkActionBtns as $action => $config)
+                        @php
+                            $label = is_array($config) ? ($config['label'] ?? $action) : $config;
+                            $icon = is_array($config) ? ($config['icon'] ?? 'bolt') : 'bolt';
+                            $color = is_array($config) ? ($config['color'] ?? 'default') : 'default';
+
+                            $colorClasses = match($color) {
+                                'danger' => 'text-red-600 hover:bg-red-50 hover:text-red-700',
+                                'success' => 'text-green-600 hover:bg-green-50 hover:text-green-700',
+                                'warning' => 'text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700',
+                                default => 'text-gray-700 hover:bg-green-50 hover:text-green-700',
+                            };
+
+                            $dotColor = match($color) {
+                                'danger' => 'bg-red-400 group-hover:bg-red-600',
+                                'success' => 'bg-green-400 group-hover:bg-green-600',
+                                'warning' => 'bg-yellow-400 group-hover:bg-yellow-600',
+                                default => 'bg-gray-400 group-hover:bg-green-600',
+                            };
+                        @endphp
                         <button wire:click="executeBulkAction('{{ $action }}')"
                                 @click="isOpen = false"
-                                class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 flex items-center group">
-                            <span class="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-green-600 mr-3 transition-colors duration-150"></span>
+                                class="w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 flex items-center group {{ $colorClasses }}">
+                            <span class="w-1.5 h-1.5 rounded-full mr-3 transition-colors duration-150 {{ $dotColor }}"></span>
+                            @if($icon === 'check-circle')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @elseif($icon === 'x-circle')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @elseif($icon === 'trash')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            @elseif($icon === 'key')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                            @elseif($icon === 'clock')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @elseif($icon === 'user-check')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 8l2 2-4 4" />
+                                </svg>
+                            @elseif($icon === 'user-x')
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 12l4 4m0-4l-4 4" />
+                                </svg>
+                            @else
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            @endif
                             {{ $label }}
                         </button>
                         @endforeach

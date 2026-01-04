@@ -9,7 +9,7 @@
 <div>
     <!-- Overlay for mobile sidebar -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 opacity-0 invisible md:hidden smooth-transition" onclick="toggleSidebar()"></div>
-    
+
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 sidebar text-white flex flex-col z-50 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 smooth-transition">
         <!-- Logo -->
@@ -35,24 +35,28 @@
         </svg>
             </button>
         </div>
-        
+
         <!-- Navigation content -->
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
             {{ $slot }}
         </nav>
-        
+
         <!-- Logout button -->
         <div class="p-4 border-t border-[rgba(255,255,255,0.1)]">
-            <x-nav.partial.sidebar-item 
-                title="Logout" 
-                action="logout()" 
-                icon="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
+            <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                @csrf
+                <button type="submit" class="sidebar-item nav-item w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-[#068406] transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 
     <!-- Mobile sidebar toggle button - fixed to screen -->
-    <button 
+    <button
         id="mobileSidebarToggle"class="md:hidden fixed bottom-6 right-6 bg-green-800 text-white p-3 rounded-full shadow-lg z-30 hover:bg-green-700"
         type="button"
         aria-label="Open sidebar menu"
@@ -190,7 +194,7 @@
     console.log("Toggle sidebar function called"); // Debugging
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    
+
     if (!sidebar || !overlay) {
       console.error("Sidebar or overlay element not found");
       return;
@@ -206,15 +210,15 @@
       document.body.style.overflow = ''; // Restore scrolling
     }
   }
-  
+
   // Ensure DOM is loaded before attaching event listeners
   document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, setting up sidebar"); // Debugging
-  
+
     // Test if buttons exist
     const mobileToggle = document.getElementById('mobileSidebarToggle');
     const sidebarClose = document.getElementById('sidebarClose');
-    
+
     if (mobileToggle) {
       console.log("Mobile toggle button found");
       mobileToggle.addEventListener('click', function(e) {
@@ -224,7 +228,7 @@
     } else {
       console.error("Mobile toggle button not found");
     }
-    
+
     if (sidebarClose) {
       console.log("Sidebar close button found");
       sidebarClose.addEventListener('click', function(e) {
@@ -234,7 +238,7 @@
     } else {
       console.error("Sidebar close button not found");
     }
-    
+
     // Highlight current page
     const currentPath = window.location.pathname;
     document.querySelectorAll('nav a').forEach(link => {
@@ -250,7 +254,7 @@
     if (overlay) {
       overlay.addEventListener('click', toggleSidebar);
     }
-    
+
     // Close sidebar with Escape key
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
@@ -261,10 +265,9 @@
       }
     });
   });
-  
-  // Logout function - You need to customize this
+
+  // Logout function - Uses form submission with CSRF protection
   function logout() {
-    // You can replace this with your actual logout logic
-    window.location.href = '/logout';
+    document.getElementById('logout-form').submit();
   }
 </script>

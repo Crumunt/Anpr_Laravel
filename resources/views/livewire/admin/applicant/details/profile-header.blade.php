@@ -91,12 +91,16 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Action Buttons - Only show if user has any edit permissions -->
+            @if($canEdit || $canApprove || $canDelete)
             <div class="flex flex-wrap sm:flex-nowrap gap-2 lg:flex-shrink-0 relative z-50">
-                <!-- Send Email Button -->
+                <!-- Send Email Button - Only if can edit -->
+                @if($canEdit)
                 @livewire('admin.applicant.details.email', ['applicantEmail' => $email ?? '', 'applicantName' => $title])
+                @endif
 
-                <!-- Account Actions Dropdown -->
+                <!-- Account Actions Dropdown - Only if can edit or delete -->
+                @if($canEdit || $canDelete)
                 <div class="relative" x-data="{
                     open: false,
                     confirmDeactivate() {
@@ -184,6 +188,7 @@
                         style="display: none; z-index: 99999;"
                         x-cloak>
 
+                        @if($canEdit)
                         <div class="py-1">
                             <!-- Deactivate/Reactivate Account - Conditional based on status -->
                             @if($isActive)
@@ -206,7 +211,9 @@
                             </button>
                             @endif
                         </div>
+                        @endif
 
+                        @if($canDelete)
                         <div class="py-1">
                             <!-- Delete Account -->
                             <button
@@ -218,9 +225,12 @@
                                 Delete Account
                             </button>
                         </div>
+                        @endif
                     </div>
                 </div>
+                @endif
             </div>
+            @endif
         </div>
     </div>
 </div>

@@ -187,12 +187,29 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div>
-                                <h4 class="text-sm font-medium text-amber-800">Password Information</h4>
+                                <h4 class="text-sm font-medium text-amber-800">Password Setup</h4>
                                 <p class="text-xs text-amber-700 mt-1">
-                                    A temporary password will be automatically generated. The admin will be required to change their password upon first login.
+                                    The admin will receive an email with a secure link to set up their password.
                                 </p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Send Invitation Email Option -->
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-100">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                wire:model="sendInvitation"
+                                class="mt-0.5 w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                            >
+                            <div>
+                                <span class="text-sm font-medium text-green-800">Send Invitation Email</span>
+                                <p class="text-xs text-green-700 mt-1">
+                                    When enabled, the new admin will receive an email with a secure link to set up their password. The link expires in 48 hours.
+                                </p>
+                            </div>
+                        </label>
                     </div>
                 </div>
 

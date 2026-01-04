@@ -8,6 +8,7 @@ use App\Services\Admin\Applicants\ApplicantWriteService;
 use App\Services\Admin\Admins\AdminReadService;
 use App\Services\Admin\Admins\AdminWriteService;
 use App\Helpers\ApplicationDisplayHelper;
+use App\Traits\HasRoleBasedAccess;
 use Exception;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Locked;
@@ -16,10 +17,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class DataTable extends Component
 {
     use WithPagination;
+    use HasRoleBasedAccess;
 
     // REFERS TO TABLE TYPE: applicant, admin etc.
     #[Locked]
@@ -42,6 +45,13 @@ class DataTable extends Component
 
     #[Validate("boolean")]
     public bool $showActions = true;
+
+    // Bulk action confirmation state
+    public bool $showBulkConfirmation = false;
+    public string $pendingBulkAction = '';
+    public string $bulkActionLabel = '';
+    public string $bulkActionDescription = '';
+    public string $bulkActionType = 'warning'; // warning, danger, success
 
     protected $queryString = ["page"];
 
@@ -79,10 +89,99 @@ class DataTable extends Component
     public function mount(): void
     {
         $this->rows = collect();
-        $this->bulkActionBtns = $this->defaultBulkActions();
+
+        // Get bulk actions filtered by user permissions
+        $allBulkActions = $this->getAllBulkActionsForType();
+        $this->bulkActionBtns = $this->getPermittedBulkActions($allBulkActions, $this->type);
+
+        // Hide checkboxes and actions if user has no bulk actions available
+        if (empty($this->bulkActionBtns)) {
+            $this->showCheckboxes = false;
+        }
 
         $this->fetchTableHeaders();
         $this->fetchTableRows();
+    }
+
+    /**
+     * Get all bulk actions specific to the table type (before permission filtering)
+     */
+    private function getAllBulkActionsForType(): array
+    {
+        return match($this->type) {
+            'admin' => [
+                'activate' => [
+                    'label' => 'Activate Selected',
+                    'icon' => 'check-circle',
+                    'color' => 'success',
+                    'description' => 'This will activate the selected admin accounts, allowing them to log in.',
+                ],
+                'deactivate' => [
+                    'label' => 'Deactivate Selected',
+                    'icon' => 'x-circle',
+                    'color' => 'warning',
+                    'description' => 'This will deactivate the selected admin accounts, preventing them from logging in.',
+                ],
+                'reset-password' => [
+                    'label' => 'Reset Passwords',
+                    'icon' => 'key',
+                    'color' => 'warning',
+                    'description' => 'This will reset passwords for the selected admins and require them to change it on next login.',
+                ],
+                'delete' => [
+                    'label' => 'Delete Selected',
+                    'icon' => 'trash',
+                    'color' => 'danger',
+                    'description' => 'This will permanently delete the selected admin accounts. This action cannot be undone.',
+                ],
+            ],
+            'applicant' => [
+                'approve' => [
+                    'label' => 'Approve Selected',
+                    'icon' => 'check-circle',
+                    'color' => 'success',
+                    'description' => 'This will approve the selected applications and activate their accounts.',
+                ],
+                'reject' => [
+                    'label' => 'Reject Selected',
+                    'icon' => 'x-circle',
+                    'color' => 'danger',
+                    'description' => 'This will reject the selected applications and deactivate their accounts.',
+                ],
+                'under-review' => [
+                    'label' => 'Set Under Review',
+                    'icon' => 'clock',
+                    'color' => 'warning',
+                    'description' => 'This will set the selected applications back to under review status.',
+                ],
+                'activate' => [
+                    'label' => 'Activate Accounts',
+                    'icon' => 'user-check',
+                    'color' => 'success',
+                    'description' => 'This will activate the selected applicant accounts.',
+                ],
+                'deactivate' => [
+                    'label' => 'Deactivate Accounts',
+                    'icon' => 'user-x',
+                    'color' => 'warning',
+                    'description' => 'This will deactivate the selected applicant accounts.',
+                ],
+                'delete' => [
+                    'label' => 'Delete Selected',
+                    'icon' => 'trash',
+                    'color' => 'danger',
+                    'description' => 'This will permanently delete the selected applicants and all their data. This action cannot be undone.',
+                ],
+            ],
+            default => [
+                'delete' => [
+                    'label' => 'Delete Selected',
+                    'icon' => 'trash',
+                    'color' => 'danger',
+                    'description' => 'This will permanently delete the selected items.',
+                ],
+            ],
+        };
     }
 
     /**
@@ -122,14 +221,174 @@ class DataTable extends Component
         $this->selectedAll = false;
     }
 
+    /**
+     * Show confirmation modal for bulk action
+     */
+    public function executeBulkAction(string $action): void
+    {
+        if (empty($this->selectedRows)) {
+            $this->dispatch('toast', type: 'warning', message: 'No items selected');
+            return;
+        }
+
+        $actionConfig = $this->bulkActionBtns[$action] ?? null;
+
+        if (!$actionConfig) {
+            $this->dispatch('toast', type: 'error', message: 'Invalid action');
+            return;
+        }
+
+        $this->pendingBulkAction = $action;
+        $this->bulkActionLabel = $actionConfig['label'];
+        $this->bulkActionDescription = $actionConfig['description'];
+        $this->bulkActionType = $actionConfig['color'];
+        $this->showBulkConfirmation = true;
+    }
+
+    /**
+     * Cancel bulk action confirmation
+     */
+    public function cancelBulkAction(): void
+    {
+        $this->showBulkConfirmation = false;
+        $this->pendingBulkAction = '';
+        $this->bulkActionLabel = '';
+        $this->bulkActionDescription = '';
+        $this->bulkActionType = 'warning';
+    }
+
+    /**
+     * Confirm and execute the bulk action
+     */
+    public function confirmBulkAction(): void
+    {
+        if (empty($this->pendingBulkAction) || empty($this->selectedRows)) {
+            $this->cancelBulkAction();
+            return;
+        }
+
+        $selectedIds = array_keys($this->selectedRows);
+        $action = $this->pendingBulkAction;
+
+        // Close modal first
+        $this->showBulkConfirmation = false;
+
+        try {
+            $result = $this->processBulkAction($action, $selectedIds);
+
+            if ($result['success_count'] > 0) {
+                $message = $this->getBulkActionSuccessMessage($action, $result['success_count']);
+                $this->dispatch('toast', type: 'success', message: $message);
+            }
+
+            if (!empty($result['failed_ids'])) {
+                $failedCount = count($result['failed_ids']);
+                $this->dispatch('toast', type: 'warning', message: "{$failedCount} item(s) could not be processed");
+            }
+
+            // Clear selection and refresh data
+            $this->clearSelection();
+            $this->dispatch('fetchCardData');
+            $this->fetchTableRows();
+
+        } catch (Exception $e) {
+            Log::error('Bulk action failed', [
+                'action' => $action,
+                'type' => $this->type,
+                'error' => $e->getMessage()
+            ]);
+            $this->dispatch('toast', type: 'error', message: 'An error occurred while processing the bulk action');
+        }
+
+        // Reset pending action
+        $this->pendingBulkAction = '';
+        $this->bulkActionLabel = '';
+        $this->bulkActionDescription = '';
+        $this->bulkActionType = 'warning';
+    }
+
+    /**
+     * Process the bulk action based on type and action
+     */
+    private function processBulkAction(string $action, array $ids): array
+    {
+        $service = $this->fetchWriteService();
+
+        if (!$service) {
+            throw new Exception('Service not available');
+        }
+
+        return match($this->type) {
+            'admin' => $this->processAdminBulkAction($service, $action, $ids),
+            'applicant' => $this->processApplicantBulkAction($service, $action, $ids),
+            default => throw new Exception('Unknown table type'),
+        };
+    }
+
+    /**
+     * Process admin-specific bulk actions
+     */
+    private function processAdminBulkAction(AdminWriteService $service, string $action, array $ids): array
+    {
+        // Filter out current user from destructive actions
+        $currentUserId = Auth::id();
+        $idsToProcess = array_filter($ids, fn($id) => $id !== $currentUserId);
+
+        if (count($idsToProcess) < count($ids)) {
+            $this->dispatch('toast', type: 'warning', message: 'You cannot perform this action on your own account');
+        }
+
+        if (empty($idsToProcess)) {
+            return ['success_count' => 0, 'failed_ids' => [], 'total' => 0];
+        }
+
+        return match($action) {
+            'activate' => $service->bulkActivate($idsToProcess),
+            'deactivate' => $service->bulkDeactivate($idsToProcess),
+            'reset-password' => $service->bulkResetPassword($idsToProcess),
+            'delete' => $service->bulkDelete($idsToProcess),
+            default => throw new Exception('Unknown admin bulk action: ' . $action),
+        };
+    }
+
+    /**
+     * Process applicant-specific bulk actions
+     */
+    private function processApplicantBulkAction(ApplicantWriteService $service, string $action, array $ids): array
+    {
+        return match($action) {
+            'approve' => $service->bulkApprove($ids),
+            'reject' => $service->bulkReject($ids),
+            'under-review' => $service->bulkSetUnderReview($ids),
+            'activate' => $service->bulkActivate($ids),
+            'deactivate' => $service->bulkDeactivate($ids),
+            'delete' => $service->bulkDelete($ids),
+            default => throw new Exception('Unknown applicant bulk action: ' . $action),
+        };
+    }
+
+    /**
+     * Get success message for bulk action
+     */
+    private function getBulkActionSuccessMessage(string $action, int $count): string
+    {
+        $item = $count === 1 ? 'item' : 'items';
+
+        return match($action) {
+            'activate' => "{$count} {$item} activated successfully",
+            'deactivate' => "{$count} {$item} deactivated successfully",
+            'delete' => "{$count} {$item} deleted successfully",
+            'approve' => "{$count} application(s) approved successfully",
+            'reject' => "{$count} application(s) rejected successfully",
+            'under-review' => "{$count} application(s) set to under review",
+            'reset-password' => "{$count} password(s) reset successfully",
+            default => "{$count} {$item} processed successfully",
+        };
+    }
+
     private function defaultBulkActions(): array
     {
-        return [
-            "approve" => "Approve Selected",
-            "delete" => "Delete Selected",
-            "bulk-export" => "Export Selected",
-            "deactivate" => "Deactivate Selected",
-        ];
+        return $this->getBulkActionsForType();
     }
 
     #[On("page-changed")]

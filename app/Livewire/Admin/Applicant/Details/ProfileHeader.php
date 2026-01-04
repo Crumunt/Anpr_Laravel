@@ -28,6 +28,11 @@ class ProfileHeader extends Component
     public bool $verified = false;
     public ?string $email = null;
 
+    // Permission flags
+    public bool $canEdit = false;
+    public bool $canApprove = false;
+    public bool $canDelete = false;
+
     /**
      * Mount the component with user data
      */
@@ -45,7 +50,10 @@ class ProfileHeader extends Component
         ?string $lastActive = null,
         array $tags = [],
         bool $verified = false,
-        ?string $email = null
+        ?string $email = null,
+        bool $canEdit = false,
+        bool $canApprove = false,
+        bool $canDelete = false
     ): void {
         $this->userId = $userId;
         $this->title = $title;
@@ -61,6 +69,11 @@ class ProfileHeader extends Component
         $this->tags = $tags;
         $this->verified = $verified;
         $this->email = $email;
+
+        // Set permission flags
+        $this->canEdit = $canEdit;
+        $this->canApprove = $canApprove;
+        $this->canDelete = $canDelete ?: auth()->user()->hasAnyRole(['super_admin', 'admin_editor']);
     }
 
     /**

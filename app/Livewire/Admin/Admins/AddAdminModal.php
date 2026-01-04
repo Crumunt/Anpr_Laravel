@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Admins;
 
 use App\Models\User;
 use App\Models\UserDetails;
+use App\Services\UserInvitationService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
@@ -40,7 +41,18 @@ class AddAdminModal extends Component
     #[Validate('required|string')]
     public string $role = 'admin_viewer';
 
+    // Option to send invitation email
+    #[Validate('boolean')]
+    public bool $sendInvitation = true;
+
     public array $availableRoles = [];
+
+    protected UserInvitationService $invitationService;
+
+    public function boot(UserInvitationService $invitationService): void
+    {
+        $this->invitationService = $invitationService;
+    }
 
     public function mount(): void
     {
@@ -89,6 +101,7 @@ class AddAdminModal extends Component
             'phone_number',
         ]);
         $this->role = 'admin_viewer';
+        $this->sendInvitation = true;
         $this->resetValidation();
     }
 
@@ -100,7 +113,7 @@ class AddAdminModal extends Component
             // Create user with auto-generated password
             $user = User::create([
                 'email' => $this->email,
-                'password' => Str::random(10),
+                'password' => Str::random(32), // Secure random password
                 'is_active' => true,
                 'must_change_password' => true,
             ]);
@@ -125,7 +138,19 @@ class AddAdminModal extends Component
                 'created_by' => auth()->id(),
             ]);
 
-            $this->dispatch('toast', type: 'success', message: 'Admin account created successfully.');
+            // Send invitation email if enabled
+            if ($this->sendInvitation) {
+                $emailSent = $this->invitationService->sendWelcomeEmail($user);
+
+                if ($emailSent) {
+                    $this->dispatch('toast', type: 'success', message: 'Admin account created and invitation email sent successfully.');
+                } else {
+                    $this->dispatch('toast', type: 'warning', message: 'Admin account created but failed to send invitation email. You can resend it later.');
+                }
+            } else {
+                $this->dispatch('toast', type: 'success', message: 'Admin account created successfully (no invitation email sent).');
+            }
+
             $this->dispatch('adminCreated');
             $this->dispatch('fetchCardData'); // Refresh stat cards
             $this->dispatch('filterTableData', filters: []); // Refresh table
