@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -16,7 +17,23 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Override the default RedirectIfAuthenticated middleware
         $middleware->redirectGuestsTo('/login');
-        $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
+        $middleware->redirectUsersTo(function () {
+            /** @var \App\Models\User|null $user */
+            $user = Auth::user();
+
+            // Security users go to ANPR dashboard
+            if ($user && $user->hasRole('security')) {
+                return route('anpr.dashboard');
+            }
+
+            // Admin roles go to admin dashboard
+            if ($user && $user->hasAnyRole(['super_admin', 'admin_editor', 'admin_viewer', 'encoder', 'maintenance'])) {
+                return route('admin.dashboard');
+            }
+
+            // Applicants go to applicant dashboard
+            return route('applicant.dashboard');
+        });
 
         // Register Spatie Permission middleware aliases
         $middleware->alias([
@@ -24,6 +41,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'applicant' => \App\Http\Middleware\ApplicantMiddleware::class,
+            'security' => \App\Http\Middleware\SecurityMiddleware::class,
+            'ensure_role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -40,18 +40,23 @@ class AuthenticatedSessionController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Check if user has admin-level roles
-        if ($user->hasAnyRole(['super_admin', 'admin_editor', 'admin_viewer', 'encoder', 'security', 'maintenance'])) {
+        // Security users go to ANPR dashboard
+        if ($user->hasRole('security')) {
+            return redirect()->route('anpr.dashboard');
+        }
+
+        // Check if user has admin-level roles (excludes security)
+        if ($user->hasAnyRole(['super_admin', 'admin_editor', 'admin_viewer', 'encoder', 'maintenance'])) {
             return redirect()->route('admin.dashboard');
         }
 
         // Applicants go to their dashboard
         if ($user->hasRole('applicant')) {
-            return redirect()->route('dashboard');
+            return redirect()->route('applicant.dashboard');
         }
 
         // Default fallback
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('applicant.dashboard', absolute: false));
     }
 
     /**

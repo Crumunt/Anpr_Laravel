@@ -140,9 +140,9 @@ class User extends Authenticatable
 
     public function scopeAdmin($query)
     {
-        // Fetch all admin roles except security and applicant
+        // Fetch all admin roles including security, but not applicant
         return $query
-            ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["security", "applicant"]))
+            ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["applicant"]))
             ->with([
                 "details:user_id,clsu_id,phone_number,first_name,middle_name,last_name,suffix",
                 "roles:id,name",
@@ -157,7 +157,7 @@ class User extends Authenticatable
                 ->whereHas("roles", fn($q) => $q->where("name", "super_admin"))
                 ->count(),
             "admin" => (clone $query)
-                ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["super_admin", "security", "applicant"]))
+                ->whereHas("roles", fn($q) => $q->whereNotIn("name", ["super_admin", "applicant"]))
                 ->count(),
         ];
     }

@@ -56,10 +56,15 @@ class RolePermissionSeeder extends Seeder
             'approve applications',
             'reject applications',
 
-            // Security
+            // Security / ANPR
             'view camera feed',
             'mark blacklisted',
             'mark flagged',
+            'view anpr dashboard',
+            'view alerts',
+            'manage alerts',
+            'view analytics',
+            'view flagged vehicles',
 
             // System
             'view reports',
@@ -137,6 +142,11 @@ class RolePermissionSeeder extends Seeder
                 'view vehicles',
                 'view gate passes',
                 'view applications',
+                'view anpr dashboard',
+                'view alerts',
+                'manage alerts',
+                'view analytics',
+                'view flagged vehicles',
             ],
 
             // Maintenance staff

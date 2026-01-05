@@ -6,6 +6,10 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GatePassController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\VehicleController;
+use App\Http\Controllers\ANPR\AnprAlertsController;
+use App\Http\Controllers\ANPR\AnprAnalyticsController;
+use App\Http\Controllers\ANPR\AnprDashboardController;
+use App\Http\Controllers\ANPR\AnprFlaggedController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +19,8 @@ Route::get('/test', fn() => view('testing'));
 
 Route::get('/documents/{document}/view', [DocumentController::class, 'view'])->name('documents.view');
 
-// Admin routes - Protected by auth and role middleware
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|admin_editor|admin_viewer|encoder|security|maintenance'])->group(function () {
+// Admin routes - Protected by auth and role middleware (excludes security and applicant)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|admin_editor|admin_viewer|encoder|maintenance'])->group(function () {
 
     // Dashboard - All admin roles
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -64,7 +68,41 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|ad
 
     // Account Settings (Manage My Account) - Available to all admin roles
     Route::get('/account', \App\Livewire\Admin\Settings\AccountSettings::class)->name('account');
+});
 
+// Applicant routes - Protected by auth and applicant middleware
+Route::prefix('applicant')->name('applicant.')->middleware(['auth', 'applicant'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\Applicant\ApplicantDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/settings', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'updateSettings'])->name('profile.settings.update');
+    Route::post('/profile/password', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    Route::get('/vehicles', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'index'])->name('vehicles');
+    Route::get('/vehicles/{id}', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'show'])->name('vehicles.show');
+
+    Route::get('/activity-log', [\App\Http\Controllers\Applicant\ActivityLogController::class, 'index'])->name('activity-log');
+});
+
+// ANPR Dashboard Routes - Protected by auth and security middleware
+Route::prefix('anpr')->name('anpr.')->middleware(['auth', 'security'])->group(function () {
+    Route::get('/dashboard', [AnprDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/alerts', [AnprAlertsController::class, 'index'])->name('alerts');
+
+    Route::get('/live-feeds', [AnprDashboardController::class, 'index'])->name('live-feeds');
+
+    Route::get('/flagged-vehicles', [AnprFlaggedController::class, 'index'])->name('flagged-vehicles');
+
+    Route::get('/analytics', [AnprAnalyticsController::class, 'index'])->name('analytics');
+
+    Route::get('/user-management/profile', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'index'])->name('user-management.profile');
+    Route::post('/user-management/profile', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updateProfile'])->name('user-management.profile.update');
+    Route::post('/user-management/profile/settings', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updateSettings'])->name('user-management.profile.settings.update');
+    Route::post('/user-management/profile/password', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updatePassword'])->name('user-management.profile.password.update');
+
+    Route::get('/settings', function () {
+        return view('anpr.settings.index');
+    })->name('settings');
 });
 
 //sa applicant form route
