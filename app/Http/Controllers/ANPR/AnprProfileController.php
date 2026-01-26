@@ -5,7 +5,7 @@ namespace App\Http\Controllers\ANPR;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserDetails;
-use App\Models\UserSetting;
+use App\Models\ApplicantUserSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
@@ -38,7 +38,7 @@ class AnprProfileController extends Controller
         // Get or create user settings
         $settings = $user->settings;
         if (!$settings) {
-            $settings = UserSetting::create([
+            $settings = ApplicantUserSetting::create([
                 'user_id' => $user->id,
             ]);
         }
@@ -213,7 +213,7 @@ class AnprProfileController extends Controller
             // Get or create settings
             $settings = $user->settings;
             if (!$settings) {
-                $settings = UserSetting::create([
+                $settings = ApplicantUserSetting::create([
                     'user_id' => $user->id,
                 ]);
             }
@@ -252,7 +252,7 @@ class AnprProfileController extends Controller
 
         foreach ($userPermissions as $permission) {
             $permissionLower = strtolower($permission);
-            
+
             // Gate Monitoring
             if (str_contains($permissionLower, 'gate') || str_contains($permissionLower, 'monitor')) {
                 $modules['Gate Monitoring']['view'] = true;
@@ -263,7 +263,7 @@ class AnprProfileController extends Controller
                     $modules['Gate Monitoring']['delete'] = true;
                 }
             }
-            
+
             // Violation Reports
             if (str_contains($permissionLower, 'violation') || str_contains($permissionLower, 'report')) {
                 $modules['Violation Reports']['view'] = true;
@@ -274,7 +274,7 @@ class AnprProfileController extends Controller
                     $modules['Violation Reports']['delete'] = true;
                 }
             }
-            
+
             // Personnel Directory
             if (str_contains($permissionLower, 'personnel') || str_contains($permissionLower, 'user')) {
                 $modules['Personnel Directory']['view'] = true;
@@ -282,7 +282,7 @@ class AnprProfileController extends Controller
                     $modules['Personnel Directory']['edit'] = true;
                 }
             }
-            
+
             // System Configuration
             if (str_contains($permissionLower, 'system') || str_contains($permissionLower, 'config')) {
                 $modules['System Configuration']['view'] = true;

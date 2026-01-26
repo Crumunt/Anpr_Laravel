@@ -1,0 +1,147 @@
+{
+	"info": {
+		"name": "ANPR Flask API",
+		"description": "Collection for testing ANPR Flask backend endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/anpr/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"anpr",
+						"status"
+					]
+				},
+				"description": "Test if Flask backend is running and healthy"
+			},
+			"response": []
+		},
+		{
+			"name": "List Cameras",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/anpr/cameras",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"anpr",
+						"cameras"
+					]
+				},
+				"description": "Get list of available cameras"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Image",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "process_immediately",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "camera_id",
+							"value": "camera-0",
+							"type": "text"
+						},
+						{
+							"key": "gate_location",
+							"value": "main-gate",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/anpr/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"anpr",
+						"upload"
+					]
+				},
+				"description": "Upload an image for ANPR processing"
+			},
+			"response": []
+		},
+		{
+			"name": "Process Image",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "camera_id",
+							"value": "camera-0",
+							"type": "text"
+						},
+						{
+							"key": "gate_location",
+							"value": "main-gate",
+							"type": "text"
+						},
+						{
+							"key": "direction",
+							"value": "entry",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/anpr/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"anpr",
+						"process"
+					]
+				},
+				"description": "Process an image for ANPR recognition"
+			},
+			"response": []
+		}
+	]
+}

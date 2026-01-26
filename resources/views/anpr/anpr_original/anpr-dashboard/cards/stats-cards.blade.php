@@ -1,0 +1,58 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 p-4 md:p-8">
+    <x-anpr.anpr-dashboard.cards.stat-card
+        title="VEHICLES SCANNED"
+        :count="1284"
+        icon="fa-car"
+        iconGradient="linear-gradient(135deg, #e6f7ef, #d1f0e2)"
+        iconColor="clsu-text"
+        :percent="24"
+        percentColor="text-green-600"
+        percentIcon="fa-arrow-up"
+        percentText="from yesterday"
+        :progress="75"
+        progressBarColor="clsu-bg"
+        progressBg="bg-gray-100"
+    />
+    <x-anpr.anpr-dashboard.cards.stat-card
+        title="ALERTS ISSUED"
+        :count="42"
+        icon="fa-exclamation-triangle"
+        iconGradient="linear-gradient(135deg, #fff7e6, #ffeacc)"
+        iconColor="text-amber-600"
+        :percent="12"
+        percentColor="text-amber-600"
+        percentIcon="fa-arrow-up"
+        percentText="from yesterday"
+        :progress="42"
+        progressBarColor="bg-amber-500"
+        progressBg="bg-gray-100"
+    />
+    <x-anpr.anpr-dashboard.cards.stat-card
+        title="FLAGGED VEHICLES"
+        :count="18"
+        icon="fa-flag"
+        iconGradient="linear-gradient(135deg, #ffe6e6, #ffcccc)"
+        iconColor="text-red-600"
+        :percent="5"
+        percentColor="text-red-600"
+        percentIcon="fa-arrow-up"
+        percentText="from yesterday"
+        :progress="18"
+        progressBarColor="bg-red-500"
+        progressBg="bg-gray-100"
+    />
+    <x-anpr.anpr-dashboard.cards.stat-card
+        title="RFID PASSES"
+        :count="956"
+        icon="fa-id-card"
+        iconGradient="linear-gradient(135deg, #e6e6ff, #ccccff)"
+        iconColor="text-indigo-600"
+        :percent="8"
+        percentColor="text-indigo-600"
+        percentIcon="fa-arrow-up"
+        percentText="from yesterday"
+        :progress="60"
+        progressBarColor="bg-indigo-500"
+        progressBg="bg-gray-100"
+    />
+</div> 

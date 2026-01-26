@@ -102,6 +102,8 @@ class InfoTable extends Component
     public function applicationApprove(Application $application)
     {
         $approvedStatus = Status::select('id')->where('code', 'approved')->first();
+        $vehicleApprovedStatus = Status::where('type', 'vehicle')->where('code', 'active')->first();
+
         try {
             $documents = $application->documents;
 
@@ -119,7 +121,15 @@ class InfoTable extends Component
                 return;
             }
 
-            $application->update(['status_id' => $approvedStatus->id]);
+            DB::transaction(function () use ($application, $approvedStatus, $vehicleApprovedStatus) {
+                $application->update(['status_id' => $approvedStatus->id]);
+
+                // Also update all associated vehicles to approved status
+                if ($vehicleApprovedStatus) {
+                    Vehicle::where('application_id', $application->id)
+                        ->update(['status_id' => $vehicleApprovedStatus->id]);
+                }
+            });
 
             $this->loadData();
 
@@ -144,15 +154,23 @@ class InfoTable extends Component
     public function rejectApplication(Application $application)
     {
         $rejectedStatus = Status::select('id')->where('code', 'rejected')->first();
+        $vehicleRejectedStatus = Status::where('type', 'vehicle')->where('code', 'inactive')->first();
+
         try {
             $documents = $application->documents;
 
-            DB::transaction(function () use ($documents, $application, $rejectedStatus) {
+            DB::transaction(function () use ($documents, $application, $rejectedStatus, $vehicleRejectedStatus) {
                 foreach ($documents as $document) {
                     $document->update(['status_id' => $rejectedStatus->id]);
                 }
 
                 $application->update(['status_id' => $rejectedStatus->id]);
+
+                // Also update all associated vehicles to rejected status
+                if ($vehicleRejectedStatus) {
+                    Vehicle::where('application_id', $application->id)
+                        ->update(['status_id' => $vehicleRejectedStatus->id]);
+                }
             });
 
             $this->loadData();

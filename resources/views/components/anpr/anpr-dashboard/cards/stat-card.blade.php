@@ -1,5 +1,3 @@
-
-
 @props([
     'title' => '',
     'count' => 0,
@@ -19,7 +17,7 @@
     <div class="flex justify-between items-start">
         <div>
             <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">{{ $title }}</p>
-            <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ $count }}</h3>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ number_format($count) }}</h3>
         </div>
         <div class="p-3 rounded-lg flex items-center justify-center" style="background: {{ $iconGradient }};">
             <i class="fas {{ $icon }} text-xl {{ $iconColor }}" aria-hidden="true"></i>

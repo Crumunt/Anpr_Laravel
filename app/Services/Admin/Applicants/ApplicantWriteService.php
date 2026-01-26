@@ -5,6 +5,7 @@ namespace App\Services\Admin\Applicants;
 use App\Models\Application;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\Vehicle\Vehicle;
 use App\Services\Admin\Applicants\Actions\CreateApplicant;
 use App\Services\Admin\Applicants\Actions\DeleteApplicant;
 use App\Services\Admin\Applicants\Actions\UpdateApplicant;
@@ -139,9 +140,19 @@ class ApplicantWriteService
         DB::beginTransaction();
 
         try {
+            // Get the corresponding vehicle status
+            $vehicleStatusCode = match($statusCode) {
+                'approved' => 'active',
+                'rejected' => 'inactive',
+                default => 'pending_verification'
+            };
+            $vehicleStatus = Status::where('type', 'vehicle')
+                ->where('code', $vehicleStatusCode)
+                ->first();
+
             foreach ($applicantIds as $applicantId) {
                 try {
-                    $user = User::with('applications')->find($applicantId);
+                    $user = User::with(['applications', 'vehicles'])->find($applicantId);
 
                     if (!$user) {
                         $failedIds[] = $applicantId;
@@ -163,6 +174,14 @@ class ApplicantWriteService
                             $user->is_active = false;
                             $user->save();
                         }
+
+                        // Sync vehicle status with application status
+                        if ($vehicleStatus) {
+                            $user->vehicles()->update([
+                                'status_id' => $vehicleStatus->id
+                            ]);
+                        }
+
                         $successCount++;
                     } else {
                         $failedIds[] = $applicantId;

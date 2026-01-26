@@ -84,6 +84,21 @@ class User extends Authenticatable
         return $this->hasMany(Vehicle::class, "owner_id");
     }
 
+    public function applicantSettings()
+    {
+        return $this->hasOne(ApplicantUserSetting::class, "user_id");
+    }
+
+    public function settings()
+    {
+        return $this->hasOne(ApplicantUserSetting::class, "user_id");
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, "user_id");
+    }
+
     public function getPhoneNumberAttribute()
     {
         return ApplicationDisplayHelper::formatPhoneNumber(

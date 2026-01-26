@@ -1,3 +1,8 @@
+@php
+    // Get vehicle data from view or use defaults
+    $vehicle = $vehicle ?? [];
+@endphp
+
 <div class="glass-card overflow-hidden shadow-lg">
     <div class="bg-[#008000] text-white px-6 py-5 flex items-center justify-between">
         <div class="flex items-center">
@@ -23,7 +28,7 @@
                     <!-- License plate text with enhanced styling -->
                     <div class="relative z-10">
                         <span class="text-3xl font-black tracking-widest text-black drop-shadow-lg">
-                            {{ $vehicle['license_plate'] ?? 'ABC-123' }}
+                            {{ $vehicle['license_plate'] ?? ($vehicle['plate'] ?? 'ABC-123') }}
                         </span>
                     </div>
                     
@@ -38,8 +43,6 @@
                         VALID
                     </span>
                 </div>
-                
-
             </div>
         </div>
         
@@ -70,7 +73,7 @@
                         <span class="text-xs text-gray-500">Make & Model</span>
                         <div class="flex items-center mt-1">
                             <i class="fas fa-car text-gray-400 mr-2" aria-hidden="true"></i>
-                            <span class="text-sm font-medium">{{ $vehicle['make_model'] ?? 'Toyota Camry' }}</span>
+                            <span class="text-sm font-medium">{{ $vehicle['make_model'] ?? ($vehicle['model'] ?? 'Toyota Camry') }}</span>
                         </div>
                     </div>
                     <div class="flex flex-col">

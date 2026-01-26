@@ -82,4 +82,3 @@
 		.overlay.show { display: block; }
 	}
 </style>
-

@@ -79,46 +79,6 @@
                             </div>
                             <span class="text-xs text-green-600 font-medium">Active</span>
                         </label>
-                        <label class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4">
-                                <span class="ml-3 text-sm font-medium text-gray-700">Face Recognition</span>
-                            </div>
-                            <span class="text-xs text-gray-500 font-medium">Disabled</span>
-                        </label>
-                        <label class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4">
-                                <span class="ml-3 text-sm font-medium text-gray-700">Behavioral Analysis</span>
-                            </div>
-                            <span class="text-xs text-gray-500 font-medium">Disabled</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Advanced Settings -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">
-                        <i class="fas fa-sliders-h mr-2 text-orange-500" aria-hidden="true"></i>
-                        Advanced Settings
-                    </label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Detection Sensitivity</label>
-                            <select class="w-full text-sm border-gray-300 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-200">
-                                <option>Low</option>
-                                <option selected>Medium</option>
-                                <option>High</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Alert Threshold</label>
-                            <select class="w-full text-sm border-gray-300 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-200">
-                                <option>70%</option>
-                                <option selected>85%</option>
-                                <option>95%</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
                 
@@ -136,4 +96,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>

@@ -25,13 +25,13 @@ class ApplicantDashboardController extends Controller
         $stats = [
             'total_vehicles' => $vehicles->count(),
             'active_vehicles' => $vehicles->filter(function($vehicle) {
-                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'approved';
+                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active';
             })->count(),
             'pending_vehicles' => $vehicles->filter(function($vehicle) {
-                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'pending';
+                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'pending_verification';
             })->count(),
             'active_gate_passes' => $vehicles->filter(function($vehicle) {
-                return $vehicle->assigned_gate_pass && $vehicle->status && strtolower($vehicle->status->code ?? '') === 'approved';
+                return $vehicle->assigned_gate_pass && $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active';
             })->count(),
         ];
 

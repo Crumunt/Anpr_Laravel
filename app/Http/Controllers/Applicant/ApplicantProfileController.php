@@ -21,15 +21,6 @@ class ApplicantProfileController extends Controller
         // Load relationships
         $user->load(['details', 'vehicles.status', 'applicantSettings', 'activityLogs']);
 
-        // Get or create applicant settings
-        $settings = $user->applicantSettings;
-        if (!$settings) {
-            $settings = \App\Models\ApplicantUserSetting::create([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'user_id' => $user->id,
-            ]);
-        }
-
         // Calculate gate pass statistics
         $vehicles = $user->vehicles;
         $gatePassStats = [

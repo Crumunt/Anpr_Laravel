@@ -1,13 +1,18 @@
 @props([
     'navItems' => null,
-    'userName' => 'John Doe',
-    'userRole' => 'System Administrator',
-    'userInitials' => 'JD',
+    'userName' => null,
+    'userRole' => null,
+    'userInitials' => null,
     'alertsCount' => 8,
     'cameraCount' => 3
 ])
 
 <style>
+/* Smooth transition utility */
+.smooth-transition {
+    transition: all 0.3s ease-in-out;
+}
+
 /* Sidebar Component Styles */
 .sidebar {
     background-color: #006300;
@@ -29,8 +34,20 @@
     transform: translateX(3px);
 }
 
+/* Desktop sidebar positioning */
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 16rem; /* 256px - w-64 */
+        z-index: 30;
+    }
+}
+
 /* Mobile responsiveness for sidebar */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .sidebar {
         position: fixed;
         left: -100%;
@@ -58,6 +75,20 @@
 </style>
 
 @php
+    // Ensure all user props are strings, not arrays
+    $userNameRaw = $userName ?? auth()->user()->name ?? 'User';
+    $userName = is_array($userNameRaw) ? json_encode($userNameRaw) : (string)$userNameRaw;
+    
+    $userRoleRaw = $userRole ?? auth()->user()->details?->role ?? 'Security Personnel';
+    $userRole = is_array($userRoleRaw) ? json_encode($userRoleRaw) : (string)$userRoleRaw;
+    
+    $userInitialsRaw = $userInitials ?? (auth()->user()->name_initial ?? strtoupper(substr($userName, 0, 2)));
+    $userInitials = is_array($userInitialsRaw) ? json_encode($userInitialsRaw) : (string)$userInitialsRaw;
+    
+    // Ensure counts are integers
+    $alertsCount = is_array($alertsCount) ? 0 : (int)$alertsCount;
+    $cameraCount = is_array($cameraCount) ? 0 : (int)$cameraCount;
+    
     $defaultNavItems = [
         [
             'route' => 'anpr.dashboard',
@@ -102,7 +133,13 @@
             'route' => 'anpr.user-management',
             'icon' => 'users',
             'label' => 'User Management',
-            'active' => request()->routeIs('anpr.user-management'),
+            'active' => request()->routeIs('anpr.user-management*'),
+        ],
+        [
+            'route' => 'anpr.user-management.profile',
+            'icon' => 'user-circle',
+            'label' => 'My Profile',
+            'active' => request()->routeIs('anpr.user-management.profile'),
         ],
         [
             'route' => 'anpr.settings',
@@ -114,7 +151,7 @@
     $navItemsToShow = $navItems && is_array($navItems) && count($navItems) > 0 ? $navItems : $defaultNavItems;
 @endphp
 
-<div id="sidebar" class="w-64 sidebar text-white flex flex-col z-30 lg:relative">
+<aside id="sidebar" class="w-64 sidebar text-white flex flex-col z-30 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 smooth-transition">
     <div class="flex flex-col items-center px-6 py-5 h-auto border-b border-white border-opacity-10">
         <div class="w-full h-20 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
             <img src="{{ asset('images/CLSU.png') }}" alt="CLSU Logo" class="max-h-full max-w-full object-contain">
@@ -129,13 +166,29 @@
             @if(isset($item['divider']) && $item['divider'])
                 <div class="my-3 h-px bg-white bg-opacity-10"></div>
             @else
-                <a href="{{ route($item['route']) }}" class="flex items-center px-4 py-3 text-white rounded-lg sidebar-item {{ $item['active'] ? 'active' : '' }}" aria-current="{{ $item['active'] ? 'page' : 'false' }}">
+                @php
+                    // Safely extract route, ensuring it's a string
+                    $route = is_array($item['route'] ?? null) ? '#' : (string)($item['route'] ?? '#');
+                    $icon = is_array($item['icon'] ?? null) ? 'circle' : (string)($item['icon'] ?? 'circle');
+                    $label = is_array($item['label'] ?? null) ? 'Menu Item' : (string)($item['label'] ?? 'Menu Item');
+                    $badge = isset($item['badge']) ? (is_array($item['badge']) ? (string)count($item['badge']) : (string)$item['badge']) : null;
+                    $badgeClass = is_array($item['badge_class'] ?? null) ? 'bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded' : ($item['badge_class'] ?? 'bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded');
+                    $isActive = isset($item['active']) && $item['active'];
+                    
+                    // Safely generate route URL
+                    try {
+                        $routeUrl = route($route);
+                    } catch (\Exception $e) {
+                        $routeUrl = '#';
+                    }
+                @endphp
+                <a href="{{ $routeUrl }}" class="flex items-center px-4 py-3 text-white rounded-lg sidebar-item {{ $isActive ? 'active' : '' }}" aria-current="{{ $isActive ? 'page' : 'false' }}">
                     <div class="bg-white bg-opacity-10 w-8 h-8 rounded-md flex items-center justify-center">
-                        <i class="fas fa-{{ $item['icon'] }}" aria-hidden="true"></i>
+                        <i class="fas fa-{{ $icon }}" aria-hidden="true"></i>
                     </div>
-                    <span class="ml-3 font-medium">{{ $item['label'] }}</span>
-                    @if(isset($item['badge']) && $item['badge'])
-                        <span class="ml-auto {{ $item['badge_class'] ?? 'bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded' }}" aria-label="{{ $item['badge'] }}">{{ $item['badge'] }}</span>
+                    <span class="ml-3 font-medium">{{ $label }}</span>
+                    @if($badge)
+                        <span class="ml-auto {{ $badgeClass }}" aria-label="{{ $badge }}">{{ $badge }}</span>
                     @endif
                 </a>
             @endif
@@ -157,7 +210,7 @@
             </div>
         </div>
     </div>
-</div> 
+</aside> 
 
 <script>
 // Sidebar toggle for mobile
@@ -173,4 +226,4 @@ function toggleSidebar() {
         if (firstLink) firstLink.focus();
     }
 }
-</script> 
+</script>

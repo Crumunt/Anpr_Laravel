@@ -73,9 +73,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|ad
 // Applicant routes - Protected by auth and applicant middleware
 Route::prefix('applicant')->name('applicant.')->middleware(['auth', 'applicant'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Applicant\ApplicantDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/settings', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'updateSettings'])->name('profile.settings.update');
-    Route::post('/profile/password', [\App\Http\Controllers\Applicant\ApplicantProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/profile', \App\Livewire\Applicant\ProfileSettings::class)->name('profile');
 
     Route::get('/vehicles', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'index'])->name('vehicles');
     Route::get('/vehicles/{id}', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'show'])->name('vehicles.show');
@@ -95,10 +93,7 @@ Route::prefix('anpr')->name('anpr.')->middleware(['auth', 'security'])->group(fu
 
     Route::get('/analytics', [AnprAnalyticsController::class, 'index'])->name('analytics');
 
-    Route::get('/user-management/profile', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'index'])->name('user-management.profile');
-    Route::post('/user-management/profile', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updateProfile'])->name('user-management.profile.update');
-    Route::post('/user-management/profile/settings', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updateSettings'])->name('user-management.profile.settings.update');
-    Route::post('/user-management/profile/password', [\App\Http\Controllers\ANPR\AnprProfileController::class, 'updatePassword'])->name('user-management.profile.password.update');
+    Route::get('/user-management/profile', \App\Livewire\ANPR\ProfileSettings::class)->name('user-management.profile');
 
     Route::get('/settings', function () {
         return view('anpr.settings.index');

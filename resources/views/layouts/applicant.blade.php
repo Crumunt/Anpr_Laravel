@@ -58,12 +58,6 @@
                         <i class="fas fa-user"></i>
                         <span>Profile</span>
                     </a>
-                    <a href="{{ route('applicant.activity-log') }}"
-                       class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                              {{ request()->routeIs('applicant.activity-log') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
-                        <i class="fas fa-history"></i>
-                        <span>Activity</span>
-                    </a>
                 </nav>
 
                 <!-- User Menu -->

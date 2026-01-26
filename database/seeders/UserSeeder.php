@@ -123,7 +123,7 @@ class UserSeeder extends Seeder
                 'created_at' => $random_date
             ]);
 
-            $applicant->applications()->create([
+            $application = $applicant->applications()->create([
                 'applicant_type' => collect(ApplicantType::cases())->random(),
                 'status_id' => $status->id,
             ]);
@@ -131,6 +131,7 @@ class UserSeeder extends Seeder
             // VEHICLE SEEDER
             $make = $faker->randomElement($vehicleMakes);
             $applicant->vehicles()->create([
+                'application_id' => $application->id,
                 'plate_number' => strtoupper(Str::random(3)) . ' ' . $faker->numberBetween(100, 9999),
                 'type' => $faker->randomElement($vehicleTypes),
                 'make' => $make,

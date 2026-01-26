@@ -3,212 +3,277 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <!-- Welcome Header -->
-    <div class="mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
-            Welcome back, {{ $user->details?->first_name ?? 'User' }}!
-        </h1>
-        <p class="text-gray-500 mt-1">Here's an overview of your vehicle registrations and gate passes.</p>
+    <!-- Add Vehicle Modal Component -->
+    @livewire('applicant.add-vehicle-modal')
+
+    <!-- Welcome Header with improved typography and spacing -->
+    <div class="mb-8 lg:mb-10">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-2">
+                    Welcome back, <span class="text-emerald-600">{{ $user->details?->first_name ?? 'User' }}</span>!
+                </h1>
+                <p class="text-base md:text-lg text-gray-600 leading-relaxed">
+                    Here's an overview of your vehicle registrations and gate passes.
+                </p>
+            </div>
+            <div class="hidden lg:flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 shadow-sm">
+                <i class="fas fa-car-side text-emerald-600 text-2xl"></i>
+            </div>
+        </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Enhanced Stats Cards with better visual hierarchy -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 lg:mb-10">
         <!-- Total Vehicles -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Total Vehicles</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['total_vehicles'] }}</p>
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1">Total Vehicles</p>
+                    <p class="text-3xl md:text-4xl font-bold text-gray-900 leading-none">{{ $stats['total_vehicles'] }}</p>
+                    <p class="text-xs text-gray-500 mt-2">All registered</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-car text-blue-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Active Vehicles -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Active Vehicles</p>
-                    <p class="text-3xl font-bold text-emerald-600 mt-1">{{ $stats['active_vehicles'] }}</p>
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-emerald-300 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1">Active Vehicles</p>
+                    <p class="text-3xl md:text-4xl font-bold text-emerald-600 leading-none">{{ $stats['active_vehicles'] }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Approved & active</p>
                 </div>
-                <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-check-circle text-emerald-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Pending Vehicles -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Pending Approval</p>
-                    <p class="text-3xl font-bold text-amber-600 mt-1">{{ $stats['pending_vehicles'] }}</p>
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-amber-300 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1">Pending Approval</p>
+                    <p class="text-3xl md:text-4xl font-bold text-amber-600 leading-none">{{ $stats['pending_vehicles'] }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Under review</p>
                 </div>
-                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-clock text-amber-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Active Gate Passes -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Active Gate Passes</p>
-                    <p class="text-3xl font-bold text-purple-600 mt-1">{{ $stats['active_gate_passes'] }}</p>
+        <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-purple-300 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1">Active Gate Passes</p>
+                    <p class="text-3xl md:text-4xl font-bold text-purple-600 leading-none">{{ $stats['active_gate_passes'] }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Currently active</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-id-card text-purple-600 text-xl"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent Vehicles -->
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800">My Vehicles</h3>
-                <a href="{{ route('applicant.vehicles') }}" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                    View All <i class="fas fa-arrow-right ml-1"></i>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <!-- Recent Vehicles with enhanced design -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">My Vehicles</h3>
+                    <p class="text-sm text-gray-500 mt-1">Recent vehicle registrations</p>
+                </div>
+                <a href="{{ route('applicant.vehicles') }}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                    View All 
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
                 </a>
             </div>
 
             @if($recentVehicles->count() > 0)
                 <div class="divide-y divide-gray-100">
                     @foreach($recentVehicles as $vehicle)
-                        <div class="p-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-car text-gray-500"></i>
+                        <a href="{{ route('applicant.vehicles.show', $vehicle['id']) }}" 
+                           class="block p-5 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-transparent transition-all duration-200 group">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-4 min-w-0 flex-1">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
+                                        <i class="fas fa-car text-blue-600 text-lg"></i>
                                     </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900">{{ $vehicle['license_plate'] }}</p>
-                                        <p class="text-sm text-gray-500">{{ $vehicle['make_model'] }} ({{ $vehicle['year'] }})</p>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-bold text-gray-900 text-lg font-mono mb-1 group-hover:text-emerald-600 transition-colors">
+                                            {{ $vehicle['license_plate'] }}
+                                        </p>
+                                        <p class="text-sm text-gray-600 truncate">
+                                            {{ $vehicle['make_model'] }} 
+                                            @if($vehicle['year'])
+                                                <span class="text-gray-400">•</span> {{ $vehicle['year'] }}
+                                            @endif
+                                        </p>
+                                        @if($vehicle['gate_pass'])
+                                            <div class="flex items-center gap-1.5 mt-2">
+                                                <i class="fas fa-id-badge text-xs text-emerald-600"></i>
+                                                <span class="text-xs font-medium text-emerald-600">{{ $vehicle['gate_pass'] }}</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        @if(strtolower($vehicle['status']) === 'approved') bg-emerald-100 text-emerald-800
-                                        @elseif(strtolower($vehicle['status']) === 'pending') bg-amber-100 text-amber-800
-                                        @elseif(strtolower($vehicle['status']) === 'rejected') bg-red-100 text-red-800
-                                        @else bg-gray-100 text-gray-800 @endif">
+                                <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                        @if(strtolower($vehicle['status']) === 'active' || strtolower($vehicle['status']) === 'approved') 
+                                            bg-emerald-100 text-emerald-800 border border-emerald-200
+                                        @elseif(str_contains(strtolower($vehicle['status']), 'pending')) 
+                                            bg-amber-100 text-amber-800 border border-amber-200
+                                        @elseif(strtolower($vehicle['status']) === 'inactive' || strtolower($vehicle['status']) === 'blacklisted' || strtolower($vehicle['status']) === 'rejected') 
+                                            bg-red-100 text-red-800 border border-red-200
+                                        @else 
+                                            bg-gray-100 text-gray-800 border border-gray-200 
+                                        @endif">
                                         {{ $vehicle['status'] }}
                                     </span>
-                                    @if($vehicle['gate_pass'])
-                                        <p class="text-xs text-gray-500 mt-1">
-                                            <i class="fas fa-id-badge mr-1"></i>{{ $vehicle['gate_pass'] }}
-                                        </p>
-                                    @endif
+                                    <span class="text-xs text-gray-500">{{ $vehicle['registered_date'] }}</span>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             @else
-                <div class="p-8 text-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-car text-gray-400 text-2xl"></i>
+                <!-- Enhanced Empty State -->
+                <div class="p-12 lg:p-16 text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                        <i class="fas fa-car text-gray-400 text-3xl"></i>
                     </div>
-                    <h4 class="text-lg font-medium text-gray-900 mb-2">No vehicles registered</h4>
-                    <p class="text-gray-500 mb-4">You haven't registered any vehicles yet.</p>
-                    <a href="{{ route('gate-pass.gate-pass-applicant-form') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors">
-                        <i class="fas fa-plus mr-2"></i> Register Vehicle
-                    </a>
+                    <h4 class="text-xl font-bold text-gray-900 mb-2">No vehicles registered</h4>
+                    <p class="text-gray-600 mb-6 max-w-sm mx-auto leading-relaxed">
+                        You haven't registered any vehicles yet. Register your first vehicle to get started with gate pass applications.
+                    </p>
+                    <button
+                        type="button"
+                        onclick="Livewire.dispatch('openAddVehicleModal')"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-emerald-800 shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transform hover:scale-105">
+                        <i class="fas fa-plus"></i> 
+                        <span>Register Your First Vehicle</span>
+                    </button>
                 </div>
             @endif
         </div>
 
-        <!-- Quick Actions & Info -->
+        <!-- Quick Actions & Info with enhanced design -->
         <div class="space-y-6">
             <!-- Quick Actions -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-lg font-semibold text-gray-800">Quick Actions</h3>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                    <h3 class="text-lg font-bold text-gray-900">Quick Actions</h3>
+                    <p class="text-sm text-gray-500 mt-1">Common tasks and shortcuts</p>
                 </div>
-                <div class="p-4 space-y-3">
-                    <a href="{{ route('gate-pass.gate-pass-applicant-form') }}" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors group">
-                        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-emerald-200 transition-colors">
-                            <i class="fas fa-plus text-emerald-600"></i>
+                <div class="p-4 space-y-2">
+                    <button
+                        type="button"
+                        onclick="Livewire.dispatch('openAddVehicleModal')"
+                        class="w-full flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl hover:from-emerald-100 hover:to-emerald-200 transition-all duration-200 group text-left border border-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
+                            <i class="fas fa-plus text-emerald-600 text-lg"></i>
                         </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Register New Vehicle</p>
-                            <p class="text-xs text-gray-500">Apply for a new gate pass</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">Register New Vehicle</p>
+                            <p class="text-xs text-gray-600 mt-0.5">Apply for a new gate pass</p>
                         </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <a href="{{ route('applicant.vehicles') }}" 
+                       class="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all duration-200 group border border-blue-200/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
+                            <i class="fas fa-list text-blue-600 text-lg"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">View All Vehicles</p>
+                            <p class="text-xs text-gray-600 mt-0.5">Manage your registered vehicles</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </a>
 
-                    <a href="{{ route('applicant.vehicles') }}" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
-                            <i class="fas fa-list text-blue-600"></i>
+                    <a href="{{ route('applicant.profile') }}" 
+                       class="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-purple-100/50 rounded-xl hover:from-purple-100 hover:to-purple-200 transition-all duration-200 group border border-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
+                            <i class="fas fa-user-edit text-purple-600 text-lg"></i>
                         </div>
-                        <div>
-                            <p class="font-medium text-gray-900">View All Vehicles</p>
-                            <p class="text-xs text-gray-500">Manage your registered vehicles</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Update Profile</p>
+                            <p class="text-xs text-gray-600 mt-0.5">Edit your personal information</p>
                         </div>
-                    </a>
-
-                    <a href="{{ route('applicant.profile') }}" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors group">
-                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
-                            <i class="fas fa-user-edit text-purple-600"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Update Profile</p>
-                            <p class="text-xs text-gray-500">Edit your personal information</p>
-                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </a>
                 </div>
             </div>
 
-            <!-- Account Info -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-lg font-semibold text-gray-800">Account Information</h3>
+            <!-- Account Info with enhanced design -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                    <h3 class="text-lg font-bold text-gray-900">Account Information</h3>
+                    <p class="text-sm text-gray-500 mt-1">Your account details</p>
                 </div>
-                <div class="p-4 space-y-4">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-envelope text-gray-500"></i>
+                <div class="p-4 space-y-3">
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-envelope text-gray-600"></i>
                         </div>
-                        <div>
-                            <p class="text-xs text-gray-500">Email</p>
-                            <p class="text-sm font-medium text-gray-900">{{ $user->email }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Email</p>
+                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $user->email }}</p>
                         </div>
                     </div>
 
                     @if($user->details?->phone_number)
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-phone text-gray-500"></i>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                            <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center shadow-sm">
+                                <i class="fas fa-phone text-gray-600"></i>
                             </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Phone Number</p>
-                                <p class="text-sm font-medium text-gray-900">{{ $user->phone_number }}</p>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Phone Number</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ $user->details->phone_number }}</p>
                             </div>
                         </div>
                     @endif
 
                     @if($user->details?->clsu_id)
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-id-badge text-gray-500"></i>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                            <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center shadow-sm">
+                                <i class="fas fa-id-badge text-gray-600"></i>
                             </div>
-                            <div>
-                                <p class="text-xs text-gray-500">CLSU ID</p>
-                                <p class="text-sm font-medium text-gray-900">{{ $user->details->clsu_id }}</p>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">CLSU ID</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ $user->details->clsu_id }}</p>
                             </div>
                         </div>
                     @endif
 
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-calendar text-gray-500"></i>
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-calendar text-gray-600"></i>
                         </div>
-                        <div>
-                            <p class="text-xs text-gray-500">Member Since</p>
-                            <p class="text-sm font-medium text-gray-900">{{ $user->created_at->format('M d, Y') }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Member Since</p>
+                            <p class="text-sm font-semibold text-gray-900">{{ $user->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>
                 </div>

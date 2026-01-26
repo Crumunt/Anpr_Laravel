@@ -44,6 +44,14 @@ class Email extends Component
     }
 
     /**
+     * Keep emailRecipient in sync with applicantEmail
+     */
+    public function hydrate(): void
+    {
+        $this->emailRecipient = $this->applicantEmail;
+    }
+
+    /**
      * Listen for applicant data updates from parent components
      */
     #[On('set-email-recipient')]
@@ -55,21 +63,32 @@ class Email extends Component
     }
 
     /**
+     * Ensure emailRecipient is always synced with applicantEmail
+     */
+    public function updatedApplicantEmail(): void
+    {
+        $this->emailRecipient = $this->applicantEmail;
+    }
+
+    /**
      * Send the email to the recipient
      */
     public function sendEmail(): void
     {
         $this->sending = true;
 
+        // Always use applicantEmail as the recipient (cannot be changed)
+        $this->emailRecipient = $this->applicantEmail;
+
         // Validate the form
         $validated = $this->validate();
 
         try {
             // Get the recipient name (use provided name or extract from email)
-            $recipientName = $this->applicantName ?: $this->extractNameFromEmail($this->emailRecipient);
+            $recipientName = $this->applicantName ?: $this->extractNameFromEmail($this->applicantEmail);
 
             // Send the email using the ContactApplicant mailable
-            Mail::to($this->emailRecipient)->send(
+            Mail::to($this->applicantEmail)->send(
                 new ContactApplicant(
                     userName: $recipientName,
                     messageSubject: $this->emailSubject,
@@ -81,7 +100,7 @@ class Email extends Component
             $this->dispatch(
                 'toast',
                 type: 'success',
-                message: 'Email sent successfully to ' . $this->emailRecipient
+                message: 'Email sent successfully to ' . $this->applicantEmail
             );
 
             // Close modal
@@ -92,7 +111,7 @@ class Email extends Component
 
             // Log successful email
             Log::info('Email sent successfully', [
-                'recipient' => $this->emailRecipient,
+                'recipient' => $this->applicantEmail,
                 'subject' => $this->emailSubject,
             ]);
         } catch (\Exception $e) {
@@ -104,11 +123,13 @@ class Email extends Component
             );
 
             Log::error('Email send error', [
-                'recipient' => $this->emailRecipient,
+                'recipient' => $this->applicantEmail,
                 'subject' => $this->emailSubject,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+            
+            // Don't close modal on error - let user retry or cancel manually
         } finally {
             $this->sending = false;
         }

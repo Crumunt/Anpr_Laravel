@@ -39,4 +39,9 @@ class Application extends Model
     {
         return $this->hasMany(Documents::class, "application_id", "id");
     }
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle\Vehicle::class, "application_id", "id");
+    }
 }
