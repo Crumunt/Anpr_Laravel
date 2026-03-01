@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use App\Services\UserInvitationService;
+use App\Traits\RedirectsBasedOnRole;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,7 @@ use Illuminate\View\View;
 
 class SetupPasswordController extends Controller
 {
+    use RedirectsBasedOnRole;
     public function __construct(
         protected UserInvitationService $invitationService
     ) {}
@@ -112,10 +115,13 @@ class SetupPasswordController extends Controller
             'email' => $user->email,
         ]);
 
+        // Log activity
+        ActivityLogService::logPasswordSet($user);
+
         // Log the user in
         Auth::login($user);
 
-        return redirect()->route('admin.dashboard')
+        return $this->redirectBasedOnRole()
             ->with('success', 'Your password has been set successfully. Welcome to ' . config('app.name') . '!');
     }
 

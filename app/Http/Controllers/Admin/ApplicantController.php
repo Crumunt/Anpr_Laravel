@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ApplicantIndexRequest;
 use App\Http\Resources\ApplicantResource;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use App\Services\ApplicantService;
 use Exception;
 use Illuminate\Http\Request;
@@ -63,6 +64,9 @@ class ApplicantController extends Controller
 
         $extracted_data = $this->extractApplicantData($applicant_details);
 
+        // Get formatted activity logs for this user
+        $activities = ActivityLogService::getFormattedActivities($user);
+
         $breadcrumbs = [
             ["label" => "Dashboard", "url" => route("admin.dashboard")],
             ["label" => "Applicants", "url" => route("admin.applicant")],
@@ -72,6 +76,7 @@ class ApplicantController extends Controller
         return view("admin.users.applicants.show", [
             ...$extracted_data,
             "breadcrumbs" => $breadcrumbs,
+            "activities" => $activities,
         ]);
     }
 

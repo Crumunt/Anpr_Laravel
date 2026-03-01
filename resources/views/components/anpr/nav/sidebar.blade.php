@@ -78,38 +78,23 @@
     // Ensure all user props are strings, not arrays
     $userNameRaw = $userName ?? auth()->user()->name ?? 'User';
     $userName = is_array($userNameRaw) ? json_encode($userNameRaw) : (string)$userNameRaw;
-    
+
     $userRoleRaw = $userRole ?? auth()->user()->details?->role ?? 'Security Personnel';
     $userRole = is_array($userRoleRaw) ? json_encode($userRoleRaw) : (string)$userRoleRaw;
-    
+
     $userInitialsRaw = $userInitials ?? (auth()->user()->name_initial ?? strtoupper(substr($userName, 0, 2)));
     $userInitials = is_array($userInitialsRaw) ? json_encode($userInitialsRaw) : (string)$userInitialsRaw;
-    
+
     // Ensure counts are integers
     $alertsCount = is_array($alertsCount) ? 0 : (int)$alertsCount;
     $cameraCount = is_array($cameraCount) ? 0 : (int)$cameraCount;
-    
+
     $defaultNavItems = [
         [
             'route' => 'anpr.dashboard',
             'icon' => 'tachometer-alt',
             'label' => 'Dashboard',
             'active' => request()->routeIs('anpr.dashboard'),
-        ],
-        [
-            'route' => 'anpr.live-feeds',
-            'icon' => 'video',
-            'label' => 'Live Feeds',
-            'active' => request()->routeIs('anpr.live-feeds'),
-            'badge' => $cameraCount,
-        ],
-        [
-            'route' => 'anpr.alerts',
-            'icon' => 'exclamation-triangle',
-            'label' => 'Alerts',
-            'active' => request()->routeIs('anpr.alerts'),
-            'badge' => $alertsCount,
-            'badge_class' => 'bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full',
         ],
         [
             'divider' => true
@@ -130,22 +115,10 @@
             'divider' => true
         ],
         [
-            'route' => 'anpr.user-management',
-            'icon' => 'users',
-            'label' => 'User Management',
-            'active' => request()->routeIs('anpr.user-management*'),
-        ],
-        [
-            'route' => 'anpr.user-management.profile',
+            'route' => 'anpr.profile',
             'icon' => 'user-circle',
             'label' => 'My Profile',
-            'active' => request()->routeIs('anpr.user-management.profile'),
-        ],
-        [
-            'route' => 'anpr.settings',
-            'icon' => 'cog',
-            'label' => 'System Settings',
-            'active' => request()->routeIs('anpr.settings'),
+            'active' => request()->routeIs('anpr.profile'),
         ],
     ];
     $navItemsToShow = $navItems && is_array($navItems) && count($navItems) > 0 ? $navItems : $defaultNavItems;
@@ -174,7 +147,7 @@
                     $badge = isset($item['badge']) ? (is_array($item['badge']) ? (string)count($item['badge']) : (string)$item['badge']) : null;
                     $badgeClass = is_array($item['badge_class'] ?? null) ? 'bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded' : ($item['badge_class'] ?? 'bg-white bg-opacity-20 text-xs px-1.5 py-0.5 rounded');
                     $isActive = isset($item['active']) && $item['active'];
-                    
+
                     // Safely generate route URL
                     try {
                         $routeUrl = route($route);
@@ -210,17 +183,17 @@
             </div>
         </div>
     </div>
-</aside> 
+</aside>
 
 <script>
 // Sidebar toggle for mobile
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-    
+
     sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('show');
-    
+
     if (sidebar.classList.contains('open')) {
         const firstLink = document.querySelector('.sidebar a');
         if (firstLink) firstLink.focus();

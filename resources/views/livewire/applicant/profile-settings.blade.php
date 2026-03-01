@@ -13,7 +13,7 @@
                 <!-- User Profile Summary -->
                 <div class="p-5 border-b border-gray-200 bg-gradient-to-br from-emerald-50 via-emerald-50/50 to-white">
                     <div class="flex items-center gap-4">
-                        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-lg ring-4 ring-emerald-100">
+                        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center font-bold text-xl shadow-lg ring-4 ring-emerald-100">
                             {{ auth()->user()->name_initial ?? 'U' }}
                         </div>
                         <div class="min-w-0 flex-1">
@@ -130,11 +130,11 @@
                             </button>
                             @endif
                         </div>
-                        @error('email') 
+                        @error('email')
                             <p class="mt-2 flex items-center gap-2 text-sm text-red-600">
                                 <i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}
-                            </p> 
+                            </p>
                         @enderror
 
                         <!-- Email Verification Status -->
@@ -204,11 +204,11 @@
                                 class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 @error('currentPassword') border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="Enter your current password">
                         </div>
-                        @error('currentPassword') 
+                        @error('currentPassword')
                             <p class="mt-2 flex items-center gap-2 text-sm text-red-600">
                                 <i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}
-                            </p> 
+                            </p>
                         @enderror
                     </div>
 
@@ -229,11 +229,11 @@
                                 class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 @error('newPassword') border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="Enter your new password">
                         </div>
-                        @error('newPassword') 
+                        @error('newPassword')
                             <p class="mt-2 flex items-center gap-2 text-sm text-red-600">
                                 <i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}
-                            </p> 
+                            </p>
                         @enderror
                     </div>
 
@@ -254,11 +254,11 @@
                                 class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 @error('newPasswordConfirmation') border-red-500 focus:ring-red-500 @enderror"
                                 placeholder="Confirm your new password">
                         </div>
-                        @error('newPasswordConfirmation') 
+                        @error('newPasswordConfirmation')
                             <p class="mt-2 flex items-center gap-2 text-sm text-red-600">
                                 <i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}
-                            </p> 
+                            </p>
                         @enderror
                     </div>
 

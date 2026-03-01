@@ -5,11 +5,10 @@
 
         $vehicleHeaders = ['Plate Number', 'Make & Model', 'Year', 'Registration Date'];
 
-        $vehicleDataHeaders = ['Vehicle Info', 'Plate Number', 'Gate Pass Number', 'Expiry Date'];
+        $vehicleDataHeaders = ['Vehicle Info', 'Plate Number', 'Gate Pass Number', 'Expires At', 'Is Renewal'];
 
         $documents = [];
         $accessRecords = [];
-        $activities = [];
 
         // Permission-based editing
         $canEditApplicants = auth()->user()->can('edit applicants');

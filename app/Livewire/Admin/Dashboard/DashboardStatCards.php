@@ -61,9 +61,12 @@ class DashboardStatCards extends Component
         $lastMonth = Carbon::now()->subMonth()->startOfMonth();
         $lastMonthEnd = Carbon::now()->subMonth()->endOfMonth();
 
-        $totalVehicles = Vehicle::count();
-        $newThisMonth = Vehicle::where('created_at', '>=', $currentMonth)->count();
-        $lastMonthCount = Vehicle::whereBetween('created_at', [$lastMonth, $lastMonthEnd])->count();
+        // Only count vehicles from approved applications
+        $approvedVehicleQuery = Vehicle::whereHas('application.status', fn($q) => $q->where('code', 'approved'));
+
+        $totalVehicles = (clone $approvedVehicleQuery)->count();
+        $newThisMonth = (clone $approvedVehicleQuery)->where('created_at', '>=', $currentMonth)->count();
+        $lastMonthCount = (clone $approvedVehicleQuery)->whereBetween('created_at', [$lastMonth, $lastMonthEnd])->count();
 
         $percentChange = $lastMonthCount > 0
             ? round((($newThisMonth - $lastMonthCount) / $lastMonthCount) * 100, 1)
@@ -79,7 +82,7 @@ class DashboardStatCards extends Component
 
     private function getApplicationStats(): array
     {
-        $pending = Application::whereHas('status', fn($q) => $q->where('code', 'pending'))->count();
+        $pending = Application::whereHas('status', fn($q) => $q->where('code', 'under_review'))->count();
         $approved = Application::whereHas('status', fn($q) => $q->where('code', 'approved'))->count();
         $rejected = Application::whereHas('status', fn($q) => $q->where('code', 'rejected'))->count();
         $total = Application::count();

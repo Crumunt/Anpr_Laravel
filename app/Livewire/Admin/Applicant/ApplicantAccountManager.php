@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Applicant;
 
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\On;
@@ -65,6 +66,9 @@ class ApplicantAccountManager extends Component
         try {
             $this->user->update(['is_active' => false]);
 
+            // Log activity
+            ActivityLogService::logAccountDeactivated($this->user, auth()->user());
+
             $this->dispatch('toast', type: 'success', message: 'Account has been deactivated successfully.');
             $this->dispatch('applicant-status-changed', userId: $this->userId, isActive: false);
 
@@ -91,6 +95,9 @@ class ApplicantAccountManager extends Component
 
         try {
             $this->user->update(['is_active' => true]);
+
+            // Log activity
+            ActivityLogService::logAccountActivated($this->user, auth()->user());
 
             $this->dispatch('toast', type: 'success', message: 'Account has been activated successfully.');
             $this->dispatch('applicant-status-changed', userId: $this->userId, isActive: true);

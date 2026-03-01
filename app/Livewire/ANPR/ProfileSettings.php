@@ -13,7 +13,7 @@ use Livewire\Component;
 /**
  * Profile Settings for security/ANPR users.
  */
-#[Layout('layouts.anpr')]
+#[Layout('layouts.anpr-layout')]
 class ProfileSettings extends Component
 {
     // Current user
@@ -61,7 +61,7 @@ class ProfileSettings extends Component
         $this->emailVerified = $this->user->email_verified_at !== null;
 
         // Set display info
-        $this->displayName = $this->user?->full_name;
+        $this->displayName = $this->user?->full_name ?? '';
         $this->memberSince = $this->user->created_at?->format('F j, Y') ?? 'Unknown';
     }
 

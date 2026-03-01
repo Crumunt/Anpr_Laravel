@@ -11,6 +11,7 @@ use App\Models\Vehicle\Vehicle;
 use App\Services\Admin\Applicants\ApplicantReadService;
 use App\Services\Admin\Vehicles\VehicleWriteService;
 use App\Services\Application\SaveVehicleService;
+use App\Services\ActivityLogService;
 use App\Traits\HasVehicleDetails;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -122,14 +123,51 @@ class InfoTable extends Component
             }
 
             DB::transaction(function () use ($application, $approvedStatus, $vehicleApprovedStatus) {
-                $application->update(['status_id' => $approvedStatus->id]);
+                $application->update([
+                    'status_id' => $approvedStatus->id,
+                    'approved_by' => auth()->id(),
+                ]);
 
-                // Also update all associated vehicles to approved status
+                // Also update all associated vehicles to approved status and set expiration dates
                 if ($vehicleApprovedStatus) {
-                    Vehicle::where('application_id', $application->id)
-                        ->update(['status_id' => $vehicleApprovedStatus->id]);
+                    $vehicles = Vehicle::where('application_id', $application->id)->get();
+                    $approvalDate = now();
+                    $defaultValidityYears = config('anpr.gate_pass.default_validity_years', 4);
+
+                    foreach ($vehicles as $vehicle) {
+                        $vehicle->status_id = $vehicleApprovedStatus->id;
+                        $vehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+                        $vehicle->save();
+
+                        // If this is a renewal, update the original vehicle as well
+                        if ($vehicle->is_renewal && $vehicle->renewed_from_vehicle_id) {
+                            $originalVehicle = Vehicle::find($vehicle->renewed_from_vehicle_id);
+                            if ($originalVehicle) {
+                                // Mark the original vehicle's gate pass as renewed
+                                // Transfer the validity to the renewal vehicle
+                                // and inherit the gate pass number if not already set
+                                if (!$vehicle->assigned_gate_pass && $originalVehicle->assigned_gate_pass) {
+                                    $vehicle->assigned_gate_pass = $originalVehicle->assigned_gate_pass;
+                                    $vehicle->save();
+                                }
+
+                                // Set the original vehicle's status to indicate it was renewed
+                                $expiredStatus = Status::where('type', 'vehicle')->where('code', 'inactive')->first();
+                                if ($expiredStatus) {
+                                    $originalVehicle->status_id = $expiredStatus->id;
+                                    $originalVehicle->save();
+                                }
+                            }
+                        }
+                    }
                 }
             });
+
+            // Log activity
+            $user = User::find($this->userId);
+            if ($user) {
+                ActivityLogService::logApplicationApproved($user, auth()->user());
+            }
 
             $this->loadData();
 
@@ -142,6 +180,7 @@ class InfoTable extends Component
 
             $this->dispatch('close-dropdown');
             $this->dispatch('refreshApplicationCard');
+            $this->dispatch('refreshVehicleTable');
         } catch (\Exception $e) {
             $this->dispatch(
                 "toast",
@@ -173,6 +212,12 @@ class InfoTable extends Component
                 }
             });
 
+            // Log activity
+            $user = User::find($this->userId);
+            if ($user) {
+                ActivityLogService::logApplicationRejected($user, auth()->user());
+            }
+
             $this->loadData();
 
             $this->dispatch(
@@ -193,8 +238,9 @@ class InfoTable extends Component
 
     public function assignVehicleNumber(Vehicle $vehicle, $gatePassNumber)
     {
-
-        $approved_status = Status::where('code', 'approved')->first();
+        // Check for vehicle 'active' status (vehicle type) or application 'approved' status
+        $vehicleActiveStatus = Status::where('type', 'vehicle')->where('code', 'active')->first();
+        $applicationApprovedStatus = Status::where('type', 'application')->where('code', 'approved')->first();
 
         try {
             Validator::make(
@@ -207,8 +253,12 @@ class InfoTable extends Component
                 ]
             )->validate();
 
-            if ($vehicle->status_id !== $approved_status->id) {
-                $this->dispatch('alert', message: 'Please approved application first.', type: 'warning', duration: 3000);
+            // Check if vehicle is active OR if the application is approved
+            $isVehicleActive = $vehicleActiveStatus && $vehicle->status_id === $vehicleActiveStatus->id;
+            $isApplicationApproved = $applicationApprovedStatus && $vehicle->application?->status_id === $applicationApprovedStatus->id;
+
+            if (!$isVehicleActive && !$isApplicationApproved) {
+                $this->dispatch('alert', message: 'Please approve the application first.', type: 'warning', duration: 3000);
                 return;
             }
         } catch (ValidationException $e) {
@@ -217,6 +267,12 @@ class InfoTable extends Component
         }
 
         $vehicle->update(['assigned_gate_pass' => $gatePassNumber]);
+
+        // Log activity
+        $user = User::find($this->userId);
+        if ($user) {
+            ActivityLogService::logGatePassIssued($user, $gatePassNumber, auth()->user());
+        }
 
         $this->dispatch("toast", message: "Gate pass assigned!", type: "success", duration: 3000);
 
@@ -328,6 +384,14 @@ class InfoTable extends Component
     public function refreshTable()
     {
         $this->loadData();
+    }
+
+    #[On('refreshVehicleTable')]
+    public function refreshVehicleData()
+    {
+        if ($this->type === 'vehicle') {
+            $this->loadData();
+        }
     }
 
     #[On('page-changed')]

@@ -9,7 +9,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 transform translate-y-0"
          x-transition:leave-end="opacity-0 transform -translate-y-4"
-         class="bg-green-50 border-b border-green-100 px-4 py-2 flex items-center justify-between top-0 z-40">
+         class="bg-green-50 border-b border-green-100 px-4 py-2 flex flex-wrap items-center justify-between gap-2 top-0 z-40">
 
         <div class="text-sm text-green-800 font-medium">
             <span x-text="selectedRows.length"></span> item<span x-show="selectedRows.length !== 1">s</span> selected
@@ -46,8 +46,8 @@
         </div>
     </div>
 
-    <!-- Table -->
-    <div class="relative w-full table-container overflow-x-auto">
+    <!-- Desktop Table -->
+    <div class="relative w-full table-container overflow-x-auto hidden lg:block">
         <table class="w-full caption-bottom text-sm">
             @if($caption)
                 <caption class="mt-4 text-sm text-gray-500 animate-fade-in">{{ $caption }}</caption>

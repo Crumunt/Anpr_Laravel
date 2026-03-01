@@ -5,13 +5,20 @@ namespace App\Services\Application;
 use App\Models\Documents;
 use App\Models\Status;
 use App\Models\User;
+use App\Services\ActivityLogService;
+use App\Services\UserInvitationService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SaveApplicationService
 {
-    public function handle(array $payload, array $uploadedTempPaths = [])
+    public function __construct(
+        protected UserInvitationService $invitationService
+    ) {}
+
+    public function handle(array $payload, array $uploadedTempPaths = []): array
     {
         $created = null;
         try {
@@ -86,10 +93,34 @@ class SaveApplicationService
             throw $e;
         }
 
+        $emailSent = false;
+
         if ($created) {
             $created->assignRole("applicant");
+
+            // Log application submission
+            ActivityLogService::logApplicationSubmitted($created, $payload['applicant_type'] ?? 'Unknown');
+
+            // Send invitation email
+            try {
+                $emailSent = $this->invitationService->sendWelcomeEmail($created);
+
+                Log::info('Applicant invitation email sent', [
+                    'user_id' => $created->id,
+                    'email' => $created->email,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send applicant invitation email', [
+                    'user_id' => $created->id,
+                    'email' => $created->email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
-        return $created;
+        return [
+            'user' => $created,
+            'emailSent' => $emailSent,
+        ];
     }
 }

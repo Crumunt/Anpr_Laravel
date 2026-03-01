@@ -17,6 +17,9 @@ Route::get('/', fn() => view('auth.login'));
 
 Route::get('/test', fn() => view('testing'));
 
+// Public Gate Pass Application - No authentication required
+Route::get('/apply', \App\Livewire\GatePass\GatePassApplication::class)->name('gate-pass.apply');
+
 Route::get('/documents/{document}/view', [DocumentController::class, 'view'])->name('documents.view');
 
 // Admin routes - Protected by auth and role middleware (excludes security and applicant)
@@ -93,7 +96,7 @@ Route::prefix('anpr')->name('anpr.')->middleware(['auth', 'security'])->group(fu
 
     Route::get('/analytics', [AnprAnalyticsController::class, 'index'])->name('analytics');
 
-    Route::get('/user-management/profile', \App\Livewire\ANPR\ProfileSettings::class)->name('user-management.profile');
+    Route::get('/profile', \App\Livewire\ANPR\ProfileSettings::class)->name('profile');
 
     Route::get('/settings', function () {
         return view('anpr.settings.index');
@@ -124,9 +127,24 @@ Route::prefix('gate-pass')->name('gate-pass.')->group(function () {
 
 // ];
 
+// Role-based dashboard redirect (fallback for direct /dashboard access)
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    /** @var \App\Models\User $user */
+    $user = auth()->user();
+
+    // Security users go to ANPR dashboard
+    if ($user->hasRole('security')) {
+        return redirect()->route('anpr.dashboard');
+    }
+
+    // Admin roles go to admin dashboard
+    if ($user->hasAnyRole(['super_admin', 'admin_editor', 'admin_viewer', 'encoder', 'maintenance'])) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    // Applicants go to applicant dashboard
+    return redirect()->route('applicant.dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

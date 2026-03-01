@@ -183,7 +183,7 @@
                     <h3 class="text-lg font-semibold text-gray-900">Quick Links</h3>
                 </div>
                 <div class="p-2">
-                    <a href="{{ route('anpr.user-management.profile') }}" class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors duration-200 group">
+                    <a href="{{ route('anpr.profile') }}" class="flex items-center px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors duration-200 group">
                         <i class="fas fa-user w-5 text-gray-500 group-hover:text-emerald-600 transition-colors" aria-hidden="true"></i>
                         <span class="ml-3 text-sm font-medium text-gray-700 group-hover:text-gray-900">My Profile</span>
                     </a>

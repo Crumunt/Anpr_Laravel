@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ANPR;
 
 use App\Http\Controllers\Controller;
 use App\Models\ANPR\Record;
+use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,6 @@ class AnprController extends Controller
         // Validate incoming data
         $validator = Validator::make($request->all(), [
             'timestamp' => 'required|string',
-            'total_detections' => 'required|integer',
             'camera_id' => 'nullable|string',
             'gate_type' => 'nullable|string',
             'location' => 'nullable|string',
@@ -54,28 +54,34 @@ class AnprController extends Controller
                     continue;
                 }
 
+                $plateNumber = $detection['plate_text'];
+
+                // Check if this plate has a registered vehicle with a gate pass
+                $registeredVehicle = Vehicle::where('plate_number', $plateNumber)
+                    ->whereNotNull('assigned_gate_pass')
+                    ->where('assigned_gate_pass', '!=', '')
+                    ->first();
+
                 // Create detection record
                 $plateDetection = Record::create([
-                    'plate_number' => $detection['plate_text'],
+                    'plate_number' => $plateNumber,
                     'confidence' => $detection['confidence'],
                     'bbox_x1' => $detection['bbox']['x1'] ?? null,
                     'bbox_y1' => $detection['bbox']['y1'] ?? null,
                     'bbox_x2' => $detection['bbox']['x2'] ?? null,
                     'bbox_y2' => $detection['bbox']['y2'] ?? null,
-                    'image_path' => $detection['image_path'] ?? null,
-                    'frame_number' => $detection['frame_number'] ?? null,
                     'camera_id' => $validated['camera_id'] ?? null,
                     'gate_type' => $validated['gate_type'] ?? null,
                     'location' => $validated['location'] ?? null,
-                    'detected_at' => $detection['timestamp'] ?? now(),
-                    'raw_data' => json_encode($detection),
+                    'detected_at' => $validated['timestamp'] ?? now(),
+                    'gate_pass_number' => $registeredVehicle?->assigned_gate_pass,
+                    'vehicle_id' => $registeredVehicle?->id,
                 ]);
 
                 $savedDetections[] = $plateDetection->id;
             }
 
             Log::info('ALPR webhook processed successfully', [
-                'total_detections' => $validated['total_detections'],
                 'saved_count' => count($savedDetections),
                 'detection_ids' => $savedDetections
             ]);

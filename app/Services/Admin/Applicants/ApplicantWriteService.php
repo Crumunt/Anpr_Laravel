@@ -21,9 +21,9 @@ class ApplicantWriteService
         protected DeleteApplicant $deleteApplicant,
     ) {}
 
-    public function create(array $payload, array $uploadedTempPaths = [])
+    public function create(array $payload, array $uploadedTempPaths = [], bool $sendInvitation = true): array
     {
-        return $this->createApplicant->handle($payload, $uploadedTempPaths);
+        return $this->createApplicant->handle($payload, $uploadedTempPaths, $sendInvitation);
     }
 
     public function update(array $payload, string $context = "default")
@@ -177,9 +177,40 @@ class ApplicantWriteService
 
                         // Sync vehicle status with application status
                         if ($vehicleStatus) {
-                            $user->vehicles()->update([
-                                'status_id' => $vehicleStatus->id
-                            ]);
+                            if ($statusCode === 'approved') {
+                                // Set expiration dates for approved vehicles
+                                $approvalDate = now();
+                                $defaultValidityYears = config('anpr.gate_pass.default_validity_years', 4);
+                                $inactiveStatus = Status::where('type', 'vehicle')->where('code', 'inactive')->first();
+
+                                $vehicles = $user->vehicles;
+                                foreach ($vehicles as $vehicle) {
+                                    $vehicle->status_id = $vehicleStatus->id;
+                                    $vehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+                                    $vehicle->save();
+
+                                    // Handle renewals: update original vehicle
+                                    if ($vehicle->is_renewal && $vehicle->renewed_from_vehicle_id) {
+                                        $originalVehicle = Vehicle::find($vehicle->renewed_from_vehicle_id);
+                                        if ($originalVehicle) {
+                                            // Inherit gate pass number
+                                            if (!$vehicle->assigned_gate_pass && $originalVehicle->assigned_gate_pass) {
+                                                $vehicle->assigned_gate_pass = $originalVehicle->assigned_gate_pass;
+                                                $vehicle->save();
+                                            }
+                                            // Mark original as inactive
+                                            if ($inactiveStatus) {
+                                                $originalVehicle->status_id = $inactiveStatus->id;
+                                                $originalVehicle->save();
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                $user->vehicles()->update([
+                                    'status_id' => $vehicleStatus->id
+                                ]);
+                            }
                         }
 
                         $successCount++;

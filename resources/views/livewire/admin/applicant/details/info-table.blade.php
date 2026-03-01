@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                {{-- Scrollable table wrapper with improved scrollbar --}}
+                {{-- Table with Horizontal Scroll --}}
                 <div class="overflow-x-auto custom-scrollbar">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50/80 backdrop-blur-sm">
@@ -72,7 +72,7 @@
                             @forelse($items as $rowIndex => $row)
                             <tr class="hover:bg-blue-50/30 transition-all duration-150 group cursor-pointer">
                                 @foreach($row as $key => $cell)
-                                @if($key !== 'actions' && $key !== 'vehicle_id' && $key !== 'application_id' && $key !== 'application_status')
+                                @if(!in_array($key, ['actions', 'vehicle_id', 'application_id', 'application_status', 'expiration_status', 'days_until_expiration', 'is_expired', 'is_expiring_soon', 'can_renew', 'approved_at', 'validity_years', 'renewed_from_vehicle_id', 'renewal_requested_at', 'registration_date']))
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($key === 'status')
                                     <x-ui.badge :label="$cell" />
@@ -129,6 +129,35 @@
                                     <span class="text-sm font-semibold {{ isset($cell['change']) && $cell['change'] > 0 ? 'text-green-600' : (isset($cell['change']) && $cell['change'] < 0 ? 'text-red-600' : 'text-gray-900') }}">
                                         {{ is_array($cell) ? $cell['value'] : $cell }}
                                     </span>
+
+                                    @elseif($key === 'expires_at')
+                                    @if($cell)
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-sm text-gray-700">{{ $cell }}</span>
+                                            @if(isset($row['expiration_status']))
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $row['expiration_status']['class'] ?? 'bg-gray-100 text-gray-800' }}">
+                                                    @if($row['is_expired'] ?? false)
+                                                        <i class="fas fa-exclamation-circle mr-1"></i>Expired
+                                                    @elseif($row['is_expiring_soon'] ?? false)
+                                                        <i class="fas fa-clock mr-1"></i>{{ $row['days_until_expiration'] ?? 0 }} days left
+                                                    @else
+                                                        <i class="fas fa-check-circle mr-1"></i>Active
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-sm text-gray-400">Not set</span>
+                                    @endif
+
+                                    @elseif($key === 'is_renewal')
+                                    @if($cell)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-100 text-cyan-800">
+                                            <i class="fas fa-sync mr-1"></i>Renewal
+                                        </span>
+                                    @else
+                                        <span class="text-sm text-gray-400">-</span>
+                                    @endif
 
                                     @else
                                     <span class="text-sm text-gray-700">{{ $cell }}</span>

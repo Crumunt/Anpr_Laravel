@@ -3,6 +3,9 @@
 @section('title', 'Vehicle Details')
 
 @section('content')
+    <!-- Renew Gate Pass Modal Component -->
+    @livewire('applicant.renew-gate-pass-modal')
+
     <!-- Breadcrumb -->
     <nav class="mb-6" aria-label="Breadcrumb">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
@@ -10,7 +13,7 @@
             <li><i class="fas fa-chevron-right text-xs"></i></li>
             <li><a href="{{ route('applicant.vehicles') }}" class="hover:text-emerald-600">Vehicles</a></li>
             <li><i class="fas fa-chevron-right text-xs"></i></li>
-            <li class="text-gray-900 font-medium">{{ $vehicle->license_plate }}</li>
+            <li class="text-gray-900 font-medium">{{ $vehicle->plate_number }}</li>
         </ol>
     </nav>
 
@@ -25,15 +28,12 @@
                             <i class="fas fa-car text-blue-600 text-2xl"></i>
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900 font-mono">{{ $vehicle->license_plate }}</h1>
-                            <p class="text-gray-500">{{ $vehicle->vehicle_make }} {{ $vehicle->vehicle_model }} ({{ $vehicle->vehicle_year }})</p>
+                            <h1 class="text-2xl font-bold text-gray-900 font-mono">{{ $vehicle->plate_number }}</h1>
+                            <p class="text-gray-500">{{ $vehicle->make }} {{ $vehicle->model }} ({{ $vehicle->year }})</p>
                         </div>
                     </div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                        {{ $vehicle->status_badge === 'Approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                        {{ $vehicle->status_badge === 'Pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                        {{ $vehicle->status_badge === 'Rejected' ? 'bg-red-100 text-red-800' : '' }}">
-                        {{ $vehicle->status_badge }}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $vehicle->status_badge['class'] }}">
+                        {{ $vehicle->status_badge['label'] ?? 'Pending' }}
                     </span>
                 </div>
 
@@ -46,7 +46,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Make</p>
-                                <p class="font-medium text-gray-900">{{ $vehicle->vehicle_make }}</p>
+                                <p class="font-medium text-gray-900">{{ $vehicle->make }}</p>
                             </div>
                         </div>
 
@@ -56,7 +56,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Model</p>
-                                <p class="font-medium text-gray-900">{{ $vehicle->vehicle_model }}</p>
+                                <p class="font-medium text-gray-900">{{ $vehicle->model }}</p>
                             </div>
                         </div>
 
@@ -66,7 +66,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Year</p>
-                                <p class="font-medium text-gray-900">{{ $vehicle->vehicle_year }}</p>
+                                <p class="font-medium text-gray-900">{{ $vehicle->year }}</p>
                             </div>
                         </div>
 
@@ -76,7 +76,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Color</p>
-                                <p class="font-medium text-gray-900">{{ $vehicle->vehicle_color ?? 'N/A' }}</p>
+                                <p class="font-medium text-gray-900">{{ $vehicle->color ?? 'N/A' }}</p>
                             </div>
                         </div>
 
@@ -86,7 +86,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Vehicle Type</p>
-                                <p class="font-medium text-gray-900">{{ ucfirst($vehicle->vehicle_type ?? 'Car') }}</p>
+                                <p class="font-medium text-gray-900">{{ ucfirst($vehicle->type ?? 'Car') }}</p>
                             </div>
                         </div>
 
@@ -119,14 +119,49 @@
                             </div>
                             <p class="text-2xl font-bold text-emerald-600 font-mono">{{ $vehicle->assigned_gate_pass }}</p>
                             <p class="text-sm text-gray-500 mt-1">Active Gate Pass</p>
+
+                            @if($vehicle->is_renewal)
+                                <p class="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-cyan-100 text-cyan-800">
+                                    <i class="fas fa-sync mr-1"></i> Renewal Application
+                                </p>
+                            @endif
                         </div>
+
+                        <!-- Expiration Info -->
+                        @if($vehicle->expires_at)
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-500">Expires</span>
+                                    <span class="text-sm font-medium text-gray-900">{{ $vehicle->expires_at->format('M d, Y') }}</span>
+                                </div>
+
+                                <div class="inline-flex items-center w-full justify-center px-3 py-1.5 rounded-lg text-sm font-medium {{ $vehicle->expiration_status['class'] }}">
+                                    @if($vehicle->isExpired())
+                                        <i class="fas fa-exclamation-circle mr-1.5"></i>
+                                        Expired
+                                    @elseif($vehicle->isExpiringSoon())
+                                        <i class="fas fa-clock mr-1.5"></i>
+                                        {{ $vehicle->days_until_expiration }} days remaining
+                                    @else
+                                        <i class="fas fa-check-circle mr-1.5"></i>
+                                        Valid until {{ $vehicle->expires_at->format('M Y') }}
+                                    @endif
+                                </div>
+
+                                @if($vehicle->approved_at)
+                                    <p class="text-xs text-gray-500 text-center mt-2">
+                                        Approved: {{ $vehicle->approved_at->format('M d, Y') }}
+                                    </p>
+                                @endif
+                            </div>
+                        @endif
                     @else
                         <div class="text-center">
                             <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <i class="fas fa-id-badge text-gray-400 text-3xl"></i>
                             </div>
                             <p class="text-gray-500">No gate pass assigned</p>
-                            @if($vehicle->status_badge === 'Pending')
+                            @if(($vehicle->status_badge['label'] ?? 'Pending') === 'Pending')
                                 <p class="text-sm text-amber-600 mt-2">
                                     <i class="fas fa-clock mr-1"></i> Awaiting approval
                                 </p>
@@ -142,6 +177,14 @@
                     <h3 class="text-lg font-semibold text-gray-800">Actions</h3>
                 </div>
                 <div class="p-4 space-y-3">
+                    @if($vehicle->canRenew())
+                        <button
+                            type="button"
+                            onclick="Livewire.dispatch('openRenewGatePassModal', { vehicleId: '{{ $vehicle->id }}' })"
+                            class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-cyan-600 text-white text-sm font-semibold rounded-lg hover:bg-cyan-700 transition-colors">
+                            <i class="fas fa-sync mr-2"></i> Renew Gate Pass
+                        </button>
+                    @endif
                     <a href="{{ route('applicant.vehicles') }}" class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
                         <i class="fas fa-arrow-left mr-2"></i> Back to Vehicles
                     </a>

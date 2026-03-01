@@ -6,6 +6,9 @@
     <!-- Add Vehicle Modal Component -->
     @livewire('applicant.add-vehicle-modal')
 
+    <!-- Renew Gate Pass Modal Component -->
+    @livewire('applicant.renew-gate-pass-modal')
+
     <!-- Welcome Header with improved typography and spacing -->
     <div class="mb-8 lg:mb-10">
         <div class="flex items-start justify-between gap-4">
@@ -86,6 +89,38 @@
         </div>
     </div>
 
+    <!-- Expiration Alerts Section -->
+    @if(($stats['expiring_soon'] ?? 0) > 0 || ($stats['expired'] ?? 0) > 0)
+    <div class="mb-8 lg:mb-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+        @if(($stats['expiring_soon'] ?? 0) > 0)
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-4">
+            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-amber-600 text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="text-amber-800 font-semibold">Gate Pass Expiring Soon</h4>
+                <p class="text-amber-700 text-sm mt-1">
+                    You have <strong>{{ $stats['expiring_soon'] }}</strong> gate pass(es) expiring within the next {{ config('anpr.gate_pass.renewal_warning_days', 90) }} days. Consider renewing now to avoid interruption.
+                </p>
+            </div>
+        </div>
+        @endif
+        @if(($stats['expired'] ?? 0) > 0)
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-4">
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-times-circle text-red-600 text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="text-red-800 font-semibold">Expired Gate Pass</h4>
+                <p class="text-red-700 text-sm mt-1">
+                    You have <strong>{{ $stats['expired'] }}</strong> expired gate pass(es). Please renew to continue using the gate pass.
+                </p>
+            </div>
+        </div>
+        @endif
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <!-- Recent Vehicles with enhanced design -->
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -94,19 +129,12 @@
                     <h3 class="text-xl font-bold text-gray-900">My Vehicles</h3>
                     <p class="text-sm text-gray-500 mt-1">Recent vehicle registrations</p>
                 </div>
-                <a href="{{ route('applicant.vehicles') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                    View All 
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
             </div>
 
             @if($recentVehicles->count() > 0)
                 <div class="divide-y divide-gray-100">
                     @foreach($recentVehicles as $vehicle)
-                        <a href="{{ route('applicant.vehicles.show', $vehicle['id']) }}" 
+                        <a href="{{ route('applicant.vehicles.show', $vehicle['id']) }}"
                            class="block p-5 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-transparent transition-all duration-200 group">
                             <div class="flex items-center justify-between gap-4">
                                 <div class="flex items-center gap-4 min-w-0 flex-1">
@@ -118,7 +146,7 @@
                                             {{ $vehicle['license_plate'] }}
                                         </p>
                                         <p class="text-sm text-gray-600 truncate">
-                                            {{ $vehicle['make_model'] }} 
+                                            {{ $vehicle['make_model'] }}
                                             @if($vehicle['year'])
                                                 <span class="text-gray-400">•</span> {{ $vehicle['year'] }}
                                             @endif
@@ -133,17 +161,46 @@
                                 </div>
                                 <div class="flex flex-col items-end gap-2 flex-shrink-0">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                                        @if(strtolower($vehicle['status']) === 'active' || strtolower($vehicle['status']) === 'approved') 
+                                        @if(strtolower($vehicle['status']) === 'active' || strtolower($vehicle['status']) === 'approved')
                                             bg-emerald-100 text-emerald-800 border border-emerald-200
-                                        @elseif(str_contains(strtolower($vehicle['status']), 'pending')) 
+                                        @elseif(str_contains(strtolower($vehicle['status']), 'pending'))
                                             bg-amber-100 text-amber-800 border border-amber-200
-                                        @elseif(strtolower($vehicle['status']) === 'inactive' || strtolower($vehicle['status']) === 'blacklisted' || strtolower($vehicle['status']) === 'rejected') 
+                                        @elseif(strtolower($vehicle['status']) === 'inactive' || strtolower($vehicle['status']) === 'blacklisted' || strtolower($vehicle['status']) === 'rejected')
                                             bg-red-100 text-red-800 border border-red-200
-                                        @else 
-                                            bg-gray-100 text-gray-800 border border-gray-200 
+                                        @else
+                                            bg-gray-100 text-gray-800 border border-gray-200
                                         @endif">
                                         {{ $vehicle['status'] }}
                                     </span>
+
+                                    @if(isset($vehicle['expires_at']))
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $vehicle['expiration_status']['class'] ?? 'bg-gray-100 text-gray-800' }}">
+                                            @if($vehicle['is_expired'] ?? false)
+                                                <i class="fas fa-exclamation-circle mr-1"></i>Expired
+                                            @elseif($vehicle['is_expiring_soon'] ?? false)
+                                                <i class="fas fa-clock mr-1"></i>{{ $vehicle['days_until_expiration'] }} days left
+                                            @else
+                                                <i class="fas fa-calendar mr-1"></i>{{ $vehicle['expires_at'] }}
+                                            @endif
+                                        </span>
+                                    @endif
+
+                                    @if($vehicle['can_renew'] ?? false)
+                                        <button
+                                            type="button"
+                                            onclick="event.preventDefault(); event.stopPropagation(); Livewire.dispatch('openRenewGatePassModal', { vehicleId: '{{ $vehicle['id'] }}' })"
+                                            class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-cyan-700 bg-cyan-100 border border-cyan-200 rounded-lg hover:bg-cyan-200 transition-colors">
+                                            <i class="fas fa-sync mr-1.5"></i>
+                                            Renew
+                                        </button>
+                                    @endif
+
+                                    @if($vehicle['is_renewal'] ?? false)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cyan-100 text-cyan-800">
+                                            <i class="fas fa-sync mr-1"></i>Renewal
+                                        </span>
+                                    @endif
+
                                     <span class="text-xs text-gray-500">{{ $vehicle['registered_date'] }}</span>
                                 </div>
                             </div>
@@ -164,7 +221,7 @@
                         type="button"
                         onclick="Livewire.dispatch('openAddVehicleModal')"
                         class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-emerald-800 shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transform hover:scale-105">
-                        <i class="fas fa-plus"></i> 
+                        <i class="fas fa-plus"></i>
                         <span>Register Your First Vehicle</span>
                     </button>
                 </div>
@@ -196,7 +253,7 @@
                         </svg>
                     </button>
 
-                    <a href="{{ route('applicant.vehicles') }}" 
+                    <a href="{{ route('applicant.vehicles') }}"
                        class="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all duration-200 group border border-blue-200/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
                             <i class="fas fa-list text-blue-600 text-lg"></i>
@@ -206,20 +263,6 @@
                             <p class="text-xs text-gray-600 mt-0.5">Manage your registered vehicles</p>
                         </div>
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
-
-                    <a href="{{ route('applicant.profile') }}" 
-                       class="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-purple-100/50 rounded-xl hover:from-purple-100 hover:to-purple-200 transition-all duration-200 group border border-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
-                            <i class="fas fa-user-edit text-purple-600 text-lg"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Update Profile</p>
-                            <p class="text-xs text-gray-600 mt-0.5">Edit your personal information</p>
-                        </div>
-                        <svg class="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>

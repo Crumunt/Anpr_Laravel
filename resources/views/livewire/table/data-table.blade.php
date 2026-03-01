@@ -79,12 +79,12 @@
 
     <!-- Bulk Selection Bar -->
     @if(count($selectedRows))
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-6 py-3 flex items-center justify-between sticky top-0 z-40 backdrop-blur-sm">
-        <div class="flex items-center gap-3">
-            <div class="flex items-center justify-center w-8 h-8 bg-green-600 text-white rounded-full text-xs font-bold">
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-40 backdrop-blur-sm">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-600 text-white rounded-full text-xs font-bold">
                 {{ count($selectedRows) }}
             </div>
-            <span class="text-sm font-medium text-green-900">
+            <span class="text-xs sm:text-sm font-medium text-green-900">
                 {{ count($selectedRows) }} {{ (count($selectedRows) > 1) ? 'items' : 'item' }} selected
             </span>
         </div>
@@ -204,7 +204,7 @@
     @endif
 
     <!-- Table Container with Horizontal Scroll -->
-    <div class="relative w-full"> {{--removed overflow-x-auto on table root div--}}
+    <div class="relative w-full overflow-x-auto"> {{--removed overflow-x-auto on table root div--}}
         <table class="w-full text-sm border-collapse">
 
             <!-- Table Caption -->

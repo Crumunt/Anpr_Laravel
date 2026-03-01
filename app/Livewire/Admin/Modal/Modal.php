@@ -3,7 +3,6 @@
 namespace App\Livewire\Admin\Modal;
 
 use App\Services\Admin\Applicants\ApplicantWriteService;
-use App\Services\Application\SaveApplicationService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Traits\HasPhilippineAddress;
@@ -133,10 +132,13 @@ class Modal extends Component
             }
         }
 
-        $created = $this->applicantWriteService->create(
+        $result = $this->applicantWriteService->create(
             $validated,
             $uploadedTempPaths,
         );
+
+        $created = $result['user'];
+        $emailSent = $result['emailSent'];
 
         if (!$created->hasRole("applicant")) {
             $this->dispatch("log-action", $created->role);
@@ -145,11 +147,21 @@ class Modal extends Component
 
         $this->resetForm();
         $this->showModal = false;
-        $this->dispatch(
-            "notify",
-            message: "Applicant added successfully!",
-            type: "success",
-        );
+
+        // Show appropriate success message based on email status
+        if ($emailSent) {
+            $this->dispatch(
+                "notify",
+                message: "Applicant added successfully! Invitation email sent.",
+                type: "success",
+            );
+        } else {
+            $this->dispatch(
+                "notify",
+                message: "Applicant added successfully! (Invitation email could not be sent)",
+                type: "warning",
+            );
+        }
 
         $this->dispatch("fetchCardData");
         $this->dispatch("refetchTableData");

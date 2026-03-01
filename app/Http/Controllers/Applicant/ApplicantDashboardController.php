@@ -33,9 +33,15 @@ class ApplicantDashboardController extends Controller
             'active_gate_passes' => $vehicles->filter(function($vehicle) {
                 return $vehicle->assigned_gate_pass && $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active';
             })->count(),
+            'expiring_soon' => $vehicles->filter(function($vehicle) {
+                return $vehicle->isExpiringSoon();
+            })->count(),
+            'expired' => $vehicles->filter(function($vehicle) {
+                return $vehicle->isExpired();
+            })->count(),
         ];
 
-        // Get recent vehicles
+        // Get recent vehicles with expiration info
         $recentVehicles = $vehicles->take(5)->map(function($vehicle) {
             return [
                 'id' => $vehicle->id,
@@ -43,8 +49,16 @@ class ApplicantDashboardController extends Controller
                 'make_model' => trim(($vehicle->make ?? '') . ' ' . ($vehicle->model ?? '')),
                 'year' => $vehicle->year ?? '',
                 'status' => $vehicle->status?->status_name ?? 'Pending',
+                'status_code' => $vehicle->status?->code ?? 'pending',
                 'gate_pass' => $vehicle->assigned_gate_pass,
                 'registered_date' => $vehicle->created_at?->format('M d, Y') ?? 'N/A',
+                'expires_at' => $vehicle->expires_at?->format('M d, Y'),
+                'days_until_expiration' => $vehicle->days_until_expiration,
+                'expiration_status' => $vehicle->expiration_status,
+                'is_expiring_soon' => $vehicle->isExpiringSoon(),
+                'is_expired' => $vehicle->isExpired(),
+                'can_renew' => $vehicle->canRenew(),
+                'is_renewal' => $vehicle->is_renewal,
             ];
         });
 

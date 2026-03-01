@@ -25,7 +25,7 @@
     $camera = is_array($camera) ? json_encode($camera) : (string)$camera;
     $owner_name = is_array($owner_name) ? json_encode($owner_name) : (string)$owner_name;
     $owner_role = is_array($owner_role) ? json_encode($owner_role) : (string)$owner_role;
-    
+
     // Status classes mapping (PHP 7.4 compatible)
     $hoverClass = 'hover:bg-gray-50';
     $bgClass = 'bg-gray-100';
@@ -33,7 +33,7 @@
     $badgeBgClass = 'bg-gray-100';
     $badgeTextClass = 'text-gray-800';
     $dotBgClass = 'bg-gray-600';
-    
+
     switch($status) {
         case 'authorized':
             $hoverClass = 'hover:bg-green-50';
@@ -60,7 +60,7 @@
             $dotBgClass = 'bg-red-600';
             break;
     }
-    
+
     $typeColorBg = 'bg-gray-100';
     $typeColorText = 'text-gray-800';
     switch($type_color) {
@@ -143,28 +143,28 @@
         </span>
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <div class="flex space-x-1.5 justify-end">
-            <button class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-lg transition-colors tooltip" aria-label="View details" onclick="viewVehicleDetails('{{ $license_plate }}')">
-                <i class="fas fa-eye" aria-hidden="true"></i>
-                <span class="tooltip-text">View details</span>
+        <div class="flex space-x-2 justify-end">
+            <button class="inline-flex items-center px-3 py-1.5 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors text-xs font-medium" aria-label="View details" onclick="viewVehicleDetails('{{ $license_plate }}')">
+                <i class="fas fa-eye mr-1.5" aria-hidden="true"></i>
+                View
             </button>
             @if($status === 'pending')
-                <button class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-1.5 rounded-lg transition-colors tooltip" aria-label="Approve" onclick="approveVehicle('{{ $license_plate }}')">
-                    <i class="fas fa-check" aria-hidden="true"></i>
-                    <span class="tooltip-text">Approve</span>
+                <button class="inline-flex items-center px-3 py-1.5 text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-xs font-medium" aria-label="Approve" onclick="approveVehicle('{{ $license_plate }}')">
+                    <i class="fas fa-check mr-1.5" aria-hidden="true"></i>
+                    Approve
                 </button>
-                <button class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors tooltip" aria-label="Deny" onclick="denyVehicleInTable('{{ $license_plate }}')">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                    <span class="tooltip-text">Deny</span>
+                <button class="inline-flex items-center px-3 py-1.5 text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-xs font-medium" aria-label="Deny" onclick="denyVehicleInTable('{{ $license_plate }}')">
+                    <i class="fas fa-times mr-1.5" aria-hidden="true"></i>
+                    Deny
                 </button>
             @else
-                <button class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition-colors tooltip" aria-label="Flag vehicle" onclick="flagVehicleInTable('{{ $license_plate }}')">
-                    <i class="fas fa-flag" aria-hidden="true"></i>
-                    <span class="tooltip-text">Flag vehicle</span>
+                <button class="inline-flex items-center px-3 py-1.5 text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors text-xs font-medium" aria-label="Flag vehicle" onclick="flagVehicleInTable('{{ $license_plate }}')">
+                    <i class="fas fa-flag mr-1.5" aria-hidden="true"></i>
+                    Flag
                 </button>
-                <button class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors tooltip" aria-label="Report issue" onclick="reportIssue('{{ $license_plate }}')">
-                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span class="tooltip-text">Report issue</span>
+                <button class="inline-flex items-center px-3 py-1.5 text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-xs font-medium" aria-label="Report issue" onclick="reportIssue('{{ $license_plate }}')">
+                    <i class="fas fa-exclamation-triangle mr-1.5" aria-hidden="true"></i>
+                    Report
                 </button>
             @endif
         </div>

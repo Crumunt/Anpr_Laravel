@@ -164,8 +164,8 @@
 
                 <!-- Profile -->
                 <li>
-                    <a href="{{ route('anpr.user-management.profile') }}"
-                       class="anpr-sidebar-item flex items-center px-4 py-3 text-green-100 rounded-r-lg {{ request()->routeIs('anpr.user-management.profile') ? 'active' : '' }}">
+                    <a href="{{ route('anpr.profile') }}"
+                       class="anpr-sidebar-item flex items-center px-4 py-3 text-green-100 rounded-r-lg {{ request()->routeIs('anpr.profile') ? 'active' : '' }}">
                         <i class="fas fa-user-cog w-5 mr-3"></i>
                         <span>My Profile</span>
                     </a>
