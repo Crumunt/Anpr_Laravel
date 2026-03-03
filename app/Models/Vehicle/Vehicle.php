@@ -27,6 +27,8 @@ class Vehicle extends Model
         'year',
         'color',
         'assigned_gate_pass',
+        'previous_gate_pass',
+        'gate_pass_assignment_count',
         'status_id',
         'validity_years',
         'approved_at',

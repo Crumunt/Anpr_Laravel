@@ -11,6 +11,7 @@
     }"
     @tab-changed.window="updateFilterType($event.detail)"
     class="w-full bg-white border border-gray-100 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
+
     <div class="p-5">
         <form class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             @csrf
@@ -109,7 +110,7 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 -translate-y-2"
-                                        class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto">
+                                        class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto hide-scrollbar">
 
                                         <!-- Dropdown Header -->
                                         <div class="px-3 py-2 border-b border-gray-100 bg-gray-50">
@@ -212,7 +213,7 @@
                                             x-transition:leave="transition ease-in duration-150"
                                             x-transition:leave-start="opacity-100 translate-y-0"
                                             x-transition:leave-end="opacity-0 -translate-y-2"
-                                            class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto">
+                                            class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto hide-scrollbar">
 
                                             <!-- Dropdown Header with Select All -->
                                             @if(count($roleFilter) > 6)
@@ -230,15 +231,15 @@
                                             <!-- Options List -->
                                             <div class="py-1">
                                                 @foreach($roleFilter as $key => $label)
-                                                    <label class="flex items-center justify-between px-4 py-2.5 hover:bg-green-50 cursor-pointer transition-colors duration-150 group">
+                                                    <label wire:key="role-label-{{ $key }}" class="flex items-center justify-between px-4 py-2.5 hover:bg-green-50 cursor-pointer transition-colors duration-150 group">
 
                                                         <!-- Checkbox and Label -->
                                                         <div class="flex items-center gap-3">
                                                             <input
                                                                 type="checkbox"
                                                                 wire:click="toggleRow('{{$key}}')"
-                                                                wire:key="role-{{ $key }}"
-                                                                {{ in_array($key, $selectedRole) ? 'checked' : '' }}
+                                                                wire:key="role-checkbox-{{ $key }}-{{ in_array($key, $selectedRole) ? 'checked' : 'unchecked' }}"
+                                                                @checked(in_array($key, $selectedRole))
                                                                 class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer">
                                                             <span class="text-sm text-gray-700 group-hover:text-green-700 font-medium">{{ $label }}</span>
                                                         </div>
@@ -361,7 +362,7 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 -translate-y-2"
-                                        class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto">
+                                        class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-64 overflow-auto hide-scrollbar">
 
                                         <!-- Dropdown Header -->
                                         <div class="px-3 py-2 border-b border-gray-100 bg-gray-50">

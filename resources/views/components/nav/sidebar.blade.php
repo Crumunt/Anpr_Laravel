@@ -37,7 +37,7 @@
         </div>
 
         <!-- Navigation content -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto hide-scrollbar" aria-label="Main Navigation">
             {{ $slot }}
         </nav>
 

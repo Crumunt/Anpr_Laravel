@@ -91,6 +91,26 @@ class ApplicationDisplayHelper
                     ],
                 ],
             },
+            "user_archived_applicant" => match ($tab) {
+                default => [
+                    ...$base,
+                    [
+                        "key" => "applicant_type",
+                        "label" => "Applicant Type",
+                        "width" => "120px",
+                    ],
+                    [
+                        "key" => "applications",
+                        "label" => "Application/s",
+                        "width" => "120px",
+                    ],
+                    [
+                        "key" => "archived_date",
+                        "label" => "Archived Date",
+                        "width" => "150px",
+                    ],
+                ],
+            },
             default => [],
         };
     }

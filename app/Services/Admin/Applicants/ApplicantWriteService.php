@@ -6,8 +6,10 @@ use App\Models\Application;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\Vehicle\Vehicle;
+use App\Services\Admin\Applicants\Actions\ArchiveApplicant;
 use App\Services\Admin\Applicants\Actions\CreateApplicant;
 use App\Services\Admin\Applicants\Actions\DeleteApplicant;
+use App\Services\Admin\Applicants\Actions\RestoreApplicant;
 use App\Services\Admin\Applicants\Actions\UpdateApplicant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,8 @@ class ApplicantWriteService
         protected CreateApplicant $createApplicant,
         protected UpdateApplicant $updateApplicant,
         protected DeleteApplicant $deleteApplicant,
+        protected ArchiveApplicant $archiveApplicant,
+        protected RestoreApplicant $restoreApplicant,
     ) {}
 
     public function create(array $payload, array $uploadedTempPaths = [], bool $sendInvitation = true): array
@@ -34,6 +38,120 @@ class ApplicantWriteService
     public function delete($applicantID)
     {
         return $this->deleteApplicant->handle($applicantID);
+    }
+
+    /**
+     * Archive an applicant (soft delete)
+     *
+     * @param string $applicantID The user ID to archive
+     * @return User The archived user
+     */
+    public function archive(string $applicantID): User
+    {
+        return $this->archiveApplicant->handle($applicantID);
+    }
+
+    /**
+     * Restore an archived applicant
+     *
+     * @param string $applicantID The user ID to restore
+     * @return User The restored user
+     */
+    public function restore(string $applicantID): User
+    {
+        return $this->restoreApplicant->handle($applicantID);
+    }
+
+    /**
+     * Bulk archive multiple applicants
+     *
+     * @param array $applicantIds Array of user IDs to archive
+     * @return array Result with success count and failed IDs
+     */
+    public function bulkArchive(array $applicantIds): array
+    {
+        $successCount = 0;
+        $failedIds = [];
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($applicantIds as $applicantId) {
+                try {
+                    $this->archiveApplicant->handle($applicantId);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    Log::warning('Failed to archive applicant in bulk operation', [
+                        'applicant_id' => $applicantId,
+                        'error' => $e->getMessage()
+                    ]);
+                    $failedIds[] = $applicantId;
+                }
+            }
+
+            DB::commit();
+
+            Log::info('Bulk applicant archiving completed', [
+                'success_count' => $successCount,
+                'failed_count' => count($failedIds)
+            ]);
+
+            return [
+                'success_count' => $successCount,
+                'failed_ids' => $failedIds,
+                'total' => count($applicantIds)
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk applicant archiving failed', ['error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Bulk restore multiple archived applicants
+     *
+     * @param array $applicantIds Array of user IDs to restore
+     * @return array Result with success count and failed IDs
+     */
+    public function bulkRestore(array $applicantIds): array
+    {
+        $successCount = 0;
+        $failedIds = [];
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($applicantIds as $applicantId) {
+                try {
+                    $this->restoreApplicant->handle($applicantId);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    Log::warning('Failed to restore applicant in bulk operation', [
+                        'applicant_id' => $applicantId,
+                        'error' => $e->getMessage()
+                    ]);
+                    $failedIds[] = $applicantId;
+                }
+            }
+
+            DB::commit();
+
+            Log::info('Bulk applicant restoration completed', [
+                'success_count' => $successCount,
+                'failed_count' => count($failedIds)
+            ]);
+
+            return [
+                'success_count' => $successCount,
+                'failed_ids' => $failedIds,
+                'total' => count($applicantIds)
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk applicant restoration failed', ['error' => $e->getMessage()]);
+            throw $e;
+        }
     }
 
     /**

@@ -47,6 +47,8 @@ class ApplicantAccountManager extends Component
         match ($action) {
             'deactivate' => $this->deactivateAccount(),
             'activate' => $this->activateAccount(),
+            'archive' => $this->archiveAccount(),
+            'restore' => $this->restoreAccount(),
             'delete' => $this->deleteAccount(),
             'force-password-change' => $this->forcePasswordChange(),
             'reset-password' => $this->sendPasswordReset(),
@@ -140,10 +142,80 @@ class ApplicantAccountManager extends Component
             ]);
 
             // Redirect to applicants list after deletion
-            $this->redirect(route('admin.applicants.index'), navigate: true);
+            $this->redirect(route('admin.applicant'), navigate: true);
         } catch (\Exception $e) {
             $this->dispatch('toast', type: 'error', message: 'Failed to delete account.');
             Log::error('Account deletion failed', ['user_id' => $this->userId, 'error' => $e->getMessage()]);
+        } finally {
+            $this->processing = false;
+        }
+    }
+
+    /**
+     * Archive the applicant's account (soft delete)
+     */
+    public function archiveAccount(): void
+    {
+        if (!$this->user) return;
+
+        $this->processing = true;
+
+        try {
+            $this->user->update([
+                'is_deleted' => true,
+                'deleted_at' => now(),
+                'is_active' => false,
+            ]);
+
+            // Log activity
+            ActivityLogService::logAccountArchived($this->user, auth()->user());
+
+            $this->dispatch('toast', type: 'success', message: 'Account has been archived successfully.');
+
+            Log::info('Applicant account archived by admin', [
+                'applicant_id' => $this->userId,
+                'admin_id' => auth()->id(),
+            ]);
+
+            // Redirect to applicants list after archiving
+            $this->redirect(route('admin.applicant'), navigate: true);
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', message: 'Failed to archive account.');
+            Log::error('Account archiving failed', ['user_id' => $this->userId, 'error' => $e->getMessage()]);
+        } finally {
+            $this->processing = false;
+        }
+    }
+
+    /**
+     * Restore the applicant's account from archive
+     */
+    public function restoreAccount(): void
+    {
+        if (!$this->user) return;
+
+        $this->processing = true;
+
+        try {
+            $this->user->update([
+                'is_deleted' => false,
+                'deleted_at' => null,
+                'is_active' => true,
+            ]);
+
+            // Log activity
+            ActivityLogService::logAccountRestored($this->user, auth()->user());
+
+            $this->dispatch('toast', type: 'success', message: 'Account has been restored successfully.');
+            $this->dispatch('applicant-status-changed', userId: $this->userId, isActive: true);
+
+            Log::info('Applicant account restored by admin', [
+                'applicant_id' => $this->userId,
+                'admin_id' => auth()->id(),
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', message: 'Failed to restore account.');
+            Log::error('Account restoration failed', ['user_id' => $this->userId, 'error' => $e->getMessage()]);
         } finally {
             $this->processing = false;
         }

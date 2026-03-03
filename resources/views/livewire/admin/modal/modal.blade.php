@@ -57,7 +57,7 @@
 
                                     <!-- Step 1: Personal Info -->
                                     @if($currentStep === 1)
-                                    <div class="space-y-6" x-data="{type: @entangle('applicant_type').live}">
+                                    <div class="space-y-6">
 
                                         <div>
                                             <h3 class="text-sm font-semibold text-gray-900 mb-4">Basic Information</h3>
@@ -175,36 +175,42 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">Applicant Type <span class="text-red-500">*</span></label>
-                                                    <select x-model="type"
+                                                    <select wire:model.live="applicant_type"
                                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                                         <option value="">Select Applicant Type</option>
-                                                        <option value="student">Student</option>
-                                                        <option value="faculty">Faculty</option>
-                                                        <option value="staff">Staff</option>
+                                                        @foreach($applicantTypeOptions as $type)
+                                                            <option value="{{ $type->id }}">{{ $type->label }}</option>
+                                                        @endforeach
                                                     </select>
                                                     @error('applicant_type') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                                 </div>
-                                                <div x-show="['staff','student', 'faculty'].includes(type)">
+                                                @if($selectedApplicantType && $selectedApplicantType->requires_clsu_id)
+                                                <div>
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">CLSU ID Number <span class="text-red-500">*</span></label>
                                                     <input type="text" name="clsu_id"
                                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                                         wire:model="clsu_id">
                                                     @error('clsu_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                                 </div>
-                                                <div x-show="['staff','faculty', 'student'].includes(type)">
+                                                @endif
+                                                @if($selectedApplicantType && $selectedApplicantType->requires_department)
+                                                <div>
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department <span class="text-red-500">*</span></label>
                                                     <input type="text" name="college_unit_department"
                                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                                         wire:model="department">
                                                     @error('department') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                                 </div>
-                                                <div x-show="['staff','faculty'].includes(type)" class="md:col-span-2">
+                                                @endif
+                                                @if($selectedApplicantType && $selectedApplicantType->requires_position)
+                                                <div class="md:col-span-2">
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">Designation/Position <span class="text-red-500">*</span></label>
                                                     <input type="text" name="position"
                                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                                         wire:model="position">
                                                     @error('position') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                                 </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -257,97 +263,66 @@
                                     <div class="space-y-6">
                                         <div>
                                             <h3 class="text-sm font-semibold text-gray-900 mb-2">Required Documents</h3>
-                                            <p class="text-sm text-gray-600 mb-6">Please upload all necessary documents for your application</p>
+                                            <p class="text-sm text-gray-600 mb-6">
+                                                @if($selectedApplicantType)
+                                                    Upload the required documents for {{ $selectedApplicantType->label }} application
+                                                @else
+                                                    Please upload all necessary documents for your application
+                                                @endif
+                                            </p>
 
-                                            <!-- Vehicle Registration -->
+                                            @forelse($documentRequirements as $document)
                                             <div class="mb-6">
                                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                    Vehicle Registration <span class="text-red-500">*</span>
+                                                    {{ $document->label }}
+                                                    @if($document->is_required)
+                                                        <span class="text-red-500">*</span>
+                                                    @else
+                                                        <span class="text-gray-400 text-xs">(Optional)</span>
+                                                    @endif
                                                 </label>
+                                                @if($document->description)
+                                                    <p class="text-xs text-gray-500 mb-2">{{ $document->description }}</p>
+                                                @endif
                                                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-green-500 transition-colors">
-                                                    <input type="file" wire:model="vehicle_registration" id="vehicleRegistration" class="hidden" accept=".pdf,.png,.jpg,.jpeg">
-                                                    <label for="vehicleRegistration" class="cursor-pointer flex items-center gap-3">
+                                                    <input
+                                                        type="file"
+                                                        wire:model="files.{{ $document->name }}"
+                                                        id="doc_{{ $document->name }}"
+                                                        class="hidden"
+                                                        accept=".{{ str_replace(',', ',.', $document->accepted_formats) }}"
+                                                        multiple>
+                                                    <label for="doc_{{ $document->name }}" class="cursor-pointer flex items-center gap-3">
                                                         <svg class="h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                         </svg>
                                                         <div class="text-left">
-                                                            <p class="text-sm text-gray-600">Click to upload vehicle registration</p>
-                                                            <p class="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
+                                                            <p class="text-sm text-gray-600">Click to upload {{ strtolower($document->label) }}</p>
+                                                            <p class="text-xs text-gray-500">{{ strtoupper($document->accepted_formats) }} up to {{ $document->max_file_size_display }}</p>
                                                         </div>
                                                     </label>
                                                 </div>
-                                                @error('vehicle_registration') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
-                                                @if($vehicle_registration)
-                                                @foreach ($vehicle_registration as $registration)
-                                                <div class="mt-2 flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                                                    <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    <span class="text-sm text-gray-700">{{ $registration->getClientOriginalName() }}</span>
-                                                </div>
-                                                @endforeach
-                                                @endif
-                                            </div>
-
-                                            <!-- Driver's License -->
-                                            <div class="mb-6">
-                                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                    Driver's License <span class="text-red-500">*</span>
-                                                </label>
-                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-green-500 transition-colors">
-                                                    <input type="file" wire:model="license" id="license" class="hidden" accept=".pdf,.png,.jpg,.jpeg">
-                                                    <label for="license" class="cursor-pointer flex items-center gap-3">
-                                                        <svg class="h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                @error("files.{$document->name}.*") <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                                                @if(isset($files[$document->name]) && is_array($files[$document->name]))
+                                                    @foreach ($files[$document->name] as $uploadedFile)
+                                                    <div class="mt-2 flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                                                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                                         </svg>
-                                                        <div class="text-left">
-                                                            <p class="text-sm text-gray-600">Click to upload driver's license</p>
-                                                            <p class="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                                @error('license') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
-                                                @if($license)
-                                                @foreach ($license as $license_files)
-                                                <div class="mt-2 flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                                                    <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    <span class="text-sm text-gray-700">{{ $license_files->getClientOriginalName() }}</span>
-                                                </div>
-                                                @endforeach
+                                                        <span class="text-sm text-gray-700">{{ $uploadedFile->getClientOriginalName() }}</span>
+                                                    </div>
+                                                    @endforeach
                                                 @endif
                                             </div>
-
-                                            <!-- Proof of Identification -->
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                    Proof of Identification <span class="text-red-500">*</span>
-                                                </label>
-                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-green-500 transition-colors">
-                                                    <input type="file" wire:model="proof_of_identification" id="proofOfId" class="hidden" accept=".pdf,.png,.jpg,.jpeg">
-                                                    <label for="proofOfId" class="cursor-pointer flex items-center gap-3">
-                                                        <svg class="h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                        <div class="text-left">
-                                                            <p class="text-sm text-gray-600">Click to upload proof of identification</p>
-                                                            <p class="text-xs text-gray-500">CLSU ID, National ID, Passport (PDF, PNG, JPG up to 10MB)</p>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                                @error('proof_of_identification') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
-                                                @if($proof_of_identification)
-                                                @foreach ($proof_of_identification as $identification)
-                                                <div class="mt-2 flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                                                    <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                    <span class="text-sm text-gray-700">{{ $identification->getClientOriginalName() }}</span>
-                                                </div>
-                                                @endforeach
-                                                @endif
+                                            @empty
+                                            <div class="text-center py-8 text-gray-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <p class="text-sm">No document requirements found for this applicant type.</p>
+                                                <p class="text-xs mt-1">Please go back and select an applicant type.</p>
                                             </div>
+                                            @endforelse
                                         </div>
                                     </div>
                                     @endif
@@ -377,7 +352,7 @@
                                                         </div>
                                                         <div>
                                                             <dt class="text-xs text-gray-500">Applicant Type</dt>
-                                                            <dd class="text-sm text-gray-900 mt-1 capitalize">{{ $applicant_type }}</dd>
+                                                            <dd class="text-sm text-gray-900 mt-1 capitalize">{{ $selectedApplicantType?->label ?? 'Not selected' }}</dd>
                                                         </div>
                                                         @if($clsu_id)
                                                         <div>
@@ -416,44 +391,27 @@
                                                     </dl>
                                                 </div>
 
-                                                @if($vehicle_registration || $license || $proof_of_identification)
+                                                @if(count($files) > 0)
                                                 <div class="bg-gray-50 rounded-lg p-4">
                                                     <h4 class="text-sm font-semibold text-gray-900 mb-3">Documents</h4>
                                                     <ul class="space-y-2">
-                                                        @if($vehicle_registration)
-                                                        <li class="flex items-center gap-2 text-sm text-gray-700">
-                                                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            <span class="font-medium">Vehicle Registration:</span>
-                                                            @foreach ($vehicle_registration as $registration)
-                                                            <span class="text-sm text-gray-700">{{ $registration->getClientOriginalName() }}</span>
-                                                            @endforeach
-                                                        </li>
-                                                        @endif
-                                                        @if($license)
-                                                        <li class="flex items-center gap-2 text-sm text-gray-700">
-                                                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            <span class="font-medium">Driver's License:</span>
-                                                            @foreach ($license as $license_files)
-                                                            <span class="text-sm text-gray-700">{{ $license_files->getClientOriginalName() }}</span>
-                                                            @endforeach
-                                                        </li>
-                                                        @endif
-                                                        @if($proof_of_identification)
-                                                        <li class="flex items-center gap-2 text-sm text-gray-700">
-                                                            <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            <span class="font-medium">Proof of ID:</span>
-                                                            @foreach ($proof_of_identification as $identification)
-
-                                                            <span class="text-sm text-gray-700">{{ $identification->getClientOriginalName() }}</span>
-                                                            @endforeach
-                                                        </li>
-                                                        @endif
+                                                        @foreach($files as $docType => $docFiles)
+                                                            @if(is_array($docFiles) && count($docFiles) > 0)
+                                                            <li class="flex items-start gap-2 text-sm text-gray-700">
+                                                                <svg class="h-4 w-4 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                </svg>
+                                                                <div>
+                                                                    <span class="font-medium capitalize">{{ str_replace('_', ' ', $docType) }}:</span>
+                                                                    <span class="text-gray-600">
+                                                                        @foreach ($docFiles as $file)
+                                                                            {{ $file->getClientOriginalName() }}@if(!$loop->last), @endif
+                                                                        @endforeach
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                            @endif
+                                                        @endforeach
                                                     </ul>
                                                 </div>
                                                 @endif

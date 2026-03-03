@@ -31,6 +31,26 @@ class ApplicantReadService
             );
     }
 
+    public function getArchivedApplicants(array $filters)
+    {
+        // SELECTING ONLY REQUIRED DATA FOR SPEED - for archived applicants
+        return User::select(['id', 'email', 'created_at', 'deleted_at'])
+            ->archived()
+            ->withApplicationCounts()
+            ->when($filters['search'] ?? null, fn($q) => $q->searchTerm($filters['search']))
+            ->when($filters['applicant_types'] ?? null, fn($q) => $q->applicantType($filters['applicant_types']))
+            ->when(
+                $filters['sort_by'] ?? null,
+                fn($q) => $q->sortApplicant($filters['sort_by']),
+                fn($q) => $q->orderBy('deleted_at', 'desc')
+            );
+    }
+
+    public function getArchivedCount(): int
+    {
+        return User::archived()->count();
+    }
+
     public function getDashboardCounts()
     {
 

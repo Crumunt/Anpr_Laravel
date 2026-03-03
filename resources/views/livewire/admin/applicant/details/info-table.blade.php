@@ -72,10 +72,41 @@
                             @forelse($items as $rowIndex => $row)
                             <tr class="hover:bg-blue-50/30 transition-all duration-150 group cursor-pointer">
                                 @foreach($row as $key => $cell)
-                                @if(!in_array($key, ['actions', 'vehicle_id', 'application_id', 'application_status', 'expiration_status', 'days_until_expiration', 'is_expired', 'is_expiring_soon', 'can_renew', 'approved_at', 'validity_years', 'renewed_from_vehicle_id', 'renewal_requested_at', 'registration_date']))
+                                @if(!in_array($key, ['actions', 'vehicle_id', 'application_id', 'application_status', 'expiration_status', 'days_until_expiration', 'is_expired', 'is_expiring_soon', 'can_renew', 'approved_at', 'validity_years', 'renewed_from_vehicle_id', 'renewal_requested_at', 'registration_date', 'previous_gate_pass', 'gate_pass_assignment_count']))
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($key === 'status')
                                     <x-ui.badge :label="$cell" />
+
+                                    @elseif($key === 'gate_pass_number')
+                                    {{-- Display gate pass number with previous pass and assignment count --}}
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-2">
+                                            @if($cell !== 'Not yet assigned')
+                                            <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-md">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                </svg>
+                                                {{ $cell }}
+                                            </span>
+                                            @if(($row['gate_pass_assignment_count'] ?? 0) > 1)
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700" title="Gate pass has been reassigned {{ $row['gate_pass_assignment_count'] - 1 }} time(s)">
+                                                <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                                {{ $row['gate_pass_assignment_count'] }}x
+                                            </span>
+                                            @endif
+                                            @else
+                                            <span class="text-sm text-gray-400 italic">{{ $cell }}</span>
+                                            @endif
+                                        </div>
+                                        @if($row['previous_gate_pass'] ?? null)
+                                        <div class="flex items-center gap-1 text-xs text-gray-500">
+                                            <span class="text-gray-400">Previously:</span>
+                                            <span class="font-mono text-gray-600 line-through">{{ $row['previous_gate_pass'] }}</span>
+                                        </div>
+                                        @endif
+                                    </div>
 
                                     @elseif($key === 'application_number')
                                     {{-- Display formatted application number with icon --}}

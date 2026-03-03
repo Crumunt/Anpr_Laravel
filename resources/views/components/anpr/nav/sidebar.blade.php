@@ -134,7 +134,7 @@
             <p class="text-xs opacity-80">ANPR System</p>
         </div>
     </div>
-    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto hide-scrollbar" aria-label="Main Navigation">
         @foreach($navItemsToShow as $item)
             @if(isset($item['divider']) && $item['divider'])
                 <div class="my-3 h-px bg-white bg-opacity-10"></div>

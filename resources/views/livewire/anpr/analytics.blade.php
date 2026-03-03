@@ -35,6 +35,28 @@
                     >
                 @endif
 
+                {{-- Gate Filter --}}
+                <select
+                    wire:model.live="gateFilter"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                >
+                    <option value="all">All Gates</option>
+                    @foreach($availableGates as $gate)
+                        <option value="{{ $gate }}">{{ $gate }}</option>
+                    @endforeach
+                </select>
+
+                {{-- Direction Filter --}}
+                <select
+                    wire:model.live="locationFilter"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                >
+                    <option value="all">All Directions</option>
+                    @foreach($availableLocations as $location)
+                        <option value="{{ $location }}">{{ $location }}</option>
+                    @endforeach
+                </select>
+
                 {{-- Refresh Button --}}
                 <button
                     wire:click="refreshData"

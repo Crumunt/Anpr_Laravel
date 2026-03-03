@@ -11,7 +11,7 @@
                     </div>
 
                     {{-- Clear Filters Button --}}
-                    @if($search || $gateFilter !== 'all' || $statusFilter !== 'all')
+                    @if($search || $gateFilter !== 'all' || $locationFilter !== 'all' || $statusFilter !== 'all')
                         <button
                             wire:click="clearFilters"
                             class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
@@ -53,6 +53,22 @@
                         >
                             <option value="all">All Gates</option>
                             @foreach($availableGates as $value => $label)
+                                <option value="{{ $label }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                    {{-- Direction Filter (Entry/Exit) --}}
+                    <div class="relative">
+                        <select
+                            wire:model.live="locationFilter"
+                            class="appearance-none w-full sm:w-36 pl-4 pr-10 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all cursor-pointer"
+                        >
+                            <option value="all">All Directions</option>
+                            @foreach($availableLocations as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
@@ -255,7 +271,7 @@
                                     </div>
                                     <p class="text-gray-500 font-medium">No vehicle records found</p>
                                     <p class="text-gray-400 text-sm mt-1">
-                                        @if($search || $gateFilter !== 'all' || $statusFilter !== 'all')
+                                        @if($search || $gateFilter !== 'all' || $locationFilter !== 'all' || $statusFilter !== 'all')
                                             Try adjusting your filters
                                         @else
                                             No detections in the last 24 hours
@@ -454,15 +470,15 @@
                                     Gate
                                 </label>
                                 <select
-                                    wire:model="editForm.gate_type"
+                                    wire:model="editForm.gate_id"
                                     class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
                                 >
                                     <option value="">Select Gate</option>
-                                    @foreach($availableGates as $value => $label)
-                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @foreach($allGates as $gate)
+                                        <option value="{{ $gate['id'] }}">{{ $gate['display_name'] }}</option>
                                     @endforeach
                                 </select>
-                                @error('editForm.gate_type')
+                                @error('editForm.gate_id')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>

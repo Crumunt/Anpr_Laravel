@@ -23,6 +23,8 @@ class VehicleResource extends JsonResource
             "vehicle_info" => $this->vehicle_info,
             "plate_number" => $this->plate_number,
             "gate_pass_number" => $this->assigned_gate_pass ?? 'Not yet assigned',
+            "previous_gate_pass" => $this->previous_gate_pass,
+            "gate_pass_assignment_count" => $this->gate_pass_assignment_count ?? 0,
             "registration_date" => $this->created_at->format("F d, Y"),
             "application_status" => $applicationStatus,
             // Expiration info

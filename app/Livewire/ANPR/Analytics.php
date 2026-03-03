@@ -2,6 +2,7 @@
 
 namespace App\Livewire\ANPR;
 
+use App\Models\ANPR\Gate;
 use App\Models\ANPR\Record;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -28,6 +29,12 @@ class Analytics extends Component
     public string $gateFilter = 'all';
 
     /**
+     * Gate location filter (Entry/Exit)
+     */
+    #[Url(as: 'direction')]
+    public string $locationFilter = 'all';
+
+    /**
      * Custom date range start
      */
     public ?string $customStartDate = null;
@@ -46,6 +53,11 @@ class Analytics extends Component
      * Available gates
      */
     public array $availableGates = [];
+
+    /**
+     * Available gate locations
+     */
+    public array $availableLocations = [];
 
     /**
      * Summary statistics
@@ -98,16 +110,47 @@ class Analytics extends Component
      */
     public function mount(): void
     {
-        $this->availableGates = config('anpr.gates', [
-            'entry' => 'Entry Gate',
-            'exit' => 'Exit Gate',
-            'parking' => 'Parking Gate',
-        ]);
+        $this->loadAvailableGates();
+        $this->loadAvailableLocations();
 
         $this->reportForm['start_date'] = now()->subDays(7)->format('Y-m-d');
         $this->reportForm['end_date'] = now()->format('Y-m-d');
 
         $this->loadAllData();
+    }
+
+    /**
+     * Load available gates from database
+     */
+    protected function loadAvailableGates(): void
+    {
+        // Get unique gate names from the gates table
+        $this->availableGates = Gate::active()
+            ->select('gate_name')
+            ->distinct()
+            ->orderBy('gate_name')
+            ->pluck('gate_name', 'gate_name')
+            ->toArray();
+
+        // If no gates in database yet, fall back to config
+        if (empty($this->availableGates)) {
+            $this->availableGates = config('anpr.gates', [
+                'entry' => 'Entry Gate',
+                'exit' => 'Exit Gate',
+                'parking' => 'Parking Gate',
+            ]);
+        }
+    }
+
+    /**
+     * Load available gate locations
+     */
+    protected function loadAvailableLocations(): void
+    {
+        $this->availableLocations = [
+            Gate::LOCATION_ENTRY => Gate::LOCATION_ENTRY,
+            Gate::LOCATION_EXIT => Gate::LOCATION_EXIT,
+        ];
     }
 
     /**
@@ -161,7 +204,8 @@ class Analytics extends Component
 
         $query = Record::query()
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter));
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter));
 
         $this->stats = [
             'total_detections' => $query->count(),
@@ -181,7 +225,8 @@ class Analytics extends Component
 
         $hourlyRecords = Record::query()
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
             ->selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
             ->groupBy('hour')
             ->orderBy('hour')
@@ -207,7 +252,8 @@ class Analytics extends Component
 
         $dailyRecords = Record::query()
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
             ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->groupBy('date')
             ->orderBy('date')
@@ -239,15 +285,20 @@ class Analytics extends Component
         $startDate = $this->getDateRangeStart();
         $endDate = $this->getDateRangeEnd();
 
+        // Get distribution from gates table with proper join
         $gateRecords = Record::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('gate_type, COUNT(*) as count')
-            ->groupBy('gate_type')
+            ->join('gates', 'records.gate_id', '=', 'gates.id')
+            ->whereBetween('records.created_at', [$startDate, $endDate])
+            ->when($this->locationFilter !== 'all', fn($q) => $q->where('gates.gate_location', $this->locationFilter))
+            ->selectRaw('gates.gate_name, gates.gate_location, COUNT(*) as count')
+            ->groupBy('gates.gate_name', 'gates.gate_location')
             ->orderByDesc('count')
             ->get();
 
         $this->gateDistribution = $gateRecords->map(fn($r) => [
-            'gate_type' => $r->gate_type ?? 'unknown',
+            'gate_name' => $r->gate_name ?? 'unknown',
+            'gate_location' => $r->gate_location ?? 'unknown',
+            'gate_type' => $r->gate_name ?? 'unknown', // For backward compatibility
             'count' => $r->count,
         ])->toArray();
     }
@@ -262,7 +313,8 @@ class Analytics extends Component
 
         $topPlates = Record::query()
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
             ->selectRaw('plate_number, COUNT(*) as count, AVG(confidence) * 100 as avg_confidence, MAX(created_at) as last_seen')
             ->groupBy('plate_number')
             ->orderByDesc('count')
@@ -332,6 +384,14 @@ class Analytics extends Component
      * Handle gate filter change
      */
     public function updatedGateFilter(): void
+    {
+        $this->loadAllData();
+    }
+
+    /**
+     * Handle location filter change
+     */
+    public function updatedLocationFilter(): void
     {
         $this->loadAllData();
     }

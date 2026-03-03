@@ -2,6 +2,7 @@
 
 namespace App\Livewire\ANPR;
 
+use App\Models\ANPR\Gate;
 use App\Models\ANPR\Record;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,10 +26,16 @@ class RecentVehiclesTable extends Component
     public string $search = '';
 
     /**
-     * Gate filter
+     * Gate name filter (Main Gate, Second Gate, etc.)
      */
     #[Url(as: 'gate')]
     public string $gateFilter = 'all';
+
+    /**
+     * Gate location filter (Entry, Exit, All)
+     */
+    #[Url(as: 'direction')]
+    public string $locationFilter = 'all';
 
     /**
      * Status filter (all, normal, flagged)
@@ -61,14 +68,24 @@ class RecentVehiclesTable extends Component
      */
     public array $editForm = [
         'plate_number' => '',
-        'gate_type' => '',
+        'gate_id' => '',
         'confidence' => 0,
     ];
 
     /**
-     * Available gates for filtering
+     * Available gates for filtering (unique gate names)
      */
     public array $availableGates = [];
+
+    /**
+     * Available gate locations for filtering
+     */
+    public array $availableLocations = [];
+
+    /**
+     * All gates with their details
+     */
+    public array $allGates = [];
 
     /**
      * Show edit modal
@@ -82,28 +99,54 @@ class RecentVehiclesTable extends Component
     {
         $this->perPage = config('anpr.dashboard.records_per_page', 15);
         $this->loadAvailableGates();
+        $this->loadAvailableLocations();
     }
 
     /**
-     * Load available gates from config and database
+     * Load available gates from database
      */
     protected function loadAvailableGates(): void
     {
-        // Start with configured gates
-        $this->availableGates = config('anpr.gates', []);
-
-        // Add any gates found in the database that aren't in config
-        $dbGates = Record::select('gate_type')
-            ->whereNotNull('gate_type')
+        // Get unique gate names from the gates table
+        $this->availableGates = Gate::active()
+            ->select('gate_name')
             ->distinct()
-            ->pluck('gate_type')
+            ->orderBy('gate_name')
+            ->pluck('gate_name', 'gate_name')
             ->toArray();
 
-        foreach ($dbGates as $gate) {
-            if (!isset($this->availableGates[$gate])) {
-                $this->availableGates[$gate] = ucwords(str_replace(['-', '_'], ' ', $gate));
+        // Load all gates for dropdown with full details
+        $this->allGates = Gate::active()
+            ->orderBy('gate_name')
+            ->orderBy('gate_location')
+            ->get()
+            ->map(fn($gate) => [
+                'id' => $gate->id,
+                'gate_name' => $gate->gate_name,
+                'gate_location' => $gate->gate_location,
+                'slug' => $gate->slug,
+                'display_name' => $gate->display_name,
+            ])
+            ->toArray();
+
+        // If no gates in database yet, fall back to config
+        if (empty($this->availableGates)) {
+            $configGates = config('anpr.gates', []);
+            foreach ($configGates as $key => $label) {
+                $this->availableGates[$key] = $label;
             }
         }
+    }
+
+    /**
+     * Load available gate locations
+     */
+    protected function loadAvailableLocations(): void
+    {
+        $this->availableLocations = [
+            Gate::LOCATION_ENTRY => Gate::LOCATION_ENTRY,
+            Gate::LOCATION_EXIT => Gate::LOCATION_EXIT,
+        ];
     }
 
     /**
@@ -118,6 +161,14 @@ class RecentVehiclesTable extends Component
      * Reset pagination when gate filter changes
      */
     public function updatedGateFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when location filter changes
+     */
+    public function updatedLocationFilter(): void
     {
         $this->resetPage();
     }
@@ -151,9 +202,11 @@ class RecentVehiclesTable extends Component
         $hours = config('anpr.dashboard.metrics_hours', 24);
 
         return Record::query()
+            ->with('gate')
             ->whereNot('created_at', '>=', now()->subHours($hours))
             ->when($this->search, fn($q) => $q->searchPlate($this->search))
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
             ->orderBy($this->sortField, $this->sortDirection);
     }
 
@@ -203,7 +256,7 @@ class RecentVehiclesTable extends Component
             $this->editingRecordId = $recordId;
             $this->editForm = [
                 'plate_number' => $record->plate_number,
-                'gate_type' => $record->gate_type ?? '',
+                'gate_id' => $record->gate_id ?? '',
                 'confidence' => $record->confidence,
             ];
             $this->showEditModal = true;
@@ -219,7 +272,7 @@ class RecentVehiclesTable extends Component
         $this->editingRecordId = null;
         $this->editForm = [
             'plate_number' => '',
-            'gate_type' => '',
+            'gate_id' => '',
             'confidence' => 0,
         ];
         $this->resetValidation();
@@ -232,7 +285,7 @@ class RecentVehiclesTable extends Component
     {
         $this->validate([
             'editForm.plate_number' => 'required|string|max:20',
-            'editForm.gate_type' => 'nullable|string|max:20',
+            'editForm.gate_id' => 'nullable|integer|exists:gates,id',
             'editForm.confidence' => 'required|numeric|min:0|max:1',
         ]);
 
@@ -241,7 +294,7 @@ class RecentVehiclesTable extends Component
         if ($record) {
             $record->update([
                 'plate_number' => strtoupper($this->editForm['plate_number']),
-                'gate_type' => $this->editForm['gate_type'] ?: null,
+                'gate_id' => $this->editForm['gate_id'] ?: null,
                 'confidence' => $this->editForm['confidence'],
             ]);
 
@@ -270,6 +323,7 @@ class RecentVehiclesTable extends Component
     {
         $this->search = '';
         $this->gateFilter = 'all';
+        $this->locationFilter = 'all';
         $this->statusFilter = 'all';
         $this->resetPage();
     }

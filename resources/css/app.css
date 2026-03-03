@@ -11,3 +11,16 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Hide scrollbar but retain scroll functionality */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    overflow: -moz-scrollbars-none;  /* Older Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera, Brave, Edge Chromium */
+    width: 0;
+    height: 0;
+    background: transparent;
+}

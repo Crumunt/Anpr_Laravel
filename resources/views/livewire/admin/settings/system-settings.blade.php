@@ -42,6 +42,7 @@
                                 Users & Roles
                             </button>
                         </li>
+                        @role('super_admin')
                         <li>
                             <button wire:click="setTab('health')"
                                 class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ $activeTab === 'health' ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -60,6 +61,19 @@
                                 </svg>
                                 Maintenance
                             </button>
+                        </li>
+                        @endrole
+                        <li class="border-t border-gray-200 mt-2 pt-2">
+                            <a href="{{ route('admin.settings.applicant-types') }}"
+                                class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Applicant Types
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -224,6 +238,7 @@
                 @endif
 
                 <!-- System Health Tab -->
+                @role('super_admin')
                 @if($activeTab === 'health')
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -300,8 +315,10 @@
                     </div>
                 </div>
                 @endif
+                @endrole
 
                 <!-- Maintenance Tab -->
+                @role('super_admin')
                 @if($activeTab === 'maintenance')
                 <!-- Maintenance Mode -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -403,6 +420,7 @@
                 </div>
                 @endif
                 @endif
+                @endrole
             </div>
         </div>
 

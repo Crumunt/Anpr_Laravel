@@ -31,6 +31,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|ad
     // Applicant routes - Requires 'view applicants' permission
     Route::middleware(['permission:view applicants'])->group(function () {
         Route::get('/applicant', [ApplicantController::class, 'index'])->name('applicant');
+        Route::get('/applicant/archived', [ApplicantController::class, 'archived'])->name('applicant.archived');
         Route::get('/applicant/{id}', [ApplicantController::class, 'show'])->name('applicant.show');
     });
 
@@ -68,6 +69,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin|ad
     Route::get('/settings', \App\Livewire\Admin\Settings\SystemSettings::class)
         ->middleware(['role:super_admin'])
         ->name('settings');
+
+    // Applicant Types Settings - Only super_admin can access
+    Route::get('/settings/applicant-types', \App\Livewire\Admin\Settings\ApplicantTypeSettings::class)
+        ->middleware(['role:super_admin'])
+        ->name('settings.applicant-types');
 
     // Account Settings (Manage My Account) - Available to all admin roles
     Route::get('/account', \App\Livewire\Admin\Settings\AccountSettings::class)->name('account');

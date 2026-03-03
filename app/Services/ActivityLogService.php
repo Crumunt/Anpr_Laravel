@@ -61,6 +61,11 @@ class ActivityLogService
             'bgColor' => 'bg-orange-100',
             'iconColor' => 'text-orange-600',
         ],
+        'archive' => [
+            'icon' => 'fa-archive',
+            'bgColor' => 'bg-amber-100',
+            'iconColor' => 'text-amber-600',
+        ],
         'default' => [
             'icon' => 'fa-info',
             'bgColor' => 'bg-gray-100',
@@ -106,6 +111,24 @@ class ActivityLogService
     public static function logAccountDeactivated(User $user, ?User $causer = null): Activity
     {
         return self::log($user, 'Account deactivated', 'account', $causer);
+    }
+
+    /**
+     * Log account archived
+     */
+    public static function logAccountArchived(User $user, ?User $causer = null): Activity
+    {
+        $causerName = $causer?->details?->full_name ?? $causer?->email ?? 'System';
+        return self::log($user, "Account archived by <strong>{$causerName}</strong>", 'archive', $causer);
+    }
+
+    /**
+     * Log account restored from archive
+     */
+    public static function logAccountRestored(User $user, ?User $causer = null): Activity
+    {
+        $causerName = $causer?->details?->full_name ?? $causer?->email ?? 'System';
+        return self::log($user, "Account restored from archive by <strong>{$causerName}</strong>", 'archive', $causer);
     }
 
     /**

@@ -42,7 +42,7 @@ class SearchFilter extends Component
 
     public function resetFilters()
     {
-        $this->reset("selectedStatus", "selectedRole", "selectedSortOption");
+        $this->reset("search", "selectedStatus", "selectedRole", "selectedSortOption");
         $this->appliedFilters();
     }
 
@@ -108,6 +108,12 @@ class SearchFilter extends Component
             $this->selectedRole,
             array_keys($this->roleFilter),
         );
+    }
+
+    public function clearSelectedRoles()
+    {
+        $this->selectedRole = [];
+        $this->appliedFilters();
     }
 
     private function fetchFilterOptions()

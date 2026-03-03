@@ -27,6 +27,7 @@ class ApplicantResource extends JsonResource
             "id" => $this->id,
             "email" => $this->email,
             "submitted_date" => $this->created_at->format("F d, Y"),
+            "archived_date" => $this->deleted_at ? $this->deleted_at->format("F d, Y") : null,
 
             ...$this->relationLoaded("details") && $this->context !== "detail"
                 ? [

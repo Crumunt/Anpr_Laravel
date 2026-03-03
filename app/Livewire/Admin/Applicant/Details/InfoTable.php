@@ -266,7 +266,18 @@ class InfoTable extends Component
             throw $e;
         }
 
-        $vehicle->update(['assigned_gate_pass' => $gatePassNumber]);
+        // Track previous gate pass if re-assigning
+        $updateData = ['assigned_gate_pass' => $gatePassNumber];
+
+        if ($vehicle->assigned_gate_pass && $vehicle->assigned_gate_pass !== $gatePassNumber) {
+            // Store the old gate pass as previous
+            $updateData['previous_gate_pass'] = $vehicle->assigned_gate_pass;
+        }
+
+        // Increment assignment count
+        $updateData['gate_pass_assignment_count'] = ($vehicle->gate_pass_assignment_count ?? 0) + 1;
+
+        $vehicle->update($updateData);
 
         // Log activity
         $user = User::find($this->userId);

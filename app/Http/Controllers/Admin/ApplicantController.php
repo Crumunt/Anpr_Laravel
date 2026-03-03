@@ -34,6 +34,16 @@ class ApplicantController extends Controller
     }
 
     /**
+     * Display the archived applicants listing.
+     */
+    public function archived()
+    {
+        return view("admin.users.applicants.archived", [
+            "routeName" => "admin.applicant.archived",
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

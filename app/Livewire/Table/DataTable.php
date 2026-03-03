@@ -74,6 +74,16 @@ class DataTable extends Component
                 "format" => "formatApplicantsForList",
             ],
         ],
+        "archived_applicant" => [
+            self::CONFIG_HELPER => ApplicationDisplayHelper::class,
+            self::CONFIG_READ_SERVICE => ApplicantReadService::class,
+            self::CONFIG_WRITE_SERVICE => ApplicantWriteService::class,
+            self::CONFIG_METHODS => [
+                "fetch" => "getArchivedApplicants",
+                "delete" => "delete",
+                "format" => "formatApplicantsForList",
+            ],
+        ],
         "admin" => [
             self::CONFIG_HELPER => ApplicationDisplayHelper::class,
             self::CONFIG_READ_SERVICE => AdminReadService::class,
@@ -136,38 +146,34 @@ class DataTable extends Component
                 ],
             ],
             'applicant' => [
-                'approve' => [
-                    'label' => 'Approve Selected',
-                    'icon' => 'check-circle',
-                    'color' => 'success',
-                    'description' => 'This will approve the selected applications and activate their accounts.',
-                ],
-                'reject' => [
-                    'label' => 'Reject Selected',
-                    'icon' => 'x-circle',
-                    'color' => 'danger',
-                    'description' => 'This will reject the selected applications and deactivate their accounts.',
-                ],
-                'under-review' => [
-                    'label' => 'Set Under Review',
-                    'icon' => 'clock',
-                    'color' => 'warning',
-                    'description' => 'This will set the selected applications back to under review status.',
-                ],
-                'activate' => [
-                    'label' => 'Activate Accounts',
-                    'icon' => 'user-check',
-                    'color' => 'success',
-                    'description' => 'This will activate the selected applicant accounts.',
-                ],
                 'deactivate' => [
                     'label' => 'Deactivate Accounts',
                     'icon' => 'user-x',
                     'color' => 'warning',
                     'description' => 'This will deactivate the selected applicant accounts.',
                 ],
+                'archive' => [
+                    'label' => 'Archive Selected',
+                    'icon' => 'archive',
+                    'color' => 'warning',
+                    'description' => 'This will archive the selected applicants. Archived applicants can be restored or permanently deleted later.',
+                ],
                 'delete' => [
                     'label' => 'Delete Selected',
+                    'icon' => 'trash',
+                    'color' => 'danger',
+                    'description' => 'This will permanently delete the selected applicants and all their data. This action cannot be undone.',
+                ],
+            ],
+            'archived_applicant' => [
+                'restore' => [
+                    'label' => 'Restore Selected',
+                    'icon' => 'refresh-cw',
+                    'color' => 'success',
+                    'description' => 'This will restore the selected applicants from the archive.',
+                ],
+                'delete' => [
+                    'label' => 'Delete Permanently',
                     'icon' => 'trash',
                     'color' => 'danger',
                     'description' => 'This will permanently delete the selected applicants and all their data. This action cannot be undone.',
@@ -192,6 +198,7 @@ class DataTable extends Component
         return match($this->type) {
             'admin' => 'admins_table',
             'applicant' => 'applications_table',
+            'archived_applicant' => 'archived_applications_table',
             default => 'applications_table',
         };
     }
@@ -321,6 +328,7 @@ class DataTable extends Component
         return match($this->type) {
             'admin' => $this->processAdminBulkAction($service, $action, $ids),
             'applicant' => $this->processApplicantBulkAction($service, $action, $ids),
+            'archived_applicant' => $this->processArchivedApplicantBulkAction($service, $action, $ids),
             default => throw new Exception('Unknown table type'),
         };
     }
@@ -357,13 +365,22 @@ class DataTable extends Component
     private function processApplicantBulkAction(ApplicantWriteService $service, string $action, array $ids): array
     {
         return match($action) {
-            'approve' => $service->bulkApprove($ids),
-            'reject' => $service->bulkReject($ids),
-            'under-review' => $service->bulkSetUnderReview($ids),
-            'activate' => $service->bulkActivate($ids),
             'deactivate' => $service->bulkDeactivate($ids),
+            'archive' => $service->bulkArchive($ids),
             'delete' => $service->bulkDelete($ids),
             default => throw new Exception('Unknown applicant bulk action: ' . $action),
+        };
+    }
+
+    /**
+     * Process archived applicant-specific bulk actions
+     */
+    private function processArchivedApplicantBulkAction(ApplicantWriteService $service, string $action, array $ids): array
+    {
+        return match($action) {
+            'restore' => $service->bulkRestore($ids),
+            'delete' => $service->bulkDelete($ids),
+            default => throw new Exception('Unknown archived applicant bulk action: ' . $action),
         };
     }
 
@@ -382,6 +399,8 @@ class DataTable extends Component
             'reject' => "{$count} application(s) rejected successfully",
             'under-review' => "{$count} application(s) set to under review",
             'reset-password' => "{$count} password(s) reset successfully",
+            'archive' => "{$count} applicant(s) archived successfully",
+            'restore' => "{$count} applicant(s) restored successfully",
             default => "{$count} {$item} processed successfully",
         };
     }

@@ -25,6 +25,7 @@ class Record extends Model
         'bbox_y2',
         'camera_id',
         'gate_type',
+        'gate_id',
         'location',
         'detected_at',
         'is_flagged',
@@ -48,6 +49,14 @@ class Record extends Model
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
+    }
+
+    /**
+     * Get the gate associated with this detection
+     */
+    public function gate(): BelongsTo
+    {
+        return $this->belongsTo(Gate::class);
     }
 
     /**
@@ -161,7 +170,7 @@ class Record extends Model
     }
 
     /**
-     * Scope: Filter by gate type
+     * Scope: Filter by gate type (legacy support)
      */
     public function scopeByGate(Builder $query, ?string $gateType): Builder
     {
@@ -169,6 +178,39 @@ class Record extends Model
             return $query;
         }
         return $query->where('gate_type', $gateType);
+    }
+
+    /**
+     * Scope: Filter by gate ID
+     */
+    public function scopeByGateId(Builder $query, ?int $gateId): Builder
+    {
+        if (empty($gateId)) {
+            return $query;
+        }
+        return $query->where('gate_id', $gateId);
+    }
+
+    /**
+     * Scope: Filter by gate name (e.g., "Main Gate", "Second Gate")
+     */
+    public function scopeByGateName(Builder $query, ?string $gateName): Builder
+    {
+        if (empty($gateName) || $gateName === 'all') {
+            return $query;
+        }
+        return $query->whereHas('gate', fn($q) => $q->where('gate_name', $gateName));
+    }
+
+    /**
+     * Scope: Filter by gate location (Entry/Exit)
+     */
+    public function scopeByGateLocation(Builder $query, ?string $location): Builder
+    {
+        if (empty($location) || $location === 'all') {
+            return $query;
+        }
+        return $query->whereHas('gate', fn($q) => $q->where('gate_location', $location));
     }
 
     /**
@@ -200,6 +242,17 @@ class Record extends Model
      */
     public function getGateDisplayNameAttribute(): string
     {
+        // First check if we have a gate relationship
+        if ($this->gate_id && $this->relationLoaded('gate') && $this->gate) {
+            return $this->gate->display_name;
+        }
+
+        // Lazy load gate if needed
+        if ($this->gate_id && $gate = $this->gate) {
+            return $gate->display_name;
+        }
+
+        // Fall back to legacy gate_type
         $gates = config('anpr.gates', []);
         return $gates[$this->gate_type] ?? $this->location ?? $this->gate_type ?? 'Unknown Gate';
     }

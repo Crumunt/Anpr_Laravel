@@ -30,6 +30,8 @@ class User extends Authenticatable
         "must_change_password",
         "password",
         "is_active",
+        "is_deleted",
+        "deleted_at",
     ];
 
     /**
@@ -48,6 +50,7 @@ class User extends Authenticatable
     {
         return [
             "email_verified_at" => "datetime",
+            "deleted_at" => "datetime",
             "password" => "hashed",
         ];
     }
@@ -146,11 +149,33 @@ class User extends Authenticatable
     {
         return $query
             ->whereHas("roles", fn($q) => $q->where("name", "applicant"))
+            ->where(function($q) {
+                $q->where('is_deleted', false)->orWhereNull('is_deleted');
+            })
             ->with([
                 "details:user_id,clsu_id,phone_number,first_name,middle_name,last_name,suffix",
                 "applications:user_id,status_id,applicant_type",
                 "applications.status:id,status_name",
             ]);
+    }
+
+    public function scopeArchived($query)
+    {
+        return $query
+            ->whereHas("roles", fn($q) => $q->where("name", "applicant"))
+            ->where('is_deleted', true)
+            ->with([
+                "details:user_id,clsu_id,phone_number,first_name,middle_name,last_name,suffix",
+                "applications:user_id,status_id,applicant_type",
+                "applications.status:id,status_name",
+            ]);
+    }
+
+    public function scopeNotArchived($query)
+    {
+        return $query->where(function($q) {
+            $q->where('is_deleted', false)->orWhereNull('is_deleted');
+        });
     }
 
     public function scopeAdmin($query)

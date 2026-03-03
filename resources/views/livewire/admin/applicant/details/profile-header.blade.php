@@ -137,6 +137,23 @@
                             }
                         });
                     },
+                    confirmArchive() {
+                        this.open = false;
+                        Swal.fire({
+                            title: 'Archive Account?',
+                            text: 'This account will be moved to the archive. You can restore it or permanently delete it later.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#f59e0b',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Yes, archive',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $wire.dispatchAccountAction('archive');
+                            }
+                        });
+                    },
                     confirmDelete() {
                         this.open = false;
                         Swal.fire({
@@ -215,6 +232,15 @@
 
                         @if($canDelete)
                         <div class="py-1">
+                            <!-- Archive Account -->
+                            <button
+                                @click="confirmArchive()"
+                                class="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-amber-700 hover:bg-amber-50 transition-colors duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                </svg>
+                                Archive Account
+                            </button>
                             <!-- Delete Account -->
                             <button
                                 @click="confirmDelete()"
@@ -222,7 +248,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
-                                Delete Account
+                                Delete Permanently
                             </button>
                         </div>
                         @endif
