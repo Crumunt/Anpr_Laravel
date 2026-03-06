@@ -1,66 +1,248 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ANPR Gate Pass Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive **Automatic Number Plate Recognition (ANPR)** and **Gate Pass Management System** built with Laravel. This system enables organizations to manage vehicle access control, process gate pass applications, monitor vehicle entries/exits through ANPR technology, and maintain security oversight.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Gate Pass Management
+- **Online Application Portal** - Public-facing form for gate pass applications
+- **Multi-step Application Process** - Personal info, documents, vehicle details, and review
+- **Document Management** - Upload and verification of required documents
+- **Application Status Tracking** - Track applications through various approval stages
+- **Vehicle Registration** - Register and manage multiple vehicles per applicant
+- **Gate Pass Renewal** - Support for gate pass renewal workflows
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### ANPR Dashboard (Security)
+- **Live Vehicle Detection** - Real-time license plate recognition and logging
+- **Flagged Vehicles** - Alert system for unauthorized or flagged vehicles
+- **Analytics & Reports** - Traffic analytics and downloadable reports
+- **Multi-Gate Support** - Monitor multiple entry/exit gates
+- **Camera Integration** - Support for IP-based camera systems
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Administration
+- **Role-Based Access Control** - Multiple user roles (Super Admin, Admin Editor, Admin Viewer, Encoder, Security, Maintenance)
+- **Applicant Management** - View, approve, and manage applicant records
+- **Vehicle Management** - Centralized vehicle database
+- **Activity Logging** - Comprehensive audit trail using Spatie Activity Log
+- **System Settings** - Configurable applicant types and system parameters
 
-## Learning Laravel
+### Applicant Portal
+- **Personal Dashboard** - View application status and registered vehicles
+- **Profile Management** - Update personal information
+- **Vehicle Tracking** - Monitor registered vehicles and gate pass validity
+- **Activity Log** - View personal activity history
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **PHP** >= 8.2
+- **Composer** >= 2.x
+- **Node.js** >= 18.x
+- **NPM** >= 9.x
+- **MySQL** >= 8.0 or **MariaDB** >= 10.4
+- **Web Server** (Apache/Nginx) or use Laravel's built-in server for development
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Dependencies
 
-### Premium Partners
+### PHP Packages (Composer)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+| Package | Version | Description |
+|---------|---------|-------------|
+| laravel/framework | ^12.0 | Laravel Framework |
+| laravel/sanctum | ^4.0 | API Authentication |
+| laravel/tinker | ^2.10.1 | REPL for Laravel |
+| livewire/livewire | ^3.7 | Full-stack framework for Laravel |
+| spatie/laravel-activitylog | ^4.11 | Activity logging |
+| spatie/laravel-permission | ^6.20 | Role & permission management |
 
-## Contributing
+### Development PHP Packages
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Package | Version | Description |
+|---------|---------|-------------|
+| laravel/breeze | ^2.3 | Authentication scaffolding |
+| laravel/pail | ^1.2.2 | Real-time log viewer |
+| laravel/pint | ^1.13 | Code style fixer |
+| laravel/sail | ^1.41 | Docker development environment |
+| phpunit/phpunit | ^11.5.3 | Testing framework |
+| mockery/mockery | ^1.6 | Mocking framework |
+| fakerphp/faker | ^1.23 | Fake data generator |
 
-## Code of Conduct
+### JavaScript Packages (NPM)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Package | Version | Description |
+|---------|---------|-------------|
+| tailwindcss | ^4.1.11 | Utility-first CSS framework |
+| alpinejs | ^3.14.9 | Lightweight JS framework |
+| sweetalert2 | ^11.6.13 | Beautiful alert dialogs |
+| vite | ^6.0.11 | Frontend build tool |
+| laravel-vite-plugin | ^1.2.0 | Laravel Vite integration |
+| axios | ^1.7.4 | HTTP client |
+| autoprefixer | ^10.4.2 | CSS vendor prefixing |
+| postcss | ^8.4.31 | CSS transformations |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd Anpr_Laravel
+```
+
+### 2. Install PHP Dependencies
+
+```bash
+composer install
+```
+
+### 3. Install JavaScript Dependencies
+
+```bash
+npm install
+```
+
+### 4. Environment Configuration
+
+Copy the example environment file and configure it:
+
+```bash
+cp .env.example .env
+```
+
+Update the `.env` file with your settings:
+
+```env
+APP_NAME="ANPR Gate Pass System"
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=anpr
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+MAIL_MAILER=smtp
+MAIL_HOST=your_mail_host
+MAIL_PORT=587
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_FROM_ADDRESS="noreply@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### 5. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 6. Create Database
+
+Create a MySQL database named `anpr` (or as specified in your `.env`):
+
+```sql
+CREATE DATABASE anpr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 7. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### 8. Seed the Database (Optional)
+
+Populate the database with initial data (roles, permissions, sample data):
+
+```bash
+php artisan db:seed
+```
+
+### 9. Build Frontend Assets
+
+For development:
+```bash
+npm run dev
+```
+
+For production:
+```bash
+npm run build
+```
+
+### 10. Start the Development Server
+
+Using the built-in development script (recommended):
+```bash
+composer dev
+```
+
+This starts the Laravel server, queue worker, log viewer, and Vite concurrently.
+
+Or manually:
+```bash
+php artisan serve
+```
+
+The application will be available at `http://localhost:8000`
+
+---
+
+## Development
+
+### Running Tests
+
+```bash
+php artisan test
+```
+
+Or using PHPUnit directly:
+```bash
+./vendor/bin/phpunit
+```
+
+### Code Formatting
+
+```bash
+./vendor/bin/pint
+```
+
+### Queue Worker
+
+For processing background jobs:
+```bash
+php artisan queue:work
+```
+
+### Real-time Logs
+
+```bash
+php artisan pail
+```
+
+---
+
+## User Roles
+
+| Role | Description |
+|------|-------------|
+| `super_admin` | Full system access, manage all settings |
+| `admin_editor` | Manage applicants, vehicles, and admin accounts |
+| `admin_viewer` | View-only access to admin panel |
+| `encoder` | Data entry and application processing |
+| `security` | ANPR dashboard access |
+| `security_admin` | ANPR dashboard + manage security accounts |
+| `maintenance` | System maintenance access |
+| `applicant` | Gate pass applicant portal access |
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software.
