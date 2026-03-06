@@ -10,7 +10,7 @@
 <div>
     <div class="flex-1 ml-0 md:ml-64 smooth-transition">
         <!-- Navbar -->
-        <header class="bg-white h-16 border-b border-green-200 px-4 md:px-8 flex items-center justify-between fixed top-0 left-0 right-0 z-30 shadow-md w-full md:left-64 md:w-[calc(100%-16rem)]">
+        <header class="bg-white h-16 border-b border-green-200 px-4 md:px-8 flex items-center justify-between fixed top-0 left-0 right-0 z-[100] shadow-md w-full md:left-64 md:w-[calc(100%-16rem)]">
             <div class="flex items-center">
                 <button id="menuBtn" class="mr-4 text-[#006300] md:hidden" onclick="toggleSidebar()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

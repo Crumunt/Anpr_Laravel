@@ -14,21 +14,30 @@ class SuperAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        // Check if super_admin role exists, create if not
+        // Check if roles exist, create if not
         if (!Role::where('name', 'super_admin')->exists()) {
             $this->call(RolePermissionSeeder::class);
         }
 
-        // Check if super admin already exists
+        // Create Super Admin
+        $this->createSuperAdmin();
+
+        // Create Security Admin
+        $this->createSecurityAdmin();
+    }
+
+    /**
+     * Create Super Admin account
+     */
+    private function createSuperAdmin(): void
+    {
         $existingAdmin = User::where('email', 'superadmin@clsu.edu.ph')->first();
 
         if ($existingAdmin) {
             $this->command->info('Super Admin already exists!');
-            $this->command->info('Email: superadmin@clsu.edu.ph');
             return;
         }
 
-        // Create super admin user
         $superAdmin = User::create([
             'email' => 'superadmin@clsu.edu.ph',
             'password' => Hash::make('SuperAdmin@123'),
@@ -36,7 +45,6 @@ class SuperAdminSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create user details
         $superAdmin->details()->create([
             'first_name' => 'Super',
             'middle_name' => '',
@@ -44,7 +52,6 @@ class SuperAdminSeeder extends Seeder
             'clsu_id' => 'ADMIN-0001',
         ]);
 
-        // Assign super_admin role
         $superAdmin->assignRole('super_admin');
 
         $this->command->info('');
@@ -53,6 +60,43 @@ class SuperAdminSeeder extends Seeder
         $this->command->info('========================================');
         $this->command->info('  Email:    superadmin@clsu.edu.ph');
         $this->command->info('  Password: SuperAdmin@123');
+        $this->command->info('========================================');
+    }
+
+    /**
+     * Create Security Admin account
+     */
+    private function createSecurityAdmin(): void
+    {
+        $existingAdmin = User::where('email', 'securityadmin@clsu.edu.ph')->first();
+
+        if ($existingAdmin) {
+            $this->command->info('Security Admin already exists!');
+            return;
+        }
+
+        $securityAdmin = User::create([
+            'email' => 'securityadmin@clsu.edu.ph',
+            'password' => Hash::make('SecurityAdmin@123'),
+            'must_change_password' => false,
+            'is_active' => true,
+        ]);
+
+        $securityAdmin->details()->create([
+            'first_name' => 'Security',
+            'middle_name' => '',
+            'last_name' => 'Admin',
+            'clsu_id' => 'ADMIN-0002',
+        ]);
+
+        $securityAdmin->assignRole('security_admin');
+
+        $this->command->info('');
+        $this->command->info('========================================');
+        $this->command->info('  Security Admin Account Created!');
+        $this->command->info('========================================');
+        $this->command->info('  Email:    securityadmin@clsu.edu.ph');
+        $this->command->info('  Password: SecurityAdmin@123');
         $this->command->info('========================================');
         $this->command->info('');
     }

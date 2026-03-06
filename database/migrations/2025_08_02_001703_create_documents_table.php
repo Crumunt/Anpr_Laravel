@@ -12,14 +12,12 @@ return new class extends Migration {
     {
         Schema::create("documents", function (Blueprint $table) {
             $table->ulid("id")->primary();
-            $table
-                ->foreignUlid("application_id")
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignUlid("application_id")->constrained()->cascadeOnDelete();
+            $table->foreignUlid('vehicle_id')->nullable()->constrained('vehicles')->nullOnDelete();
             $table->enum("type", [
                 "vehicle_registration",
                 "license",
-                "proof_of_identity",
+                "proof_of_identification",
             ]);
             $table->string("file_path");
             $table->string('mime_type')->nullable();
@@ -29,11 +27,9 @@ return new class extends Migration {
             $table->foreignUlid("reviewed_by")->nullable()->constrained("users");
             $table->timestamp("reviewed_at")->nullable();
             $table->integer("version")->default(1);
-            $table
-                ->foreignUlid("replaced_by")
-                ->nullable()
-                ->constrained("documents");
+            $table->foreignUlid("replaced_by")->nullable()->constrained("documents");
             $table->boolean("is_current")->default(true);
+            $table->boolean('is_renewal_document')->default(false);
             $table->timestamps();
 
             $table->index(["application_id", "is_current"]);

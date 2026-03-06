@@ -121,33 +121,22 @@ class RenewGatePassModal extends Component
             DB::transaction(function () use ($user) {
                 // Get statuses
                 $applicationStatus = Status::applicationPending();
-                $vehicleStatus = Status::vehiclePending();
 
-                // Create a new application for the renewal
+                // Create a renewal application (for admin review workflow)
                 $application = $user->applications()->create([
                     'user_id' => $user->id,
                     'applicant_type' => $this->vehicle->application?->applicant_type ?? 'regular',
                     'status_id' => $applicationStatus->id,
                 ]);
 
-                // Create a new vehicle entry for the renewal (linked to original)
-                $renewalVehicle = Vehicle::create([
-                    'application_id' => $application->id,
-                    'owner_id' => $user->id,
-                    'plate_number' => $this->vehicle->plate_number,
-                    'type' => $this->vehicle->type,
-                    'make' => $this->vehicle->make,
-                    'model' => $this->vehicle->model,
-                    'year' => $this->vehicle->year,
-                    'color' => $this->vehicle->color,
-                    'assigned_gate_pass' => $this->vehicle->assigned_gate_pass,
-                    'status_id' => $vehicleStatus->id,
-                    'is_renewal' => true,
-                    'renewed_from_vehicle_id' => $this->vehicle->id,
+                // Mark the existing vehicle as having a pending renewal
+                $this->vehicle->update([
+                    'has_pending_renewal' => true,
+                    'pending_renewal_application_id' => $application->id,
                     'renewal_requested_at' => now(),
                 ]);
 
-                // Process and store documents
+                // Process and store documents - link directly to the vehicle
                 $fileRecords = [];
                 foreach ($this->files as $fileType => $files) {
                     foreach ($files as $file) {
@@ -158,11 +147,13 @@ class RenewGatePassModal extends Component
                         $file->storeAs($storePath, $filename, 'local');
 
                         $fileRecords[] = [
+                            'vehicle_id' => $this->vehicle->id,
                             'type' => $fileType,
                             'file_path' => $finalPath,
                             'mime_type' => $file->getMimeType(),
                             'file_size' => $file->getSize(),
                             'status_id' => $applicationStatus->id,
+                            'is_renewal_document' => true,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
@@ -179,7 +170,7 @@ class RenewGatePassModal extends Component
                     "Gate pass renewal requested for vehicle {$this->vehicle->plate_number}",
                     'vehicle',
                     $user,
-                    ['original_vehicle_id' => $this->vehicle->id, 'renewal_vehicle_id' => $renewalVehicle->id]
+                    ['vehicle_id' => $this->vehicle->id, 'application_id' => $application->id]
                 );
             });
 

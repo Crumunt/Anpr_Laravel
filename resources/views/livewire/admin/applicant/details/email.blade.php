@@ -1,4 +1,7 @@
-<div>
+<div x-data="{ show: false }"
+     @open-modal.window="if ($event.detail === 'send-email') { show = true; $nextTick(() => $refs.subject?.focus()); }"
+     @close-modal.window="if ($event.detail === 'send-email') { show = false; $wire.resetEmailForm(); }"
+     @keydown.escape.window="if (show) { show = false; $wire.resetEmailForm(); }">
     <!-- Trigger button -->
     <button
         type="button"
@@ -11,43 +14,40 @@
         <span>Send Email</span>
     </button>
 
-    <!-- Email Modal -->
-    <div
-        x-data="{ show: false }"
-        @open-modal.window="if ($event.detail === 'send-email') { show = true; $nextTick(() => $refs.subject?.focus()); }"
-        @close-modal.window="if ($event.detail === 'send-email') { show = false; $wire.resetEmailForm(); }"
-        @keydown.escape.window="if (show) { show = false; $wire.resetEmailForm(); }"
-        x-show="show"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto"
-        aria-labelledby="send-email-title"
-        role="dialog"
-        aria-modal="true"
-        style="display: none;"
-    >
-        <!-- Background overlay -->
+    <!-- Email Modal - Teleported to body -->
+    <template x-teleport="body">
         <div
             x-show="show"
-            x-transition:enter="ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-            @click="if (!$wire.sending) { show = false; $wire.resetEmailForm(); }"
-        ></div>
-
-        <!-- Modal panel -->
-        <div class="flex min-h-full items-center justify-center p-4">
+            x-cloak
+            class="fixed inset-0 z-[9999] overflow-y-auto"
+            aria-labelledby="send-email-title"
+            role="dialog"
+            aria-modal="true"
+            style="display: none;"
+        >
+            <!-- Background overlay -->
             <div
                 x-show="show"
                 x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+                @click="if (!$wire.sending) { show = false; $wire.resetEmailForm(); }"
+            ></div>
+
+            <!-- Modal panel -->
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div
+                    x-show="show"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 class="relative w-full max-w-xl transform overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5"
                 @click.stop
             >
@@ -206,6 +206,7 @@
             </div>
         </div>
     </div>
+    </template>
 
     <style>
         [x-cloak] {

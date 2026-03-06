@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Rules\UniquePlateNumber;
 use Livewire\WithFileUploads;
 
 trait HasVehicleDetails
@@ -39,7 +40,7 @@ trait HasVehicleDetails
             "model" => "required|string|max:100",
             "color" => "required|string|max:50",
             "year" => "required|integer|min:1900",
-            "plate_number" => "required|string|max:20",
+            "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
 
             // Files / Documents
             "files.vehicle_registration.*" =>

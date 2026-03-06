@@ -36,6 +36,8 @@ class Vehicle extends Model
         'is_renewal',
         'renewed_from_vehicle_id',
         'renewal_requested_at',
+        'has_pending_renewal',
+        'pending_renewal_application_id',
     ];
 
     protected $casts = [
@@ -43,6 +45,7 @@ class Vehicle extends Model
         'expires_at' => 'datetime',
         'renewal_requested_at' => 'datetime',
         'is_renewal' => 'boolean',
+        'has_pending_renewal' => 'boolean',
         'validity_years' => 'integer',
     ];
 
@@ -100,6 +103,7 @@ class Vehicle extends Model
 
     /**
      * Check if the gate pass is expiring soon (within warning period).
+     * Only returns true for active vehicles with gate passes.
      */
     public function isExpiringSoon(): bool
     {
@@ -107,9 +111,15 @@ class Vehicle extends Model
             return false;
         }
 
+        // Only consider vehicles with active status
+        if ($this->status?->code !== 'active') {
+            return false;
+        }
+
         $warningDays = config('anpr.gate_pass.renewal_warning_days', 90);
-        return $this->expires_at->isFuture() &&
-               $this->expires_at->diffInDays(now()) <= $warningDays;
+        $daysUntilExpiration = (int) abs(now()->diffInDays($this->expires_at));
+
+        return $this->expires_at->isFuture() && $daysUntilExpiration <= $warningDays;
     }
 
     /**
@@ -133,6 +143,48 @@ class Vehicle extends Model
         }
 
         return max(0, (int) now()->diffInDays($this->expires_at, false));
+    }
+
+    /**
+     * Get human-readable time until expiration.
+     * Shows years/months for distant dates, days when closer.
+     */
+    public function getTimeUntilExpirationAttribute(): ?string
+    {
+        if (!$this->expires_at) {
+            return null;
+        }
+
+        $now = now();
+        $expiresAt = $this->expires_at;
+
+        if ($expiresAt->isPast()) {
+            return 'Expired';
+        }
+
+        // Cast to int as Carbon 3.x returns floats
+        $years = (int) $now->diffInYears($expiresAt);
+        $months = (int) $now->copy()->addYears($years)->diffInMonths($expiresAt);
+        $days = (int) $now->copy()->addYears($years)->addMonths($months)->diffInDays($expiresAt);
+
+        $parts = [];
+
+        if ($years > 0) {
+            $parts[] = $years . ' ' . ($years === 1 ? 'year' : 'years');
+        }
+
+        if ($months > 0) {
+            $parts[] = $months . ' ' . ($months === 1 ? 'month' : 'months');
+        }
+
+        // Only show days if less than 1 year, or if years and months are both 0
+        if ($years === 0 || ($years === 0 && $months === 0)) {
+            if ($days > 0 || empty($parts)) {
+                $parts[] = $days . ' ' . ($days === 1 ? 'day' : 'days');
+            }
+        }
+
+        return implode(', ', $parts) . ' left';
     }
 
     /**
@@ -161,22 +213,42 @@ class Vehicle extends Model
      */
     public function canRenew(): bool
     {
-        // Can only renew if approved and either expired or expiring soon
-        if (!$this->approved_at) {
+        // Can only renew if approved and has active status
+        if (!$this->approved_at || $this->status?->code !== 'active') {
             return false;
         }
 
-        // Check if there's already a pending renewal
-        $pendingRenewal = Vehicle::where('renewed_from_vehicle_id', $this->id)
-            ->whereHas('status', fn($q) => $q->whereIn('code', ['pending_verification', 'under_review']))
-            ->exists();
-
-        if ($pendingRenewal) {
+        // Check if there's already a pending renewal for this vehicle
+        if ($this->has_pending_renewal) {
             return false;
         }
 
-        // Allow renewal if expired or expiring soon
-        return $this->isExpired() || $this->isExpiringSoon();
+        // Allow renewal if expired or expiring soon (within warning period)
+        if (!$this->expires_at) {
+            return false;
+        }
+
+        $warningDays = config('anpr.gate_pass.renewal_warning_days', 90);
+        $daysUntilExpiration = (int) abs(now()->diffInDays($this->expires_at));
+
+        return $this->expires_at->isPast() || ($this->expires_at->isFuture() && $daysUntilExpiration <= $warningDays);
+    }
+
+    /**
+     * Get the pending renewal application for this vehicle.
+     */
+    public function pendingRenewalApplication()
+    {
+        return $this->belongsTo(Application::class, 'pending_renewal_application_id');
+    }
+
+    /**
+     * Get renewal documents linked directly to this vehicle.
+     */
+    public function renewalDocuments()
+    {
+        return $this->hasMany(\App\Models\Documents::class, 'vehicle_id')
+            ->where('is_renewal_document', true);
     }
 
     /**

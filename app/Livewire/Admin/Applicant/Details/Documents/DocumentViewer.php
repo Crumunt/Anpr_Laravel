@@ -72,6 +72,9 @@ class DocumentViewer extends Component
 
             // Dispatch an event to update the parent list
             $this->dispatch('documentUpdated', applicationId: $application_id);
+            $this->dispatch('refreshActivityLog');
+            $this->dispatch('refreshVehicleTable');
+            $this->dispatch('document-verified');
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -103,8 +106,44 @@ class DocumentViewer extends Component
             $application->approved_by = Auth::id();
             $application->save();
 
+            // Handle vehicle approval/renewal
+            $this->processVehicleApproval($application, $approvedStatusId);
+
             // Log the application auto-approval
             ActivityLogService::logApplicationAutoApproved($application->user, Auth::user());
+        }
+    }
+
+    /**
+     * Process vehicle approval - handles both new applications and renewals
+     */
+    protected function processVehicleApproval(Application $application, $approvedStatusId)
+    {
+        $vehicleApprovedStatus = Status::where('type', 'vehicle')->where('code', 'active')->first();
+        $approvalDate = now();
+        $defaultValidityYears = config('anpr.gate_pass.default_validity_years', 4);
+
+        // Check if this is a renewal application (linked to existing vehicle)
+        $renewalVehicle = \App\Models\Vehicle\Vehicle::where('pending_renewal_application_id', $application->id)->first();
+
+        if ($renewalVehicle) {
+            // This is a RENEWAL - extend the existing vehicle's validity
+            $renewalVehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+            $renewalVehicle->has_pending_renewal = false;
+            $renewalVehicle->pending_renewal_application_id = null;
+            $renewalVehicle->is_renewal = true;
+            $renewalVehicle->save();
+        } else {
+            // This is a NEW application - activate associated vehicles
+            if ($vehicleApprovedStatus) {
+                $vehicles = \App\Models\Vehicle\Vehicle::where('application_id', $application->id)->get();
+
+                foreach ($vehicles as $vehicle) {
+                    $vehicle->status_id = $vehicleApprovedStatus->id;
+                    $vehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+                    $vehicle->save();
+                }
+            }
         }
     }
 
@@ -139,6 +178,8 @@ class DocumentViewer extends Component
 
             // Dispatch an event to update the parent list
             $this->dispatch('documentUpdated', applicationId: $application_id);
+            $this->dispatch('refreshActivityLog');
+            $this->dispatch('refreshVehicleTable');
 
             // Close and reset the component state
             $this->closeAndClear();

@@ -5,9 +5,12 @@ namespace App\Livewire\Admin\Applicant\Details;
 use App\Http\Resources\ApplicationDetailsResource;
 use App\Http\Resources\VehicleResource;
 use App\Models\Application;
+use App\Models\ApplicantType;
+use App\Models\ApplicantTypeDocument;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\Vehicle\Vehicle;
+use App\Rules\UniquePlateNumber;
 use App\Services\Admin\Applicants\ApplicantReadService;
 use App\Services\Admin\Vehicles\VehicleWriteService;
 use App\Services\Application\SaveVehicleService;
@@ -65,6 +68,11 @@ class InfoTable extends Component
 
     protected $vehicleWriteService;
 
+    // Dynamic document uploads for applicant type
+    public $applicantType = null;
+    public $requiredDocuments = [];
+    public $documentFiles = [];
+
     public function boot(VehicleWriteService $vehicleWriteService)
     {
         $this->vehicleWriteService = $vehicleWriteService;
@@ -81,6 +89,42 @@ class InfoTable extends Component
         }
 
         $this->loadData();
+        $this->loadApplicantTypeDocuments();
+    }
+
+    /**
+     * Load the applicant type and its required documents for the user
+     */
+    public function loadApplicantTypeDocuments()
+    {
+        $user = User::with(['applications.applicantTypeModel.requiredDocuments'])->find($this->userId);
+
+        if (!$user) {
+            return;
+        }
+
+        // Get the applicant type from the user's first application
+        $firstApplication = $user->applications()->with('applicantTypeModel.requiredDocuments')->first();
+
+        if ($firstApplication && $firstApplication->applicantTypeModel) {
+            $this->applicantType = $firstApplication->applicantTypeModel;
+            $this->requiredDocuments = $firstApplication->applicantTypeModel->requiredDocuments->toArray();
+        } else {
+            // Fallback: load default required documents (vehicle_registration, license, proof_of_identification)
+            $this->requiredDocuments = [
+                ['name' => 'vehicle_registration', 'label' => 'Vehicle Registration', 'description' => 'Official vehicle registration document', 'accepted_formats' => 'pdf,jpg,jpeg,png', 'max_file_size' => 10240, 'is_required' => true],
+                ['name' => 'license', 'label' => "Driver's License", 'description' => 'Valid driver\'s license', 'accepted_formats' => 'pdf,jpg,jpeg,png', 'max_file_size' => 10240, 'is_required' => true],
+                ['name' => 'proof_of_identification', 'label' => 'Proof of Identification', 'description' => 'Valid ID (CLSU ID, National ID, etc.)', 'accepted_formats' => 'pdf,jpg,jpeg,png', 'max_file_size' => 10240, 'is_required' => true],
+            ];
+        }
+
+        // Initialize document files array
+        foreach ($this->requiredDocuments as $doc) {
+            $docName = $doc['name'] ?? $doc['id'] ?? '';
+            if ($docName && !isset($this->documentFiles[$docName])) {
+                $this->documentFiles[$docName] = [];
+            }
+        }
     }
 
     public function loadData()
@@ -128,36 +172,28 @@ class InfoTable extends Component
                     'approved_by' => auth()->id(),
                 ]);
 
-                // Also update all associated vehicles to approved status and set expiration dates
-                if ($vehicleApprovedStatus) {
-                    $vehicles = Vehicle::where('application_id', $application->id)->get();
-                    $approvalDate = now();
-                    $defaultValidityYears = config('anpr.gate_pass.default_validity_years', 4);
+                $approvalDate = now();
+                $defaultValidityYears = config('anpr.gate_pass.default_validity_years', 4);
 
-                    foreach ($vehicles as $vehicle) {
-                        $vehicle->status_id = $vehicleApprovedStatus->id;
-                        $vehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
-                        $vehicle->save();
+                // Check if this is a renewal application (linked to existing vehicle)
+                $renewalVehicle = Vehicle::where('pending_renewal_application_id', $application->id)->first();
 
-                        // If this is a renewal, update the original vehicle as well
-                        if ($vehicle->is_renewal && $vehicle->renewed_from_vehicle_id) {
-                            $originalVehicle = Vehicle::find($vehicle->renewed_from_vehicle_id);
-                            if ($originalVehicle) {
-                                // Mark the original vehicle's gate pass as renewed
-                                // Transfer the validity to the renewal vehicle
-                                // and inherit the gate pass number if not already set
-                                if (!$vehicle->assigned_gate_pass && $originalVehicle->assigned_gate_pass) {
-                                    $vehicle->assigned_gate_pass = $originalVehicle->assigned_gate_pass;
-                                    $vehicle->save();
-                                }
+                if ($renewalVehicle) {
+                    // This is a RENEWAL - extend the existing vehicle's validity
+                    $renewalVehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+                    $renewalVehicle->has_pending_renewal = false;
+                    $renewalVehicle->pending_renewal_application_id = null;
+                    $renewalVehicle->is_renewal = true; // Mark that this vehicle has been renewed at least once
+                    $renewalVehicle->save();
+                } else {
+                    // This is a NEW application - activate associated vehicles
+                    if ($vehicleApprovedStatus) {
+                        $vehicles = Vehicle::where('application_id', $application->id)->get();
 
-                                // Set the original vehicle's status to indicate it was renewed
-                                $expiredStatus = Status::where('type', 'vehicle')->where('code', 'inactive')->first();
-                                if ($expiredStatus) {
-                                    $originalVehicle->status_id = $expiredStatus->id;
-                                    $originalVehicle->save();
-                                }
-                            }
+                        foreach ($vehicles as $vehicle) {
+                            $vehicle->status_id = $vehicleApprovedStatus->id;
+                            $vehicle->setExpirationFromDate($approvalDate, $defaultValidityYears);
+                            $vehicle->save();
                         }
                     }
                 }
@@ -181,6 +217,7 @@ class InfoTable extends Component
             $this->dispatch('close-dropdown');
             $this->dispatch('refreshApplicationCard');
             $this->dispatch('refreshVehicleTable');
+            $this->dispatch('refreshActivityLog');
         } catch (\Exception $e) {
             $this->dispatch(
                 "toast",
@@ -227,6 +264,8 @@ class InfoTable extends Component
                 duration: 3000,
             );
             $this->dispatch('refreshApplicationCard');
+            $this->dispatch('refreshVehicleTable');
+            $this->dispatch('refreshActivityLog');
         } catch (\Exception $e) {
             $this->dispatch(
                 "toast",
@@ -286,6 +325,8 @@ class InfoTable extends Component
         }
 
         $this->dispatch("toast", message: "Gate pass assigned!", type: "success", duration: 3000);
+        $this->dispatch('refreshActivityLog');
+        $this->dispatch('gate-pass-assigned');
 
         $this->loadData();
     }
@@ -323,7 +364,7 @@ class InfoTable extends Component
                 "model" => "required|string|max:100",
                 "color" => "required|string|max:50",
                 "year" => "required|integer|min:1900",
-                "plate_number" => "required|string|max:20",
+                "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
             ],
             2 => [
                 "files.vehicle_registration" => "required|array|min:1",
@@ -333,6 +374,28 @@ class InfoTable extends Component
                 "files.proof_of_identification" => "required|array|min:1",
                 "files.proof_of_identification.*" => "file|mimes:pdf,jpg,jpeg,png|max:10240",
             ],
+            default => []
+        };
+
+        $this->validate($validationRules);
+        $this->currentStep++;
+    }
+
+    /**
+     * Next step for vehicle application with dynamic document validation
+     */
+    public function nextVehicleStep()
+    {
+        $validationRules = match ($this->currentStep) {
+            1 => [
+                "vehicle_type" => "required|string|max:50",
+                "make" => "required|string|max:100",
+                "model" => "required|string|max:100",
+                "color" => "required|string|max:50",
+                "year" => "required|integer|min:1900|max:" . (date('Y') + 1),
+                "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
+            ],
+            2 => $this->getDynamicDocumentRules(),
             default => []
         };
 
@@ -356,9 +419,161 @@ class InfoTable extends Component
             "year",
             "plate_number",
             "files",
+            "documentFiles",
             "currentStep"
         ]);
+
+        // Re-initialize document files array
+        foreach ($this->requiredDocuments as $doc) {
+            $docName = $doc['name'] ?? $doc['id'] ?? '';
+            if ($docName) {
+                $this->documentFiles[$docName] = [];
+            }
+        }
+
         $this->resetValidation();
+    }
+
+    /**
+     * Handle dynamic document file upload
+     */
+    public function updatedDocumentFiles($value, $key)
+    {
+        // Key format is like "document_name" or nested for array updates
+        // The files are automatically stored in documentFiles array
+    }
+
+    /**
+     * Remove a file from document uploads
+     */
+    public function removeDocumentFile($docName, $index)
+    {
+        if (isset($this->documentFiles[$docName][$index])) {
+            unset($this->documentFiles[$docName][$index]);
+            $this->documentFiles[$docName] = array_values($this->documentFiles[$docName]);
+        }
+    }
+
+    /**
+     * Get validation rules for dynamic documents
+     */
+    protected function getDynamicDocumentRules(): array
+    {
+        $rules = [];
+        foreach ($this->requiredDocuments as $doc) {
+            $docName = $doc['name'] ?? '';
+            if (!$docName) continue;
+
+            $formats = $doc['accepted_formats'] ?? 'pdf,jpg,jpeg,png';
+            $maxSize = $doc['max_file_size'] ?? 10240;
+            $isRequired = $doc['is_required'] ?? true;
+
+            if ($isRequired) {
+                $rules["documentFiles.{$docName}"] = "required|array|min:1";
+            }
+            $rules["documentFiles.{$docName}.*"] = "file|mimes:{$formats}|max:{$maxSize}";
+        }
+        return $rules;
+    }
+
+    /**
+     * Submit vehicle application form (for vehicle type table)
+     */
+    public function submitVehicleApplication()
+    {
+        // Validate vehicle details
+        $vehicleRules = [
+            "vehicle_type" => "required|string|max:50",
+            "make" => "required|string|max:100",
+            "model" => "required|string|max:100",
+            "color" => "required|string|max:50",
+            "year" => "required|integer|min:1900|max:" . (date('Y') + 1),
+            "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
+        ];
+
+        // Add dynamic document validation rules
+        $documentRules = $this->getDynamicDocumentRules();
+        $allRules = array_merge($vehicleRules, $documentRules);
+
+        $this->validate($allRules);
+
+        $user = User::find($this->userId);
+        if (!$user) {
+            $this->dispatch('toast', message: 'User not found', type: 'error');
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($user) {
+                // Get applicant type from existing application
+                $applicantType = $user->applications()->first()?->applicant_type ?? 'regular';
+                $applicantTypeId = $this->applicantType?->id ?? null;
+
+                // Get statuses
+                $applicationStatus = Status::applicationPending();
+                $vehicleStatus = Status::vehiclePending();
+
+                // Create application
+                $application = $user->applications()->create([
+                    'user_id' => $user->id,
+                    'applicant_type' => $applicantType,
+                    'applicant_type_id' => $applicantTypeId,
+                    'status_id' => $applicationStatus->id
+                ]);
+
+                // Create vehicle
+                $user->vehicles()->create([
+                    'application_id' => $application->id,
+                    'plate_number' => $this->plate_number,
+                    'type' => $this->vehicle_type,
+                    'make' => $this->make,
+                    'model' => $this->model,
+                    'year' => $this->year,
+                    'color' => $this->color,
+                    'status_id' => $vehicleStatus->id,
+                ]);
+
+                // Process documents
+                $fileRecords = [];
+                foreach ($this->documentFiles as $docType => $files) {
+                    if (!is_array($files)) continue;
+                    foreach ($files as $file) {
+                        $filename = \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
+                        $storePath = "application/{$user->id}/{$application->id}";
+                        $finalPath = "{$storePath}/{$filename}";
+
+                        $file->storeAs($storePath, $filename, 'local');
+
+                        $fileRecords[] = [
+                            'type' => $docType,
+                            'file_path' => $finalPath,
+                            'mime_type' => $file->getMimeType(),
+                            'file_size' => $file->getSize(),
+                            'status_id' => $applicationStatus->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                }
+
+                if (!empty($fileRecords)) {
+                    $application->documents()->createMany($fileRecords);
+                }
+
+                // Log activity
+                ActivityLogService::logApplicationSubmitted($user, $applicantType);
+            });
+
+            $this->resetForm();
+            $this->loadData();
+
+            $this->dispatch('close-vehicle-add-modal');
+            $this->dispatch('refreshActivityLog');
+            $this->dispatch('toast', message: 'Application submitted successfully!', type: 'success', duration: 3000);
+
+        } catch (\Exception $e) {
+            $this->dispatch('toast', message: 'Failed to submit application: ' . $e->getMessage(), type: 'error');
+        }
     }
 
     public function submitForm()
@@ -403,6 +618,13 @@ class InfoTable extends Component
         if ($this->type === 'vehicle') {
             $this->loadData();
         }
+    }
+
+    #[On('documentUpdated')]
+    public function handleDocumentUpdated()
+    {
+        // Refresh the table when documents are updated (e.g., all docs approved = application approved)
+        $this->loadData();
     }
 
     #[On('page-changed')]

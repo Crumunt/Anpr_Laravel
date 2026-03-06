@@ -45,7 +45,7 @@
 
     <!-- Dropdown Results -->
     @if($showDropdown)
-        <div class="absolute top-14 left-0 w-full z-[500] rounded-xl border border-gray-100 bg-white shadow-2xl overflow-hidden"
+        <div class="absolute top-14 left-0 w-full z-[200] rounded-xl border border-gray-100 bg-white shadow-2xl overflow-hidden"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-2"
              x-transition:enter-end="opacity-100 translate-y-0"

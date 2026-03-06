@@ -3,6 +3,7 @@
 namespace App\Livewire\GatePass;
 
 use App\Models\ApplicantType;
+use App\Rules\UniquePlateNumber;
 use App\Services\Admin\Applicants\ApplicantWriteService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -223,6 +224,9 @@ class GatePassApplication extends Component
     {
         $rules = $this->rules;
 
+        // Override plate_number with UniquePlateNumber rule
+        $rules['plate_number'] = ['required', 'string', 'max:20', new UniquePlateNumber()];
+
         // Add dynamic document rules
         if ($this->requiredDocuments) {
             foreach ($this->requiredDocuments as $document) {
@@ -251,17 +255,14 @@ class GatePassApplication extends Component
     {
         $baseRules = match ($this->currentStep) {
             1 => $this->getStep1Rules(),
-            2 => array_intersect_key(
-                $this->rules,
-                array_flip([
-                    "vehicle_type",
-                    "make",
-                    "model",
-                    "color",
-                    "year",
-                    "plate_number",
-                ]),
-            ),
+            2 => [
+                "vehicle_type" => "required|string|max:50",
+                "make" => "required|string|max:100",
+                "model" => "required|string|max:100",
+                "color" => "required|string|max:50",
+                "year" => "required|integer|min:1900",
+                "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
+            ],
             3 => $this->getDocumentRules(),
             default => [],
         };

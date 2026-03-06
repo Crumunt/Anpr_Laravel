@@ -141,10 +141,10 @@
                                         Expired
                                     @elseif($vehicle->isExpiringSoon())
                                         <i class="fas fa-clock mr-1.5"></i>
-                                        {{ $vehicle->days_until_expiration }} days remaining
+                                        {{ $vehicle->time_until_expiration }}
                                     @else
                                         <i class="fas fa-check-circle mr-1.5"></i>
-                                        Valid until {{ $vehicle->expires_at->format('M Y') }}
+                                        {{ $vehicle->time_until_expiration }}
                                     @endif
                                 </div>
 

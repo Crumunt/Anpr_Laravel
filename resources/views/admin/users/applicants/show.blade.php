@@ -60,9 +60,9 @@
         <!-- Documents Card -->
         <livewire:admin.applicant.details.documents.document-card :user_id="$applicant_details['id']" />
 
-        <!-- Activity Log Card (excluded from print) -->
+        <!-- Activity Log Card (excluded from print) - Livewire component for reactive updates -->
         <div class="no-print">
-            <x-details.parts.activity-log :activities="$activities" />
+            <livewire:admin.applicant.details.activity-log :userId="$applicant_details['id']" :limit="10" />
         </div>
     </x-slot>
 </x-details.layout>

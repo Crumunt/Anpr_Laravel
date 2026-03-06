@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('email')->unique();
-            // $table->timestamp('email_verified_at')->nullable();
             $table->boolean('must_change_password')->default(true);
             $table->string('password');
             $table->boolean('is_active')->nullable()->default(true);
+            $table->boolean('is_deleted')->default(false);
+            $table->timestamp('deleted_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            $table->index('is_deleted');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -30,7 +33,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->char('user_id', 26)->nullable()->index(); // ULID-compatible
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');

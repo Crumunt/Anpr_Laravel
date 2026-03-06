@@ -32,11 +32,13 @@ class VehicleResource extends JsonResource
             "expires_at" => $this->expires_at?->format("F d, Y"),
             "validity_years" => $this->validity_years,
             "days_until_expiration" => $this->days_until_expiration,
+            "time_until_expiration" => $this->time_until_expiration,
             "is_expired" => $this->isExpired(),
             "is_expiring_soon" => $this->isExpiringSoon(),
             "expiration_status" => $this->expiration_status,
             // Renewal info
             "is_renewal" => $this->is_renewal,
+            "has_pending_renewal" => $this->has_pending_renewal,
             "renewed_from_vehicle_id" => $this->renewed_from_vehicle_id,
             "renewal_requested_at" => $this->renewal_requested_at?->format("F d, Y"),
             "can_renew" => $this->canRenew(),

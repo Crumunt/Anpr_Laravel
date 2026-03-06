@@ -14,8 +14,10 @@ class CreateActivityLogTable extends Migration
             $table->text('description');
             // Use ULID-compatible morphs (char(26) instead of bigint)
             $table->nullableUlidMorphs('subject', 'subject');
+            $table->string('event')->nullable();
             $table->nullableUlidMorphs('causer', 'causer');
             $table->json('properties')->nullable();
+            $table->uuid('batch_uuid')->nullable();
             $table->timestamps();
             $table->index('log_name');
         });

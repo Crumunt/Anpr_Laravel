@@ -93,7 +93,7 @@
 
             <!-- Action Buttons - Only show if user has any edit permissions -->
             @if($canEdit || $canApprove || $canDelete)
-            <div class="flex flex-wrap sm:flex-nowrap gap-2 lg:flex-shrink-0 relative z-50">
+            <div class="flex flex-wrap sm:flex-nowrap gap-2 lg:flex-shrink-0 relative z-10">
                 <!-- Send Email Button - Only if can edit -->
                 @if($canEdit)
                 @livewire('admin.applicant.details.email', ['applicantEmail' => $email ?? '', 'applicantName' => $title])

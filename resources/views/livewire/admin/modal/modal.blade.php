@@ -14,13 +14,13 @@
     </x-dashboard.buttons>
     <!-- Modal -->
     @if($showModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-800/70">
+    <div class="fixed inset-0 z-[150] flex items-center justify-center bg-gray-800/70">
         <div class="bg-white rounded-xl shadow-3xl w-full max-w-3xl">
             <!-- Body -->
             <div class="p-6 max-h-[70vh] overflow-y-auto">
                 <form wire:submit.prevent="submitForm">
                     <div>
-                        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/50">
                             <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
 
                                 <!-- Fixed Header -->

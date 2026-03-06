@@ -178,9 +178,9 @@
                                             @if($vehicle['is_expired'] ?? false)
                                                 <i class="fas fa-exclamation-circle mr-1"></i>Expired
                                             @elseif($vehicle['is_expiring_soon'] ?? false)
-                                                <i class="fas fa-clock mr-1"></i>{{ $vehicle['days_until_expiration'] }} days left
+                                                <i class="fas fa-clock mr-1"></i>{{ $vehicle['time_until_expiration'] ?? $vehicle['days_until_expiration'] . ' days left' }}
                                             @else
-                                                <i class="fas fa-calendar mr-1"></i>{{ $vehicle['expires_at'] }}
+                                                <i class="fas fa-calendar mr-1"></i>{{ $vehicle['time_until_expiration'] ?? $vehicle['expires_at'] }}
                                             @endif
                                         </span>
                                     @endif

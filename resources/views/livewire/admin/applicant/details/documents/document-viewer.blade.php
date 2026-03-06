@@ -51,7 +51,7 @@
     @keydown.escape.window="if (show) { show = false; resetRejectForm(); }"
     x-show="$wire.show"
     x-cloak
-    class="fixed inset-0 z-50 overflow-y-auto"
+    class="fixed inset-0 z-[150] overflow-y-auto"
     style="display: none;">
     <!-- Backdrop -->
     <div

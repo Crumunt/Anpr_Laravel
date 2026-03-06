@@ -13,6 +13,7 @@ class Documents extends Model
     public $incrementing = false;
     protected $fillable = [
         "application_id",
+        "vehicle_id",
         "type",
         "file_path",
         'mime_type',
@@ -24,14 +25,29 @@ class Documents extends Model
         "version",
         "replaced_by",
         "is_current",
+        "is_renewal_document",
     ];
 
-    public function applications()
+    protected $casts = [
+        'is_current' => 'boolean',
+        'is_renewal_document' => 'boolean',
+    ];
+
+    public function application()
     {
         return $this->belongsTo(
             Application::class,
             "application_id",
-            "user_id",
+            "id",
+        );
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(
+            Vehicle\Vehicle::class,
+            "vehicle_id",
+            "id",
         );
     }
 

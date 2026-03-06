@@ -4,6 +4,7 @@ namespace App\Livewire\Applicant;
 
 use App\Models\Status;
 use App\Models\User;
+use App\Rules\UniquePlateNumber;
 use App\Traits\HasVehicleDetails;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class AddVehicleModal extends Component
                 "model" => "required|string|max:100",
                 "color" => "required|string|max:50",
                 "year" => "required|integer|min:1900|max:" . (date('Y') + 1),
-                "plate_number" => "required|string|max:20",
+                "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
             ],
             2 => [
                 "files.vehicle_registration" => "required|array|min:1",

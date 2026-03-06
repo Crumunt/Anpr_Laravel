@@ -221,7 +221,7 @@
 
     <!-- Create/Edit Type Modal -->
     @if($showTypeModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 z-[150] overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="fixed inset-0 bg-gray-900/50 transition-opacity" wire:click="closeTypeModal"></div>
 
@@ -325,7 +325,7 @@
 
     <!-- Create/Edit Document Modal -->
     @if($showDocumentModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 z-[150] overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="fixed inset-0 bg-gray-900/50 transition-opacity" wire:click="closeDocumentModal"></div>
 
@@ -439,7 +439,7 @@
 
     <!-- Delete Confirmation Modal -->
     @if($showDeleteModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 z-[150] overflow-y-auto">
             <div class="flex min-h-screen items-center justify-center p-4">
                 <div class="fixed inset-0 bg-gray-900/50 transition-opacity" wire:click="cancelDelete"></div>
 

@@ -34,10 +34,12 @@ class ApplicantDashboardController extends Controller
                 return $vehicle->assigned_gate_pass && $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active';
             })->count(),
             'expiring_soon' => $vehicles->filter(function($vehicle) {
-                return $vehicle->isExpiringSoon();
+                // Only count active vehicles that are expiring soon
+                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active' && $vehicle->isExpiringSoon();
             })->count(),
             'expired' => $vehicles->filter(function($vehicle) {
-                return $vehicle->isExpired();
+                // Only count vehicles that were active but are now expired
+                return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active' && $vehicle->isExpired();
             })->count(),
         ];
 
@@ -54,6 +56,7 @@ class ApplicantDashboardController extends Controller
                 'registered_date' => $vehicle->created_at?->format('M d, Y') ?? 'N/A',
                 'expires_at' => $vehicle->expires_at?->format('M d, Y'),
                 'days_until_expiration' => $vehicle->days_until_expiration,
+                'time_until_expiration' => $vehicle->time_until_expiration,
                 'expiration_status' => $vehicle->expiration_status,
                 'is_expiring_soon' => $vehicle->isExpiringSoon(),
                 'is_expired' => $vehicle->isExpired(),
