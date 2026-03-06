@@ -65,6 +65,7 @@ class RolePermissionSeeder extends Seeder
             'manage alerts',
             'view analytics',
             'view flagged vehicles',
+            'manage security accounts',
 
             // System
             'view reports',
@@ -147,6 +148,26 @@ class RolePermissionSeeder extends Seeder
                 'manage alerts',
                 'view analytics',
                 'view flagged vehicles',
+            ],
+
+            // Security Admin - manages security personnel accounts
+            'security_admin' => [
+                'view camera feed',
+                'mark blacklisted',
+                'mark flagged',
+                'view vehicles',
+                'view gate passes',
+                'view applications',
+                'view anpr dashboard',
+                'view alerts',
+                'manage alerts',
+                'view analytics',
+                'view flagged vehicles',
+                'manage security accounts',
+                'view users',
+                'create users',
+                'edit users',
+                'delete users',
             ],
 
             // Maintenance staff

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SecurityMiddleware
 {
     /**
-     * Handle an incoming request - only allow security role for ANPR access.
+     * Handle an incoming request - only allow security and security_admin roles for ANPR access.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -19,8 +19,8 @@ class SecurityMiddleware
             return redirect()->route('login');
         }
 
-        // Only security role can access ANPR dashboard
-        if (!$request->user()->hasRole('security')) {
+        // Security and security_admin roles can access ANPR dashboard
+        if (!$request->user()->hasAnyRole(['security', 'security_admin'])) {
             return $this->redirectToAppropriateDashboard($request->user());
         }
 

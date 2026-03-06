@@ -21,8 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             /** @var \App\Models\User|null $user */
             $user = Auth::user();
 
-            // Security users go to ANPR dashboard
-            if ($user && $user->hasRole('security')) {
+            // Security and security_admin users go to ANPR dashboard
+            if ($user && $user->hasAnyRole(['security', 'security_admin'])) {
                 return route('anpr.dashboard');
             }
 

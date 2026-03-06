@@ -136,6 +136,22 @@ trait HasRoleBasedAccess
     }
 
     /**
+     * Check if user is security admin
+     */
+    public function isSecurityAdmin(): bool
+    {
+        return $this->hasAnyRole(['security_admin']);
+    }
+
+    /**
+     * Check if user can manage security accounts
+     */
+    public function canManageSecurityAccounts(): bool
+    {
+        return $this->hasAnyRole(['security_admin']);
+    }
+
+    /**
      * Get the current user's primary role for display
      */
     public function getUserRole(): string
@@ -161,11 +177,11 @@ trait HasRoleBasedAccess
                 // Delete requires super_admin or admin_editor
                 'delete' => $user->hasAnyRole(['super_admin', 'admin_editor']),
 
-                // Approve/Reject requires approval permission
-                'approve', 'reject' => $user->hasAnyRole(['super_admin', 'admin_editor']),
+                // Status changes (activate, deactivate) require editor or higher
+                'activate', 'deactivate' => $user->hasAnyRole(['super_admin', 'admin_editor', 'encoder']),
 
-                // Status changes (activate, deactivate, under-review) require editor or higher
-                'activate', 'deactivate', 'under-review' => $user->hasAnyRole(['super_admin', 'admin_editor', 'encoder']),
+                // Archive/restore for applicants
+                'archive', 'restore' => $user->hasAnyRole(['super_admin', 'admin_editor']),
 
                 // Password reset for admins requires admin management permission
                 'reset-password' => $type === 'admin' && $user->hasAnyRole(['super_admin', 'admin_editor']),

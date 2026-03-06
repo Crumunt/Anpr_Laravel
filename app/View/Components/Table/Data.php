@@ -60,7 +60,6 @@ class Data extends Component
         return [
             'view' => ['label' => 'View Details'],
             'edit' => ['label' => 'Edit'],
-            'approve' => ['label' => 'Approve'],
             'delete' => ['label' => 'Delete'],
             'reset-password' => ['label' => 'Reset Password'],
             'deactivate' => ['label' => 'Deactivate'],
@@ -70,7 +69,6 @@ class Data extends Component
     protected function defaultBulkActions(): array
     {
         return [
-            'approve' => 'Approve Selected',
             'delete' => 'Delete Selected',
             'export' => 'Export Selected',
             'deactivate' => 'Deactivate Selected',

@@ -41,8 +41,8 @@
             'notificationCount' => isset($alertsCount) && is_array($alertsCount) ? ($alertsCount['total'] ?? 0) : 0
         ])
 
-        <!-- Page Content - with top padding to account for fixed header (topbar h-16 = 64px + banner at top-16 with py-3 content = ~64px, total ~128px) -->
-        <main id="main-content" class="pt-36 px-4 md:px-8 pb-28">
+        <!-- Page Content - with top padding to account for fixed header -->
+        <main id="main-content" class="pt-20 px-4 md:px-8 pb-28">
             <!-- Flash Messages -->
             @if(session('success'))
                 <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center">

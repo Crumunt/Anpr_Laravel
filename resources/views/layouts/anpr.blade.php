@@ -103,7 +103,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-white">{{ auth()->user()->details?->first_name ?? 'Security' }}</p>
-                    <p class="text-xs text-green-200">Security Personnel</p>
+                    <p class="text-xs text-green-200">{{ auth()->user()?->hasRole('security_admin') ? 'Security Admin' : 'Security Personnel' }}</p>
                 </div>
             </div>
         </div>
@@ -161,6 +161,17 @@
                 </li>
 
                 <li class="my-3 border-t border-green-700"></li>
+
+                <!-- Manage Accounts - Only for security_admin -->
+                @if(auth()->user()?->hasRole('security_admin'))
+                <li>
+                    <a href="{{ route('anpr.accounts') }}"
+                       class="anpr-sidebar-item flex items-center px-4 py-3 text-green-100 rounded-r-lg {{ request()->routeIs('anpr.accounts') ? 'active' : '' }}">
+                        <i class="fas fa-users-cog w-5 mr-3"></i>
+                        <span>Manage Accounts</span>
+                    </a>
+                </li>
+                @endif
 
                 <!-- Profile -->
                 <li>

@@ -108,6 +108,11 @@ Route::prefix('anpr')->name('anpr.')->middleware(['auth', 'security'])->group(fu
     Route::get('/settings', function () {
         return view('anpr.settings.index');
     })->name('settings');
+
+    // Manage Security Accounts - Only accessible by security_admin
+    Route::get('/accounts', \App\Livewire\ANPR\ManageAccounts::class)
+        ->middleware(['role:security_admin'])
+        ->name('accounts');
 });
 
 //sa applicant form route
@@ -139,8 +144,8 @@ Route::get('/dashboard', function () {
     /** @var \App\Models\User $user */
     $user = auth()->user();
 
-    // Security users go to ANPR dashboard
-    if ($user->hasRole('security')) {
+    // Security and security_admin users go to ANPR dashboard
+    if ($user->hasAnyRole(['security', 'security_admin'])) {
         return redirect()->route('anpr.dashboard');
     }
 

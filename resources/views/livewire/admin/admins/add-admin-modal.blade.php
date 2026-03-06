@@ -175,7 +175,7 @@
                             <li><strong>Admin Editor:</strong> Full CRUD on users, applicants, vehicles, and gate passes</li>
                             <li><strong>Admin Viewer:</strong> View-only access to all resources</li>
                             <li><strong>Encoder:</strong> Data entry for applicants, vehicles, and gate passes</li>
-                            <li><strong>Security:</strong> Checkpoint operations, camera feed, and blacklist management</li>
+                            <li><strong>Security Admin:</strong> Manages security personnel accounts in the ANPR module</li>
                             <li><strong>Maintenance:</strong> Maintenance management and reports</li>
                         </ul>
                     </div>

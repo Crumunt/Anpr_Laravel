@@ -148,13 +148,16 @@ class ApplicationDisplayHelper
             "Admin" => "bg-sky-100/80 text-sky-800 hover:bg-sky-200/60",
             "Encoder"
                 => "bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60",
+            "Security Admin"
+                => "bg-emerald-100/80 text-emerald-800 hover:bg-emerald-200/60",
+            "Security"
+                => "bg-green-100/80 text-green-800 hover:bg-green-200/60",
             "Staff"
                 => "bg-indigo-100/80 text-indigo-800 hover:bg-indigo-200/60",
             "Faculty"
-                => "bg-green-100/80 text-green-800 hover:bg-green-200/60", // new
+                => "bg-green-100/80 text-green-800 hover:bg-green-200/60",
             "Student"
-                => "bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60", // new
-            // new
+                => "bg-yellow-100/80 text-yellow-800 hover:bg-yellow-200/60",
             // Fallback
             default => "bg-red-100 text-red-800 hover:bg-red-200/60",
         };
@@ -169,6 +172,7 @@ class ApplicationDisplayHelper
             "Admin Editor",
             "Encoder",
             "Security",
+            "Security Admin",
             "Faculty",
             "Staff",
             "Student",
@@ -185,9 +189,7 @@ class ApplicationDisplayHelper
     {
         return [
             ["key" => "export", "action" => "bulk-export"],
-            $type !== "admin"
-                ? ["key" => "approve", "action" => "approve"]
-                : ["key" => "deactivate", "action" => "deactivate"],
+            ["key" => "deactivate", "action" => "deactivate"],
             ["key" => "delete", "action" => "delete"],
         ];
     }

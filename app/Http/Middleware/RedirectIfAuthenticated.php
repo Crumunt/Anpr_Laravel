@@ -36,12 +36,12 @@ class RedirectIfAuthenticated
         /** @var User $user */
         $user = Auth::user();
 
-        // Security users go to ANPR dashboard
-        if ($user->hasRole('security')) {
+        // Security and security_admin users go to ANPR dashboard
+        if ($user->hasAnyRole(['security', 'security_admin'])) {
             return redirect()->route('anpr.dashboard');
         }
 
-        // Check if user has admin-level roles (excludes security)
+        // Check if user has admin-level roles (excludes security roles)
         if ($user->hasAnyRole(['super_admin', 'admin_editor', 'admin_viewer', 'encoder', 'maintenance'])) {
             return redirect()->route('admin.dashboard');
         }

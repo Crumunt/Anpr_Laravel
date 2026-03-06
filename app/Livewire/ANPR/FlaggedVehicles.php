@@ -37,12 +37,12 @@ class FlaggedVehicles extends Component
      * Status filter (all, active, resolved, dismissed)
      */
     #[Url(as: 'status')]
-    public string $statusFilter = 'active';
+    public string $statusFilter = 'all';
 
     /**
      * Date range filter
      */
-    public string $dateRange = '7days';
+    public string $dateRange = 'all';
 
     /**
      * Sort field
@@ -129,9 +129,9 @@ class FlaggedVehicles extends Component
     public function loadStats(): void
     {
         $this->stats = [
-            'total_flagged' => FlaggedVehicle::active()->count(),
-            'high_priority' => FlaggedVehicle::active()->where('priority', 'high')->count(),
-            'medium_priority' => FlaggedVehicle::active()->where('priority', 'medium')->count(),
+            'total_flagged' => FlaggedVehicle::count(),
+            'high_priority' => FlaggedVehicle::where('priority', 'high')->count(),
+            'medium_priority' => FlaggedVehicle::where('priority', 'medium')->count(),
             'resolved_today' => FlaggedVehicle::resolvedToday()->count(),
         ];
     }
@@ -392,19 +392,10 @@ class FlaggedVehicles extends Component
     {
         $this->search = '';
         $this->priorityFilter = 'all';
-        $this->statusFilter = 'active';
-        $this->dateRange = '7days';
+        $this->statusFilter = 'all';
+        $this->dateRange = 'all';
         $this->resetPage();
         $this->loadStats();
-    }
-
-    /**
-     * Export flagged records
-     */
-    public function exportRecords(): void
-    {
-        // Dispatch event for JS to handle download
-        $this->dispatch('export-flagged-records');
     }
 
     /**

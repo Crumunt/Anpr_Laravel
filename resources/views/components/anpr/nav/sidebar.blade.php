@@ -121,6 +121,20 @@
             'active' => request()->routeIs('anpr.profile'),
         ],
     ];
+
+    // Add "Manage Accounts" for security_admin users only
+    if (auth()->user()?->hasRole('security_admin')) {
+        // Insert before "My Profile" (at position after last divider)
+        array_splice($defaultNavItems, count($defaultNavItems) - 1, 0, [
+            [
+                'route' => 'anpr.accounts',
+                'icon' => 'users-cog',
+                'label' => 'Manage Accounts',
+                'active' => request()->routeIs('anpr.accounts'),
+            ],
+        ]);
+    }
+
     $navItemsToShow = $navItems && is_array($navItems) && count($navItems) > 0 ? $navItems : $defaultNavItems;
 @endphp
 

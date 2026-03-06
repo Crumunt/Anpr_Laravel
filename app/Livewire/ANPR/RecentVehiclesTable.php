@@ -98,6 +98,11 @@ class RecentVehiclesTable extends Component
     public bool $showAddLogModal = false;
 
     /**
+     * Track IDs of flagged records that have already been alerted
+     */
+    public array $alertedFlaggedIds = [];
+
+    /**
      * Add log form data
      */
     public array $addLogForm = [
@@ -404,10 +409,58 @@ class RecentVehiclesTable extends Component
     }
 
     /**
+     * Check for flagged records and show toast notification
+     * This is called during Livewire polling
+     */
+    public function checkFlaggedRecords(): void
+    {
+        $hours = config('anpr.dashboard.metrics_hours', 24);
+
+        // Get all flagged records in the current time window
+        $flaggedRecords = Record::query()
+            ->where('created_at', '>=', now()->subHours($hours))
+            ->where('is_flagged', true)
+            ->get();
+
+        if ($flaggedRecords->isEmpty()) {
+            // Reset alerted IDs when no flagged records exist
+            $this->alertedFlaggedIds = [];
+            return;
+        }
+
+        // Find new flagged records that haven't been alerted yet
+        $newFlaggedIds = $flaggedRecords->pluck('id')->diff($this->alertedFlaggedIds)->toArray();
+
+        if (!empty($newFlaggedIds)) {
+            $newCount = count($newFlaggedIds);
+            $totalCount = $flaggedRecords->count();
+
+            // Get plate numbers for the new flagged records
+            $newPlates = $flaggedRecords->whereIn('id', $newFlaggedIds)->pluck('plate_number')->take(3)->implode(', ');
+
+            // Build the message
+            if ($newCount === 1) {
+                $message = "Flagged vehicle detected: {$newPlates}";
+            } else {
+                $message = "{$newCount} new flagged vehicles detected. Total: {$totalCount}";
+            }
+
+            // Dispatch toast notification
+            $this->dispatch('toast', type: 'warning', message: $message);
+
+            // Mark these as alerted
+            $this->alertedFlaggedIds = $flaggedRecords->pluck('id')->toArray();
+        }
+    }
+
+    /**
      * Render the component
      */
     public function render()
     {
+        // Check for flagged records on each poll/render
+        $this->checkFlaggedRecords();
+
         return view('livewire.anpr.recent-vehicles-table', [
             'records' => $this->records,
         ]);

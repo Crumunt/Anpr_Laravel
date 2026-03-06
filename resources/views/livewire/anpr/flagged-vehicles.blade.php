@@ -10,7 +10,7 @@
                 <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Total</span>
             </div>
             <p class="text-3xl font-bold text-gray-900 mb-1">{{ number_format($stats['total_flagged']) }}</p>
-            <p class="text-sm text-gray-600 font-medium">Active Flags</p>
+            <p class="text-sm text-gray-600 font-medium">Total Flags</p>
         </div>
 
         {{-- High Priority --}}
@@ -103,7 +103,7 @@
                 </select>
 
                 {{-- Clear Filters --}}
-                @if($search || $priorityFilter !== 'all' || $statusFilter !== 'active' || $dateRange !== '7days')
+                @if($search || $priorityFilter !== 'all' || $statusFilter !== 'all' || $dateRange !== 'all')
                     <button
                         wire:click="clearFilters"
                         class="px-3 py-2.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
@@ -132,14 +132,6 @@
                 >
                     <i class="fas fa-plus mr-2"></i>
                     Flag Vehicle
-                </button>
-
-                <button
-                    wire:click="exportRecords"
-                    class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                    <i class="fas fa-download mr-2"></i>
-                    Export
                 </button>
             </div>
         </div>

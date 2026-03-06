@@ -269,6 +269,7 @@ class AccountSettings extends Component
             'admin_viewer' => 'Administrator (Viewer)',
             'encoder' => 'Encoder',
             'security' => 'Security Personnel',
+            'security_admin' => 'Security Administrator',
             'maintenance' => 'Maintenance Staff',
             'applicant' => 'Applicant',
         ];

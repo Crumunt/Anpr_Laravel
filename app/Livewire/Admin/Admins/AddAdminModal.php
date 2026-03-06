@@ -61,8 +61,9 @@ class AddAdminModal extends Component
 
     public function loadRoles(): void
     {
-        // Get admin roles (exclude 'applicant' role)
-        $this->availableRoles = Role::whereNotIn('name', ['applicant'])
+        // Get admin roles (exclude 'applicant' and 'security' roles)
+        // Security accounts are managed by security_admin in the ANPR module
+        $this->availableRoles = Role::whereNotIn('name', ['applicant', 'security'])
             ->pluck('name')
             ->map(fn($role) => [
                 'value' => $role,

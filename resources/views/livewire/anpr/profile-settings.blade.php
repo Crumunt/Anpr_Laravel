@@ -16,7 +16,7 @@
                             <p class="text-sm font-semibold text-gray-900 truncate">{{ $displayName }}</p>
                             <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
                             <span class="inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Security Personnel
+                                {{ $user->hasRole('security_admin') ? 'Security Admin' : 'Security Personnel' }}
                             </span>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Role</label>
-                            <p class="text-sm text-gray-900">Security Personnel</p>
+                            <p class="text-sm text-gray-900">{{ $user->hasRole('security_admin') ? 'Security Administrator' : 'Security Personnel' }}</p>
                         </div>
                     </div>
                     @endif

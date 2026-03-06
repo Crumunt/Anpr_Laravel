@@ -63,7 +63,9 @@ class EditAdminModal extends Component
 
     public function loadRoles(): void
     {
-        $this->availableRoles = Role::whereNotIn('name', ['applicant'])
+        // Exclude 'applicant' and 'security' roles
+        // Security accounts are managed by security_admin in the ANPR module
+        $this->availableRoles = Role::whereNotIn('name', ['applicant', 'security'])
             ->pluck('name')
             ->map(fn($role) => [
                 'value' => $role,
