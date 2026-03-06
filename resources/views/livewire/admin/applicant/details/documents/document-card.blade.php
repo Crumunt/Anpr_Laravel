@@ -16,7 +16,7 @@
             <!-- First 5 Applications Accordion -->
             <div class="space-y-3" x-data="{ openApplication: null }">
                 @foreach(array_slice($applications, 0, 5) as $index => $application)
-                <livewire:admin.applicant.details.documents.document-accordion wire:key="$application['application_id']" :index="$index" :application="$application" :application_id="$application['application_id']" />
+                <livewire:admin.applicant.details.documents.document-accordion wire:key="{{ $application['application_id'] }}" :index="$index" :application="$application" :application_id="$application['application_id']" />
                 @endforeach
             </div>
 

@@ -1,6 +1,5 @@
 <x-details.layout title="Applicant Details" type="applicant">
     @php
-        $applicationHeaders = ['ID', 'Applicant Type', 'Status', 'Date Applied'];
         $rfidRows = [];
 
         $vehicleHeaders = ['Plate Number', 'Make & Model', 'Year', 'Registration Date'];
@@ -46,9 +45,6 @@
 
         <!-- Address Information Card -->
         <livewire:admin.applicant.details.info-card modelName="User" cardTitle="Address Information" :canEdit="$canEditApplicants" :userId="$applicant_details['id']" context="address" />
-
-
-        <livewire:admin.applicant.details.info-table :tableId="'application-table'" wire:key="'application-table'" cardTitle="Applications Submitted" :canCreate="$canEditApplicants" :canApprove="$canApprove" :canDelete="$canDelete" :headers="$applicationHeaders" :rows="$application_details" :userId="$applicant_details['id']" />
 
         <livewire:admin.applicant.details.info-table :tableId="'vehicles-table'" wire:key="'vehicles-table'" cardTitle="Registered Vehicles" :canCreate="$canEditApplicants" :canApprove="$canApprove" :canDelete="$canDelete" :headers="$vehicleDataHeaders" :rows="$vehicle_details" :userId="$applicant_details['id']" type="vehicle"/>
 

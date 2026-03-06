@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Admin\Applicant\Details\Documents;
 
+use App\Models\Application;
 use App\Models\Documents;
 use App\Models\Status;
+use App\Services\ActivityLogService;
 use Dom\Document;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Js;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -51,7 +54,7 @@ class DocumentViewer extends Component
         }
 
         try {
-            $document = Documents::findOrFail($docId);
+            $document = Documents::with('application.user')->findOrFail($docId);
 
             $document->status_id = $approved_status->id;
 
@@ -59,16 +62,50 @@ class DocumentViewer extends Component
 
             $document->save();
 
+            // Log the document approval activity
+            $documentType = $this->currentDocument['name'] ?? $document->type ?? 'Document';
+            $applicant = $document->application->user;
+            ActivityLogService::logDocumentApproved($applicant, $documentType, Auth::user());
+
+            // Check if all documents for this application are approved, then auto-approve the application
+            $this->checkAndAutoApproveApplication($application_id, $approved_status->id);
+
             // Dispatch an event to update the parent list
             $this->dispatch('documentUpdated', applicationId: $application_id);
         } catch (\Throwable $th) {
-            dd(true);
             throw $th;
         }
 
 
         // Close and reset the component state
         $this->closeAndClear();
+    }
+
+    /**
+     * Check if all documents for an application are approved and auto-approve the application
+     */
+    protected function checkAndAutoApproveApplication($applicationId, $approvedStatusId)
+    {
+        $application = Application::with(['documents', 'user'])->find($applicationId);
+
+        if (!$application) {
+            return;
+        }
+
+        // Check if all documents are approved
+        $allDocumentsApproved = $application->documents->every(function ($doc) use ($approvedStatusId) {
+            return $doc->status_id === $approvedStatusId;
+        });
+
+        // If all documents are approved, approve the application
+        if ($allDocumentsApproved && $application->documents->count() > 0) {
+            $application->status_id = $approvedStatusId;
+            $application->approved_by = Auth::id();
+            $application->save();
+
+            // Log the application auto-approval
+            ActivityLogService::logApplicationAutoApproved($application->user, Auth::user());
+        }
     }
 
     public function rejectDocument()
@@ -84,7 +121,7 @@ class DocumentViewer extends Component
         }
 
         try {
-            $document = Documents::findOrFail($docId);
+            $document = Documents::with('application.user')->findOrFail($docId);
 
             $document->status_id = $rejected_status->id;
 
@@ -92,19 +129,91 @@ class DocumentViewer extends Component
 
             $document->save();
 
+            // Log the document rejection activity
+            $documentType = $this->currentDocument['name'] ?? $document->type ?? 'Document';
+            $applicant = $document->application->user;
+            ActivityLogService::logDocumentRejected($applicant, $documentType, Auth::user());
 
-            // Close and reset the component state
-            $this->closeAndClear();
-
+            // Update application status to rejected when a document is rejected
+            $this->updateApplicationStatusOnRejection($application_id, $rejected_status->id);
 
             // Dispatch an event to update the parent list
             $this->dispatch('documentUpdated', applicationId: $application_id);
+
+            // Close and reset the component state
+            $this->closeAndClear();
         } catch (\Throwable $th) {
             throw $th;
         }
     }
 
-    // ... other action methods (rejectDocument, markAsPending) ...
+    /**
+     * Update application status when a document is rejected
+     */
+    protected function updateApplicationStatusOnRejection($applicationId, $rejectedStatusId)
+    {
+        $application = Application::with('user')->find($applicationId);
+
+        if (!$application) {
+            return;
+        }
+
+        // Set application to rejected status when any document is rejected
+        $application->status_id = $rejectedStatusId;
+        $application->save();
+    }
+
+    /**
+     * Mark document as pending (under review)
+     */
+    public function markAsPending()
+    {
+        $pending_status = Status::select('id')->where('code', 'under_review')->first();
+
+        $docId = $this->currentDocument['document_id'];
+
+        if (!$docId) {
+            $this->dispatch('documentUpdated', id: $docId, message: 'Something went wrong', type: 'error');
+            return;
+        }
+
+        try {
+            $document = Documents::with('application.user')->findOrFail($docId);
+
+            $document->status_id = $pending_status->id;
+
+            $application_id = $document->application_id;
+
+            $document->save();
+
+            // Update application status to under_review when a document is marked as pending
+            $this->updateApplicationStatusToPending($application_id, $pending_status->id);
+
+            // Dispatch an event to update the parent list
+            $this->dispatch('documentUpdated', applicationId: $application_id);
+
+            // Close and reset the component state
+            $this->closeAndClear();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     * Update application status when a document is marked as pending
+     */
+    protected function updateApplicationStatusToPending($applicationId, $pendingStatusId)
+    {
+        $application = Application::find($applicationId);
+
+        if (!$application) {
+            return;
+        }
+
+        // Set application to pending/under_review status
+        $application->status_id = $pendingStatusId;
+        $application->save();
+    }
 
     public function closeAndClear()
     {

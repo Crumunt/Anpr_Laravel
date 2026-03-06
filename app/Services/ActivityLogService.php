@@ -211,6 +211,51 @@ class ActivityLogService
     }
 
     /**
+     * Log document approved by admin
+     */
+    public static function logDocumentApproved(User $applicant, string $documentType, ?User $causer = null): Activity
+    {
+        $causerName = $causer?->details?->full_name ?? $causer?->email ?? 'Admin';
+        return self::log(
+            $applicant,
+            "Document <strong>{$documentType}</strong> approved by <strong>{$causerName}</strong>",
+            'approval',
+            $causer,
+            ['document_type' => $documentType, 'action' => 'approved']
+        );
+    }
+
+    /**
+     * Log document rejected by admin
+     */
+    public static function logDocumentRejected(User $applicant, string $documentType, ?User $causer = null): Activity
+    {
+        $causerName = $causer?->details?->full_name ?? $causer?->email ?? 'Admin';
+        return self::log(
+            $applicant,
+            "Document <strong>{$documentType}</strong> rejected by <strong>{$causerName}</strong>",
+            'rejection',
+            $causer,
+            ['document_type' => $documentType, 'action' => 'rejected']
+        );
+    }
+
+    /**
+     * Log application auto-approved when all documents are approved
+     */
+    public static function logApplicationAutoApproved(User $applicant, ?User $causer = null): Activity
+    {
+        $causerName = $causer?->details?->full_name ?? $causer?->email ?? 'Admin';
+        return self::log(
+            $applicant,
+            "Application automatically approved after all documents verified by <strong>{$causerName}</strong>",
+            'approval',
+            $causer,
+            ['action' => 'auto_approved']
+        );
+    }
+
+    /**
      * Log vehicle registered
      */
     public static function logVehicleRegistered(User $user, string $plateNumber): Activity

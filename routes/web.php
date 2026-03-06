@@ -101,6 +101,7 @@ Route::prefix('anpr')->name('anpr.')->middleware(['auth', 'security'])->group(fu
     Route::get('/flagged-vehicles', [AnprFlaggedController::class, 'index'])->name('flagged-vehicles');
 
     Route::get('/analytics', [AnprAnalyticsController::class, 'index'])->name('analytics');
+    Route::get('/analytics/download-report', [AnprAnalyticsController::class, 'downloadReport'])->name('analytics.download-report');
 
     Route::get('/profile', \App\Livewire\ANPR\ProfileSettings::class)->name('profile');
 

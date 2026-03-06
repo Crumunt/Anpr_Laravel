@@ -15,9 +15,7 @@
       'Other (Please specify)'
     ],
     approveDocument() {
-      // Handle approve action
-      alert('Document approved: ' + this.currentDocument.name);
-      this.show = false;
+      // Handled by wire:click on the button
     },
     rejectDocument() {
       if (!this.selectedRejectionReason) {
@@ -33,13 +31,11 @@
         : this.selectedRejectionReason;
       // Handle reject action
       $wire.rejectDocument();
-      this.show = false;
       this.resetRejectForm();
     },
     markAsPending() {
       // Handle mark as pending action
-      alert('Document marked as pending: ' + this.currentDocument.name);
-      this.show = false;
+      $wire.markAsPending();
     },
     resetRejectForm() {
       this.showRejectDropdown = false;

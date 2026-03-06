@@ -412,7 +412,7 @@
                                     <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-colors {{ ($reportForm['format'] ?? 'csv') === 'csv' ? 'bg-green-50 border-green-500 text-green-700' : 'border-gray-200 hover:bg-gray-50' }}">
                                         <input
                                             type="radio"
-                                            wire:model="reportForm.format"
+                                            wire:model.live="reportForm.format"
                                             value="csv"
                                             class="sr-only"
                                         >
@@ -422,7 +422,7 @@
                                     <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-colors {{ ($reportForm['format'] ?? '') === 'pdf' ? 'bg-green-50 border-green-500 text-green-700' : 'border-gray-200 hover:bg-gray-50' }}">
                                         <input
                                             type="radio"
-                                            wire:model="reportForm.format"
+                                            wire:model.live="reportForm.format"
                                             value="pdf"
                                             class="sr-only"
                                         >
@@ -432,7 +432,7 @@
                                     <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-colors {{ ($reportForm['format'] ?? '') === 'excel' ? 'bg-green-50 border-green-500 text-green-700' : 'border-gray-200 hover:bg-gray-50' }}">
                                         <input
                                             type="radio"
-                                            wire:model="reportForm.format"
+                                            wire:model.live="reportForm.format"
                                             value="excel"
                                             class="sr-only"
                                         >
@@ -464,18 +464,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-6">
-                                <label class="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        wire:model="reportForm.include_images"
-                                        class="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                                    >
-                                    <span class="ml-2 text-sm text-gray-700">Include detection images (PDF only)</span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center justify-end space-x-3">
+                            <div class="flex items-center justify-end space-x-3 mt-6">
                                 <button
                                     type="button"
                                     wire:click="closeReportModal"

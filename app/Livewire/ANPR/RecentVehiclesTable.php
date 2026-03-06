@@ -93,6 +93,20 @@ class RecentVehiclesTable extends Component
     public bool $showEditModal = false;
 
     /**
+     * Show add log modal
+     */
+    public bool $showAddLogModal = false;
+
+    /**
+     * Add log form data
+     */
+    public array $addLogForm = [
+        'plate_number' => '',
+        'gate_name' => '',
+        'direction' => '',
+    ];
+
+    /**
      * Initialize the component
      */
     public function mount(): void
@@ -203,7 +217,7 @@ class RecentVehiclesTable extends Component
 
         return Record::query()
             ->with('gate')
-            ->whereNot('created_at', '>=', now()->subHours($hours))
+            ->where('created_at', '>=', now()->subHours($hours))
             ->when($this->search, fn($q) => $q->searchPlate($this->search))
             ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
             ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
@@ -305,6 +319,67 @@ class RecentVehiclesTable extends Component
 
             $this->closeEditModal();
         }
+    }
+
+    /**
+     * Open the add log modal, prefilling from current filters
+     */
+    public function openAddLogModal(): void
+    {
+        $this->addLogForm = [
+            'plate_number' => '',
+            'gate_name' => $this->gateFilter !== 'all' ? $this->gateFilter : '',
+            'direction' => $this->locationFilter !== 'all' ? $this->locationFilter : '',
+        ];
+        $this->showAddLogModal = true;
+    }
+
+    /**
+     * Close the add log modal
+     */
+    public function closeAddLogModal(): void
+    {
+        $this->showAddLogModal = false;
+        $this->addLogForm = [
+            'plate_number' => '',
+            'gate_name' => '',
+            'direction' => '',
+        ];
+        $this->resetValidation();
+    }
+
+    /**
+     * Save a manual log entry
+     */
+    public function saveManualLog(): void
+    {
+        $this->validate([
+            'addLogForm.plate_number' => 'required|string|max:20',
+            'addLogForm.gate_name' => 'required|string',
+            'addLogForm.direction' => 'required|string|in:Entry,Exit',
+        ]);
+
+        // Find the matching gate by name and location
+        $gate = Gate::where('gate_name', $this->addLogForm['gate_name'])
+            ->where('gate_location', $this->addLogForm['direction'])
+            ->first();
+
+        Record::create([
+            'plate_number' => strtoupper($this->addLogForm['plate_number']),
+            'confidence' => 1.0,
+            'gate_id' => $gate?->id,
+            'gate_type' => $gate?->slug,
+            'location' => $this->addLogForm['direction'],
+            'detected_at' => now(),
+            'is_flagged' => false,
+            'camera_id' => 'MANUAL',
+        ]);
+
+        $this->dispatch('record-updated', [
+            'message' => 'Manual log entry added successfully',
+        ]);
+
+        $this->closeAddLogModal();
     }
 
     /**

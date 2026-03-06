@@ -102,7 +102,6 @@ class Analytics extends Component
         'format' => 'csv',
         'start_date' => null,
         'end_date' => null,
-        'include_images' => false,
     ];
 
     /**
@@ -429,9 +428,9 @@ class Analytics extends Component
     }
 
     /**
-     * Generate report
+     * Generate report — stores params in session and redirects to controller download route
      */
-    public function generateReport(): void
+    public function generateReport()
     {
         $this->validate([
             'reportForm.type' => 'required|in:summary,detailed,flagged',
@@ -440,12 +439,20 @@ class Analytics extends Component
             'reportForm.end_date' => 'required|date|after_or_equal:reportForm.start_date',
         ]);
 
+        // Store report params in session for the download controller
+        session()->put('anpr_report_params', [
+            'type' => $this->reportForm['type'],
+            'format' => $this->reportForm['format'],
+            'start_date' => $this->reportForm['start_date'],
+            'end_date' => $this->reportForm['end_date'],
+            'gate_filter' => $this->gateFilter,
+            'location_filter' => $this->locationFilter,
+        ]);
+
         $this->closeReportModal();
 
-        $this->dispatch('report-generated', [
-            'message' => 'Report generated successfully!',
-            'format' => $this->reportForm['format'],
-        ]);
+        // Use JS to open the download URL in a new tab so the current page stays intact
+        $this->js("window.open('" . route('anpr.analytics.download-report') . "', '_blank')");
     }
 
     /**

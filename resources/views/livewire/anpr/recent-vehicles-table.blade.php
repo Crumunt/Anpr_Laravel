@@ -10,16 +10,29 @@
                         <p class="text-sm text-gray-500">Last 24 hours activity</p>
                     </div>
 
-                    {{-- Clear Filters Button --}}
-                    @if($search || $gateFilter !== 'all' || $locationFilter !== 'all' || $statusFilter !== 'all')
+                    <div class="flex items-center gap-2">
+                        {{-- Add Log Button --}}
                         <button
-                            wire:click="clearFilters"
-                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                            wire:click="openAddLogModal"
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm hover:shadow-md"
+                            style="background-color: #1a5632;"
+                            title="Manually add a vehicle log entry"
                         >
-                            <i class="fas fa-times-circle mr-2"></i>
-                            Clear All Filters
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Add Log
                         </button>
-                    @endif
+
+                        {{-- Clear Filters Button --}}
+                        @if($search || $gateFilter !== 'all' || $locationFilter !== 'all' || $statusFilter !== 'all')
+                            <button
+                                wire:click="clearFilters"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                            >
+                                <i class="fas fa-times-circle mr-2"></i>
+                                Clear All Filters
+                            </button>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- Filters Row --}}
@@ -518,6 +531,118 @@
                                 >
                                     <i class="fas fa-save mr-1"></i>
                                     Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Add Log Modal --}}
+    @if($showAddLogModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="add-log-modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                {{-- Backdrop --}}
+                <div
+                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    wire:click="closeAddLogModal"
+                ></div>
+
+                {{-- Modal Content --}}
+                <div class="relative inline-block bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-6 py-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800" id="add-log-modal-title">
+                                    <i class="fas fa-plus-circle text-green-600 mr-2"></i>
+                                    Add Manual Log
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Manually log a vehicle entry when ANPR cannot capture the plate.
+                                </p>
+                            </div>
+                            <button
+                                wire:click="closeAddLogModal"
+                                class="text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form wire:submit="saveManualLog">
+                            {{-- Plate Number --}}
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Plate Number <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    wire:model="addLogForm.plate_number"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent uppercase"
+                                    placeholder="e.g. ABC 1234"
+                                    autofocus
+                                >
+                                @error('addLogForm.plate_number')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Location (Gate Name) --}}
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Location <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    wire:model="addLogForm.gate_name"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                                >
+                                    <option value="">Select Location</option>
+                                    @foreach($availableGates as $value => $label)
+                                        <option value="{{ $label }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('addLogForm.gate_name')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Direction (Entry/Exit) --}}
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Direction <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    wire:model="addLogForm.direction"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+                                >
+                                    <option value="">Select Direction</option>
+                                    @foreach($availableLocations as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('addLogForm.direction')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Actions --}}
+                            <div class="flex items-center justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    wire:click="closeAddLogModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm hover:shadow-md"
+                                    style="background-color: #1a5632;"
+                                >
+                                    <i class="fas fa-save mr-1"></i>
+                                    Add Log Entry
                                 </button>
                             </div>
                         </form>

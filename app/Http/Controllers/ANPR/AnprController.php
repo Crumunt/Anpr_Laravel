@@ -47,6 +47,7 @@ class AnprController extends Controller
         try {
             // Process each detection
             $savedDetections = [];
+            $skippedDuplicates = [];
 
             foreach ($validated['detections'] as $detection) {
                 // Skip unreadable plates
@@ -55,6 +56,17 @@ class AnprController extends Controller
                 }
 
                 $plateNumber = $detection['plate_text'];
+
+                // Check for duplicate detection in the last 2-5 minutes to avoid duplicates
+                // (e.g., when a vehicle is stopped at the gate for questioning)
+                $recentRecord = Record::where('plate_number', $plateNumber)
+                    ->where('detected_at', '>=', now()->subMinutes(5))
+                    ->first();
+
+                if ($recentRecord) {
+                    $skippedDuplicates[] = $plateNumber;
+                    continue;
+                }
 
                 // Check if this plate has a registered vehicle with a gate pass
                 $registeredVehicle = Vehicle::where('plate_number', $plateNumber)
@@ -83,14 +95,17 @@ class AnprController extends Controller
 
             Log::info('ALPR webhook processed successfully', [
                 'saved_count' => count($savedDetections),
-                'detection_ids' => $savedDetections
+                'detection_ids' => $savedDetections,
+                'skipped_duplicates_count' => count($skippedDuplicates),
+                'skipped_plates' => $skippedDuplicates
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Detections received and saved',
                 'saved_count' => count($savedDetections),
-                'detection_ids' => $savedDetections
+                'detection_ids' => $savedDetections,
+                'skipped_duplicates' => count($skippedDuplicates)
             ], 200);
 
         } catch (\Exception $e) {
