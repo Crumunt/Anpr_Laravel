@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\ApplicantType as ApplicantTypeEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,13 +14,8 @@ class Application extends Model
     protected $keyType = "string";
     public $incrementing = false;
 
-    protected $casts = [
-        "applicant_type" => ApplicantTypeEnum::class,
-    ];
-
     protected $fillable = [
         "user_id",
-        "applicant_type",
         "applicant_type_id",
         "approved_by",
         "status_id",
@@ -60,14 +54,9 @@ class Application extends Model
      */
     public function getApplicantTypeLabelAttribute(): string
     {
-        // Try to get from the new relationship first
+        // Get from the relationship
         if ($this->applicantTypeModel) {
             return $this->applicantTypeModel->label;
-        }
-
-        // Fall back to the old enum value
-        if ($this->applicant_type) {
-            return ucfirst($this->applicant_type->value);
         }
 
         return 'Unknown';

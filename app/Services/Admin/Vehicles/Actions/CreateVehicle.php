@@ -21,14 +21,14 @@ class CreateVehicle
 
             $created = DB::transaction(function () use ($user, $payload, $uploadedTempPaths) {
                 $user_id = $user->id;
-                $applicant_type = $user->applications()->first()->applicant_type;
+                $applicant_type_id = $user->applications()->first()?->applicant_type_id;
                 // Statuses
                 $application_status = Status::applicationPending();
                 $vehicle_status = Status::vehiclePending();
 
                 $application = $user->applications()->create([
                     'user_id' => $user_id,
-                    'applicant_type' => $applicant_type,
+                    'applicant_type_id' => $applicant_type_id,
                     'status_id' => $application_status->id
                 ]);
 

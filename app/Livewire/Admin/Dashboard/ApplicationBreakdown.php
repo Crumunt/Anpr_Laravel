@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Dashboard;
 
-use App\ApplicantType;
+use App\Models\ApplicantType;
 use App\Models\Application;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -31,29 +31,32 @@ class ApplicationBreakdown extends Component
 
     private function getApplicantTypeBreakdown(): array
     {
-        $results = Application::selectRaw('applicant_type, COUNT(*) as count')
-            ->whereNotNull('applicant_type')
-            ->groupBy('applicant_type')
+        $results = Application::selectRaw('applicant_type_id, COUNT(*) as count')
+            ->whereNotNull('applicant_type_id')
+            ->groupBy('applicant_type_id')
+            ->get()
+            ->keyBy('applicant_type_id');
+
+        // Get all active applicant types from the database
+        $allTypes = ApplicantType::where('is_active', true)
+            ->orderBy('sort_order')
             ->get();
 
-        // Initialize all applicant types with 0 count
+        // Build the types array with counts
         $types = [];
-        foreach (ApplicantType::cases() as $type) {
-            $types[$type->value] = 0;
+        foreach ($allTypes as $type) {
+            $types[$type->id] = [
+                'label' => $type->label,
+                'count' => $results->get($type->id)?->count ?? 0,
+            ];
         }
 
-        // Fill in actual counts
-        foreach ($results as $item) {
-            $key = is_object($item->applicant_type) ? $item->applicant_type->value : (string) $item->applicant_type;
-            $types[$key] = $item->count;
-        }
+        $total = collect($types)->sum('count');
 
-        $total = array_sum($types);
-
-        return collect($types)->map(fn($count, $type) => [
-            'type' => Str::headline($type),
-            'count' => $count,
-            'percentage' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+        return collect($types)->map(fn($data) => [
+            'type' => $data['label'],
+            'count' => $data['count'],
+            'percentage' => $total > 0 ? round(($data['count'] / $total) * 100, 1) : 0,
         ])->values()->toArray();
     }
 

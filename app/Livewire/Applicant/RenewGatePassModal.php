@@ -125,7 +125,7 @@ class RenewGatePassModal extends Component
                 // Create a renewal application (for admin review workflow)
                 $application = $user->applications()->create([
                     'user_id' => $user->id,
-                    'applicant_type' => $this->vehicle->application?->applicant_type ?? 'regular',
+                    'applicant_type_id' => $this->vehicle->application?->applicant_type_id,
                     'status_id' => $applicationStatus->id,
                 ]);
 

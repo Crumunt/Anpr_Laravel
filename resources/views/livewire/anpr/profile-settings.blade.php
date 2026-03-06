@@ -98,26 +98,6 @@
                             @endif
                         </div>
                         @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-
-                        <!-- Email Verification Status -->
-                        <div class="mt-3 flex items-center gap-2">
-                            @if($emailVerified)
-                            <span class="inline-flex items-center gap-1 text-sm text-green-600">
-                                <i class="fas fa-check-circle"></i>
-                                Email verified
-                            </span>
-                            @else
-                            <span class="inline-flex items-center gap-1 text-sm text-amber-600">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Email not verified
-                            </span>
-                            <button
-                                wire:click="sendVerificationEmail"
-                                class="text-sm text-green-600 hover:text-green-700 font-medium">
-                                Send verification email
-                            </button>
-                            @endif
-                        </div>
                     </div>
                 </div>
             </div>

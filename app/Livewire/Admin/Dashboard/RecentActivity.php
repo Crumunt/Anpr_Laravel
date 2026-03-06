@@ -48,14 +48,14 @@ class RecentActivity extends Component
 
     private function getRecentApplications(): array
     {
-        return Application::with(['user.details', 'status'])
+        return Application::with(['user.details', 'status', 'applicantTypeModel'])
             ->latest()
             ->take(5)
             ->get()
             ->map(fn($app) => [
                 'id' => $app->id,
                 'applicant_name' => $app->user?->details?->full_name ?? $app->user?->email ?? 'Unknown',
-                'applicant_type' => ucwords($app->applicant_type->value ?? 'N/A'),
+                'applicant_type' => $app->applicantTypeModel?->label ?? 'Unknown',
                 'status' => $app->status?->code ?? 'pending',
                 'status_label' => Str::headline($app->status?->code ?? 'Pending'),
                 'created_at' => $app->created_at->diffForHumans(),

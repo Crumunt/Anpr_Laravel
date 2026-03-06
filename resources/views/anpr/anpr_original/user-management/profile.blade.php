@@ -181,12 +181,6 @@
                         <p class="info-value text-gray-900">{{ $accountStatus['last_activity']->format('M d, Y H:i') }}</p>
                         <p class="text-xs text-gray-500">{{ $accountStatus['last_activity']->diffForHumans() }}</p>
                     </div>
-                    <div class="p-4 border border-gray-100 rounded-xl bg-gray-50">
-                        <p class="info-label text-gray-500 mb-1">Email Verification</p>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $accountStatus['email_verified'] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                            {{ $accountStatus['email_verified'] ? 'Verified' : 'Not Verified' }}
-                        </span>
-                    </div>
                 </div>
             </div>
 
@@ -849,7 +843,7 @@
     function toggleNotification(element) {
         const checkbox = element.previousElementSibling;
         checkbox.checked = !checkbox.checked;
-        
+
         // Update visual state
         if (checkbox.checked) {
             element.classList.remove('bg-gray-300');
@@ -862,46 +856,46 @@
             element.querySelector('span').classList.remove('translate-x-5');
             element.querySelector('span').classList.add('translate-x-0.5');
         }
-        
+
         // Auto-submit settings form
         document.getElementById('settingsForm').submit();
     }
-    
+
     function resetPreferences() {
         if (confirm('Are you sure you want to reset all preferences to default values?')) {
             document.getElementById('preferencesForm').reset();
             document.getElementById('preferencesForm').submit();
         }
     }
-    
+
     // Show success/error messages
     @if(session('success'))
         alert('{{ session('success') }}');
     @endif
-    
+
     @if(session('error'))
         alert('{{ session('error') }}');
     @endif
-    
+
     // Tab switching functionality
     function switchTab(tabName) {
         // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.add('hidden');
         });
-        
+
         // Remove active class from all tabs
         document.querySelectorAll('.tab-button').forEach(button => {
             button.classList.remove('active', 'border-green-600', 'text-green-600');
             button.classList.add('border-transparent', 'text-gray-500');
         });
-        
+
         // Show selected tab content
         const selectedContent = document.getElementById('content-' + tabName);
         if (selectedContent) {
             selectedContent.classList.remove('hidden');
         }
-        
+
         // Add active class to selected tab
         const selectedTab = document.getElementById('tab-' + tabName);
         if (selectedTab) {

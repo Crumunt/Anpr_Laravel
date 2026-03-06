@@ -506,8 +506,8 @@ class InfoTable extends Component
         try {
             DB::transaction(function () use ($user) {
                 // Get applicant type from existing application
-                $applicantType = $user->applications()->first()?->applicant_type ?? 'regular';
-                $applicantTypeId = $this->applicantType?->id ?? null;
+                $applicantTypeId = $user->applications()->first()?->applicant_type_id ?? $this->applicantType?->id;
+                $applicantTypeLabel = $this->applicantType?->label ?? 'Unknown';
 
                 // Get statuses
                 $applicationStatus = Status::applicationPending();
@@ -516,7 +516,6 @@ class InfoTable extends Component
                 // Create application
                 $application = $user->applications()->create([
                     'user_id' => $user->id,
-                    'applicant_type' => $applicantType,
                     'applicant_type_id' => $applicantTypeId,
                     'status_id' => $applicationStatus->id
                 ]);
@@ -561,7 +560,7 @@ class InfoTable extends Component
                 }
 
                 // Log activity
-                ActivityLogService::logApplicationSubmitted($user, $applicantType);
+                ActivityLogService::logApplicationSubmitted($user, $applicantTypeLabel);
             });
 
             $this->resetForm();

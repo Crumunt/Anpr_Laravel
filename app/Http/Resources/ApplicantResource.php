@@ -48,7 +48,7 @@ class ApplicantResource extends JsonResource
     private function getApplicationsData()
     {
         $data = [];
-        $applicant_type = $this->applications->first()?->applicant_type->name;
+        $applicant_type = $this->applications->first()?->applicantTypeModel?->label ?? 'Unknown';
 
         $data["applicant_type"] = [
             "badge_label" => $applicant_type,
@@ -124,7 +124,7 @@ class ApplicantResource extends JsonResource
             ),
             "phone_number" => $this->details?->phone_number ?? "",
             "license_number" => $this->details?->license_number ?? "",
-            "applicant_type" => $this->details?->applicant_type,
+            "applicant_type" => $this->applications->first()?->applicantTypeModel?->label,
         ];
 
         $data["address_information"] = [

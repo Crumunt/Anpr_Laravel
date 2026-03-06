@@ -28,9 +28,6 @@ class ProfileSettings extends Component
     public string $newPassword = '';
     public string $newPasswordConfirmation = '';
 
-    // Account status
-    public bool $emailVerified = false;
-
     // Processing states
     public bool $updatingEmail = false;
     public bool $updatingPassword = false;
@@ -61,7 +58,6 @@ class ProfileSettings extends Component
 
         $this->email = $this->user->email;
         $this->currentEmail = $this->user->email;
-        $this->emailVerified = $this->user->email_verified_at !== null;
 
         // Set display info
         $this->displayName = $this->user->details?->full_name ?? $this->user->email;
@@ -94,13 +90,11 @@ class ProfileSettings extends Component
 
             $this->user->update([
                 'email' => $this->email,
-                'email_verified_at' => null,
             ]);
 
             $this->currentEmail = $this->email;
-            $this->emailVerified = false;
 
-            $this->dispatch('toast', type: 'success', message: 'Email updated successfully. Please verify your new email.');
+            $this->dispatch('toast', type: 'success', message: 'Email updated successfully.');
 
             Log::info('Applicant email updated', [
                 'user_id' => $this->user->id,
@@ -115,25 +109,6 @@ class ProfileSettings extends Component
             ]);
         } finally {
             $this->updatingEmail = false;
-        }
-    }
-
-    /**
-     * Send email verification link
-     */
-    public function sendVerificationEmail(): void
-    {
-        if ($this->emailVerified) {
-            $this->dispatch('toast', type: 'info', message: 'Email is already verified.');
-            return;
-        }
-
-        try {
-            $this->user->sendEmailVerificationNotification();
-            $this->dispatch('toast', type: 'success', message: 'Verification email sent.');
-        } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', message: 'Failed to send verification email.');
-            Log::error('Verification email failed', ['error' => $e->getMessage()]);
         }
     }
 

@@ -137,43 +137,6 @@
                             </p>
                         @enderror
 
-                        <!-- Email Verification Status -->
-                        <div class="mt-4 p-4 rounded-xl border {{ $emailVerified ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200' }}">
-                            <div class="flex items-center gap-3">
-                                @if($emailVerified)
-                                    <div class="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-check-circle text-emerald-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-emerald-900">Email Verified</p>
-                                        <p class="text-xs text-emerald-700 mt-0.5">Your email address has been verified</p>
-                                    </div>
-                                @else
-                                    <div class="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-exclamation-triangle text-amber-600"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-semibold text-amber-900">Email Not Verified</p>
-                                        <p class="text-xs text-amber-700 mt-0.5 mb-2">Please verify your email address to ensure you receive important notifications</p>
-                                        <button
-                                            wire:click="sendVerificationEmail"
-                                            wire:loading.attr="disabled"
-                                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-emerald-700 bg-emerald-100 rounded-lg hover:bg-emerald-200 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                                            <span wire:loading.remove wire:target="sendVerificationEmail">
-                                                <i class="fas fa-paper-plane mr-1"></i>Send Verification Email
-                                            </span>
-                                            <span wire:loading wire:target="sendVerificationEmail" class="flex items-center gap-2">
-                                                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Sending...
-                                            </span>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

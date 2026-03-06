@@ -29,9 +29,6 @@ class AccountSettings extends Component
     public string $newPassword = '';
     public string $newPasswordConfirmation = '';
 
-    // Account status
-    public bool $emailVerified = false;
-
     // Processing states
     public bool $updatingEmail = false;
     public bool $updatingPassword = false;
@@ -67,7 +64,6 @@ class AccountSettings extends Component
 
         $this->email = $this->user->email;
         $this->currentEmail = $this->user->email;
-        $this->emailVerified = $this->user->email_verified_at !== null;
     }
 
     /**
@@ -94,9 +90,8 @@ class AccountSettings extends Component
             // TEMP: Mock update for testing - just update local state
             $oldEmail = $this->currentEmail;
             $this->currentEmail = $this->email;
-            $this->emailVerified = false;
 
-            $this->dispatch('toast', type: 'success', message: '[TEST MODE] Email updated successfully. Please verify your new email.');
+            $this->dispatch('toast', type: 'success', message: '[TEST MODE] Email updated successfully.');
 
             Log::info('[TEST] User email updated', [
                 'old_email' => $oldEmail,
@@ -108,20 +103,6 @@ class AccountSettings extends Component
         } finally {
             $this->updatingEmail = false;
         }
-    }
-
-    /**
-     * Send email verification link
-     */
-    public function sendVerificationEmail(): void
-    {
-        if ($this->emailVerified) {
-            $this->dispatch('toast', type: 'info', message: 'Email is already verified.');
-            return;
-        }
-
-        // TEMP: Mock verification for testing
-        $this->dispatch('toast', type: 'success', message: '[TEST MODE] Verification email would be sent.');
     }
 
     /**

@@ -99,7 +99,7 @@ class AddVehicleModal extends Component
 
             $created = DB::transaction(function () use ($user) {
                 $user_id = $user->id;
-                $applicant_type = $user->applications()->first()?->applicant_type ?? 'regular';
+                $applicant_type_id = $user->applications()->first()?->applicant_type_id;
 
                 // Get statuses
                 $application_status = Status::applicationPending();
@@ -108,7 +108,7 @@ class AddVehicleModal extends Component
                 // Create application
                 $application = $user->applications()->create([
                     'user_id' => $user_id,
-                    'applicant_type' => $applicant_type,
+                    'applicant_type_id' => $applicant_type_id,
                     'status_id' => $application_status->id
                 ]);
 

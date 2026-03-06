@@ -21,7 +21,7 @@ class ApplicationDetailsResource extends JsonResource
         return [
             "application_id" => $this->id,
             "application_number" => $this->createApplicationNumber(),
-            "applicant_type" => ucfirst($this->applicant_type->value),
+            "applicant_type" => $this->applicant_type_label,
             "status" => $this->status->status_name,
             // expiry calculation to be added
             "expiry_date" => $this->created_at->format("F d, Y"),

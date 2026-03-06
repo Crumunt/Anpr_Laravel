@@ -46,14 +46,14 @@ class SaveApplicationService
                     "barangay" => $payload["selectedBarangay"],
                     "zip_code" => $payload["zip_code"],
                     "phone_number" => $payload["phone"],
-                    "clsu_id" => $payload["clsu_id"],
-                    "college_unit_department" => $payload["department"],
+                    "clsu_id" => $payload["clsu_id"] ?? null,
+                    "college_unit_department" => $payload["department"] ?? null,
                     "position" => $payload["position"] ?? null,
                 ]);
 
                 $application = $applicant->applications()->create([
                     "license_number" => $payload["license_number"] ?? null,
-                    "applicant_type" => $payload["applicant_type"],
+                    "applicant_type_id" => $payload["applicant_type"],
                     "status_id" => $application_status->id,
                 ]);
 

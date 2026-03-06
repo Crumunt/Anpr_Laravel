@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\ApplicantType;
 use App\Helpers\ApplicationDisplayHelper;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +15,6 @@ class UserDetails extends Model
     protected $primaryKey = "user_id";
     protected $keyType = "string";
 
-    protected $casts = [
-        "applicant_type" => ApplicantType::class,
-    ];
     protected $fillable = [
         "user_id",
         "clsu_id",
