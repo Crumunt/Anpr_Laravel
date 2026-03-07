@@ -1,11 +1,17 @@
 <div>
-    <!-- Modal -->
+    <!-- Modal - Teleported to body for proper z-index stacking -->
     @if($showModal)
-    <div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/50">
-        <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl">
+    @teleport('body')
+    <div class="fixed inset-0 z-[9999] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
 
-            <!-- Fixed Header -->
-            <div class="flex items-center justify-between p-6 border-b">
+        <!-- Modal Content -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl transform transition-all">
+
+                <!-- Fixed Header -->
+                <div class="flex items-center justify-between p-6 border-b">
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900">Edit Admin</h2>
                     <p class="text-sm text-gray-500 mt-1">Update administrator account details</p>
@@ -270,7 +276,9 @@
                     </button>
                 </div>
             </form>
+            </div>
         </div>
     </div>
+    @endteleport
     @endif
 </div>

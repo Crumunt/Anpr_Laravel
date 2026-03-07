@@ -381,6 +381,16 @@
                                                 </div>
                                             </label>
                                         </div>
+                                        <!-- Loading Spinner -->
+                                        <div wire:loading wire:target="files.{{ $document->name }}" class="mt-3">
+                                            <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <span class="text-sm font-medium text-blue-700">Uploading {{ $document->label }}...</span>
+                                            </div>
+                                        </div>
                                         @error("files.{$document->name}.*") <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                         @if(isset($files[$document->name]) && is_array($files[$document->name]))
                                         @foreach($files[$document->name] as $uploadedFile)
@@ -506,6 +516,17 @@
                                             </ul>
                                         </div>
                                         @endif
+
+                                        <!-- UBAP Office Verification Notice -->
+                                        <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+                                            <div class="flex">
+                                                <i class="fas fa-building text-cyan-500 mt-0.5 mr-3"></i>
+                                                <div class="text-sm text-cyan-700">
+                                                    <p class="font-medium">Document Verification Required</p>
+                                                    <p>Please bring a <strong>xerox copy</strong> of all submitted documents to the <strong>UBAP Office</strong> for verification.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

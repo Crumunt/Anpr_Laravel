@@ -189,160 +189,83 @@
                                 <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3"></i>
                                 <div class="text-sm text-blue-700">
                                     <p class="font-medium">Required Documents</p>
-                                    <p>Please upload the following documents. Accepted formats: PDF, JPG, JPEG, PNG (max 10MB each)</p>
+                                    <p>Please upload the following documents based on your applicant type.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Vehicle Registration -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-file-alt mr-2 text-emerald-600"></i>
-                                Vehicle Registration (OR/CR) <span class="text-red-500">*</span>
-                            </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-emerald-400 transition-colors @error('files.vehicle_registration.*') border-red-500 @enderror @error('files.vehicle_registration') border-red-500 @enderror">
-                                <input
-                                    type="file"
-                                    wire:model="vehicle_registration"
-                                    multiple
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-                                <p class="mt-2 text-xs text-gray-500">Upload your Official Receipt (OR) and Certificate of Registration (CR)</p>
-                            </div>
-                            <!-- Loading Spinner -->
-                            <div wire:loading wire:target="vehicle_registration" class="mt-3">
-                                <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm font-medium text-blue-700">Uploading vehicle registration...</span>
+                        @forelse($requiredDocuments as $document)
+                            @php
+                                $docName = $document['name'];
+                                $docLabel = $document['label'];
+                                $docDescription = $document['description'] ?? '';
+                                $acceptedFormats = $document['accepted_formats'] ?? 'pdf,jpg,jpeg,png';
+                                $maxFileSize = $document['max_file_size'] ?? 10240;
+                                $isRequired = $document['is_required'] ?? true;
+                                $acceptString = '.' . str_replace(',', ',.', $acceptedFormats);
+                            @endphp
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-file-alt mr-2 text-emerald-600"></i>
+                                    {{ $docLabel }} @if($isRequired)<span class="text-red-500">*</span>@endif
+                                </label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-emerald-400 transition-colors @error('files.'.$docName.'.*') border-red-500 @enderror @error('files.'.$docName) border-red-500 @enderror">
+                                    <input
+                                        type="file"
+                                        wire:model="files.{{ $docName }}"
+                                        multiple
+                                        accept="{{ $acceptString }}"
+                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                                    @if($docDescription)
+                                        <p class="mt-2 text-xs text-gray-500">{{ $docDescription }}</p>
+                                    @endif
+                                    <p class="mt-1 text-xs text-gray-400">Accepted formats: {{ strtoupper($acceptedFormats) }} (max {{ round($maxFileSize / 1024) }}MB)</p>
                                 </div>
-                            </div>
-                            @error('files.vehicle_registration')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @error('files.vehicle_registration.*')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @if(isset($files['vehicle_registration']) && count($files['vehicle_registration']) > 0)
-                                <div class="mt-2 space-y-1" wire:loading.remove wire:target="vehicle_registration">
-                                    @foreach($files['vehicle_registration'] as $index => $file)
-                                        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                <!-- Loading Spinner -->
+                                <div wire:loading wire:target="files.{{ $docName }}" class="mt-3">
+                                    <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-blue-700">Uploading {{ $docLabel }}...</span>
+                                    </div>
+                                </div>
+                                @error('files.'.$docName)
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                                @error('files.'.$docName.'.*')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                                @if(isset($files[$docName]) && count($files[$docName]) > 0)
+                                    <div class="mt-2 space-y-1" wire:loading.remove wire:target="files.{{ $docName }}">
+                                        @foreach($files[$docName] as $index => $file)
+                                            <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                                </div>
+                                                <button type="button" wire:click="removeFile('{{ $docName }}', {{ $index }})" class="text-red-500 hover:text-red-700">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
-                                            <button type="button" wire:click="removeFile('vehicle_registration', {{ $index }})" class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Driver's License -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-id-card mr-2 text-emerald-600"></i>
-                                Driver's License <span class="text-red-500">*</span>
-                            </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-emerald-400 transition-colors @error('files.license.*') border-red-500 @enderror @error('files.license') border-red-500 @enderror">
-                                <input
-                                    type="file"
-                                    wire:model="license"
-                                    multiple
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-                                <p class="mt-2 text-xs text-gray-500">Upload a clear copy of your valid driver's license (front and back)</p>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
-                            <!-- Loading Spinner -->
-                            <div wire:loading wire:target="license" class="mt-3">
-                                <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm font-medium text-blue-700">Uploading driver's license...</span>
+                        @empty
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <div class="flex">
+                                    <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 mr-3"></i>
+                                    <div class="text-sm text-amber-700">
+                                        <p class="font-medium">No Documents Required</p>
+                                        <p>No documents are required for your applicant type. You may proceed to the next step.</p>
+                                    </div>
                                 </div>
                             </div>
-                            @error('files.license')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @error('files.license.*')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @if(isset($files['license']) && count($files['license']) > 0)
-                                <div class="mt-2 space-y-1" wire:loading.remove wire:target="license">
-                                    @foreach($files['license'] as $index => $file)
-                                        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
-                                            </div>
-                                            <button type="button" wire:click="removeFile('license', {{ $index }})" class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Proof of Identification -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-user-check mr-2 text-emerald-600"></i>
-                                Proof of Identification <span class="text-red-500">*</span>
-                            </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-emerald-400 transition-colors @error('files.proof_of_identification.*') border-red-500 @enderror @error('files.proof_of_identification') border-red-500 @enderror">
-                                <input
-                                    type="file"
-                                    wire:model="proof_of_identification"
-                                    multiple
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-                                <p class="mt-2 text-xs text-gray-500">Upload a valid government ID (CLSU ID, School ID, etc.)</p>
-                            </div>
-                            <!-- Loading Spinner -->
-                            <div wire:loading wire:target="proof_of_identification" class="mt-3">
-                                <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span class="text-sm font-medium text-blue-700">Uploading proof of identification...</span>
-                                </div>
-                            </div>
-                            @error('files.proof_of_identification')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @error('files.proof_of_identification.*')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                            @if(isset($files['proof_of_identification']) && count($files['proof_of_identification']) > 0)
-                                <div class="mt-2 space-y-1" wire:loading.remove wire:target="proof_of_identification">
-                                    @foreach($files['proof_of_identification'] as $index => $file)
-                                        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
-                                            </div>
-                                            <button type="button" wire:click="removeFile('proof_of_identification', {{ $index }})" class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+                        @endforelse
                     </div>
                     @endif
 
@@ -402,33 +325,22 @@
                                 Uploaded Documents
                             </h4>
                             <ul class="space-y-2">
-                                @if(isset($files['vehicle_registration']) && count($files['vehicle_registration']) > 0)
-                                <li class="flex items-center text-sm">
-                                    <svg class="h-4 w-4 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="font-medium text-gray-700">Vehicle Registration:</span>
-                                    <span class="text-gray-600 ml-1">{{ count($files['vehicle_registration']) }} file(s)</span>
-                                </li>
-                                @endif
-                                @if(isset($files['license']) && count($files['license']) > 0)
-                                <li class="flex items-center text-sm">
-                                    <svg class="h-4 w-4 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="font-medium text-gray-700">Driver's License:</span>
-                                    <span class="text-gray-600 ml-1">{{ count($files['license']) }} file(s)</span>
-                                </li>
-                                @endif
-                                @if(isset($files['proof_of_identification']) && count($files['proof_of_identification']) > 0)
-                                <li class="flex items-center text-sm">
-                                    <svg class="h-4 w-4 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="font-medium text-gray-700">Proof of ID:</span>
-                                    <span class="text-gray-600 ml-1">{{ count($files['proof_of_identification']) }} file(s)</span>
-                                </li>
-                                @endif
+                                @foreach($requiredDocuments as $document)
+                                    @php
+                                        $docName = $document['name'];
+                                        $docLabel = $document['label'];
+                                        $fileCount = isset($files[$docName]) ? count($files[$docName]) : 0;
+                                    @endphp
+                                    @if($fileCount > 0)
+                                    <li class="flex items-center text-sm">
+                                        <svg class="h-4 w-4 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span class="font-medium text-gray-700">{{ $docLabel }}:</span>
+                                        <span class="text-gray-600 ml-1">{{ $fileCount }} file(s)</span>
+                                    </li>
+                                    @endif
+                                @endforeach
                             </ul>
                         </div>
 
@@ -439,6 +351,17 @@
                                 <div class="text-sm text-amber-700">
                                     <p class="font-medium">Important Notice</p>
                                     <p>By submitting this application, you confirm that all information provided is accurate and the documents are authentic. False information may result in rejection of your application.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UBAP Office Verification Notice -->
+                        <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+                            <div class="flex">
+                                <i class="fas fa-building text-cyan-500 mt-0.5 mr-3"></i>
+                                <div class="text-sm text-cyan-700">
+                                    <p class="font-medium">Document Verification Required</p>
+                                    <p>Please bring a <strong>xerox copy</strong> of all submitted documents to the <strong>UBAP Office</strong> for verification.</p>
                                 </div>
                             </div>
                         </div>
@@ -454,7 +377,7 @@
                                     type="button"
                                     wire:click="prevStep"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                    <i class="fas fa-arrow-left"></i> 
+                                    <i class="fas fa-arrow-left"></i>
                                     <span>Back</span>
                                 </button>
                             @endif

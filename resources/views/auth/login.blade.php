@@ -33,7 +33,7 @@
     .btn-primary:hover {
         background: linear-gradient(135deg, var(--clsu-dark-green) 0%, var(--clsu-green) 100%);
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 99, 0, 0.3);
+        box-shadow: 0 5px 5px rgba(0, 99, 0, 0.3);
     }
 
     .input-field {
@@ -217,7 +217,7 @@
                 <!-- Apply for Gate Pass Button -->
                 <a
                     href="{{ route('gate-pass.apply') }}"
-                    class="w-full flex items-center justify-center py-3 px-4 border-2 border-[#006300] rounded-lg text-[#006300] font-medium hover:bg-[#006300] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#006300]"
+                    class="w-full flex items-center justify-center py-3 px-4 border-2 border-[#006300] rounded-lg text-[#006300] font-medium hover:bg-[#006300] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#006300]"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

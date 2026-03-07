@@ -308,6 +308,17 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- UBAP Office Verification Notice -->
+                            <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+                                <div class="flex">
+                                    <i class="fas fa-building text-cyan-500 mt-0.5 mr-3"></i>
+                                    <div class="text-sm text-cyan-700">
+                                        <p class="font-medium">Document Verification Required</p>
+                                        <p>Please bring a <strong>xerox copy</strong> of all submitted documents to the <strong>UBAP Office</strong> for verification.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         @endif
                     </div>

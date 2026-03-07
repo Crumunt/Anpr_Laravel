@@ -2,28 +2,58 @@
 
 namespace App\Livewire\Applicant;
 
+use App\Models\ApplicantType;
 use App\Models\Status;
 use App\Models\User;
 use App\Rules\UniquePlateNumber;
-use App\Traits\HasVehicleDetails;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class AddVehicleModal extends Component
 {
-    use HasVehicleDetails;
+    use WithFileUploads;
 
     public bool $showModal = false;
     public int $currentStep = 1;
     public int $totalSteps = 3;
 
+    // Vehicle details
+    public $vehicle_type, $make, $model, $color, $year, $plate_number;
+
+    // Dynamic files array
+    public $files = [];
+
+    // Required documents for the applicant type (loaded dynamically)
+    public $requiredDocuments = [];
+
+    public function mount()
+    {
+        $this->loadRequiredDocuments();
+    }
+
+    /**
+     * Load required documents based on the user's applicant type.
+     */
+    public function loadRequiredDocuments()
+    {
+        $user = Auth::user();
+        $applicantTypeId = $user->applications()->first()?->applicant_type_id;
+
+        if ($applicantTypeId) {
+            $applicantType = ApplicantType::with('requiredDocuments')->find($applicantTypeId);
+            $this->requiredDocuments = $applicantType?->requiredDocuments?->toArray() ?? [];
+        }
+    }
+
     #[On('openAddVehicleModal')]
     public function openModal()
     {
         $this->resetForm();
+        $this->loadRequiredDocuments();
         $this->showModal = true;
     }
 
@@ -31,6 +61,31 @@ class AddVehicleModal extends Component
     {
         $this->showModal = false;
         $this->resetForm();
+    }
+
+    /**
+     * Build dynamic validation rules for documents based on applicant type.
+     */
+    protected function getDocumentValidationRules(): array
+    {
+        $rules = [];
+
+        foreach ($this->requiredDocuments as $document) {
+            $docName = $document['name'];
+            $mimes = $document['accepted_formats'] ?? 'pdf,jpg,jpeg,png';
+            $maxSize = $document['max_file_size'] ?? 10240;
+            $isRequired = $document['is_required'] ?? true;
+
+            if ($isRequired) {
+                $rules["files.{$docName}"] = "required|array|min:1";
+            } else {
+                $rules["files.{$docName}"] = "nullable|array";
+            }
+
+            $rules["files.{$docName}.*"] = "file|mimes:{$mimes}|max:{$maxSize}";
+        }
+
+        return $rules;
     }
 
     public function nextStep()
@@ -44,14 +99,7 @@ class AddVehicleModal extends Component
                 "year" => "required|integer|min:1900|max:" . (date('Y') + 1),
                 "plate_number" => ["required", "string", "max:20", new UniquePlateNumber()],
             ],
-            2 => [
-                "files.vehicle_registration" => "required|array|min:1",
-                "files.vehicle_registration.*" => "file|mimes:pdf,jpg,jpeg,png|max:10240",
-                "files.license" => "required|array|min:1",
-                "files.license.*" => "file|mimes:pdf,jpg,jpeg,png|max:10240",
-                "files.proof_of_identification" => "required|array|min:1",
-                "files.proof_of_identification.*" => "file|mimes:pdf,jpg,jpeg,png|max:10240",
-            ],
+            2 => $this->getDocumentValidationRules(),
             default => []
         };
 
@@ -75,13 +123,19 @@ class AddVehicleModal extends Component
             "year",
             "plate_number",
             "files",
-            "vehicle_registration",
-            "license",
-            "proof_of_identification",
             "currentStep"
         ]);
         $this->currentStep = 1;
         $this->resetValidation();
+    }
+
+    /**
+     * Handle dynamic file uploads for any document type.
+     */
+    public function updatedFiles($value, $key)
+    {
+        // The $key will be the document name (e.g., 'vehicle_registration')
+        // Files are automatically bound to $this->files[$key]
     }
 
     public function removeFile($type, $index)
