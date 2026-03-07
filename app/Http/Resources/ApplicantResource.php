@@ -26,13 +26,13 @@ class ApplicantResource extends JsonResource
         return [
             "id" => $this->id,
             "email" => $this->email,
-            "submitted_date" => $this->created_at->format("F d, Y"),
+            "date_created" => $this->created_at->format("F d, Y"),
             "archived_date" => $this->deleted_at ? $this->deleted_at->format("F d, Y") : null,
 
             ...$this->relationLoaded("details") && $this->context !== "detail"
                 ? [
                     "name" => $this->details?->full_name,
-                    "clsu_id" => $this->details?->clsu_id ?? "-",
+                    "clsu_id" => $this->details?->clsu_id ?? 'applicant-' . substr($this->id, 0, 8),
                     "phone_number" => $this->phone_number,
                 ]
                 : [],

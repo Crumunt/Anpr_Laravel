@@ -20,6 +20,7 @@ class ApplicantReadService
         // SELECTING ONLY REQUIRED DATA FOR SPEED
         return User::select(['id', 'email', 'created_at'])
             ->applicant()
+            ->with(['details', 'applications.applicantTypeModel'])
             ->withApplicationCounts()
             ->when($filters['status'] ?? null, fn($q) => $q->withStatusCode($filters['status']))
             ->when($filters['search'] ?? null, fn($q) => $q->searchTerm($filters['search']))
@@ -36,6 +37,7 @@ class ApplicantReadService
         // SELECTING ONLY REQUIRED DATA FOR SPEED - for archived applicants
         return User::select(['id', 'email', 'created_at', 'deleted_at'])
             ->archived()
+            ->with(['details', 'applications.applicantTypeModel'])
             ->withApplicationCounts()
             ->when($filters['search'] ?? null, fn($q) => $q->searchTerm($filters['search']))
             ->when($filters['applicant_types'] ?? null, fn($q) => $q->applicantType($filters['applicant_types']))

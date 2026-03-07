@@ -85,8 +85,8 @@ class ApplicationDisplayHelper
                         "width" => "120px",
                     ],
                     [
-                        "key" => "submitted_date",
-                        "label" => "Submitted Date",
+                        "key" => "date_created",
+                        "label" => "Date Created",
                         "width" => "150px",
                     ],
                 ],

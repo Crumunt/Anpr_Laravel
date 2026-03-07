@@ -54,7 +54,7 @@
         <!-- Status Card -->
         {{-- <x-details.parts.status-card status="status"
             statusClass="false"
-            applicationDate="{{ $applicant_details['submitted_date'] }}" approvalDate="Jan 15, 2023"
+            applicationDate="{{ $applicant_details['date_created'] }}" approvalDate="Jan 15, 2023"
             approvedBy="Admin User" /> --}}
 
         <!-- Documents Card -->
