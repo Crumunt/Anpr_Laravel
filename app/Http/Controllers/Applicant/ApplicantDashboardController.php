@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Applicant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Documents;
+use App\Models\Status;
 use Illuminate\Http\Request;
 
 class ApplicantDashboardController extends Controller
@@ -19,6 +21,18 @@ class ApplicantDashboardController extends Controller
 
         // Load relationships
         $user->load(['details', 'vehicles.status']);
+
+        // Get rejected documents count
+        $rejectedStatus = Status::where('code', 'rejected')->first();
+        $rejectedDocumentsCount = 0;
+        if ($rejectedStatus) {
+            $rejectedDocumentsCount = Documents::whereHas('application', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+                ->where('status_id', $rejectedStatus->id)
+                ->where('is_current', true)
+                ->count();
+        }
 
         // Calculate statistics
         $vehicles = $user->vehicles;
@@ -41,6 +55,7 @@ class ApplicantDashboardController extends Controller
                 // Only count vehicles that were active but are now expired
                 return $vehicle->status && strtolower($vehicle->status->code ?? '') === 'active' && $vehicle->isExpired();
             })->count(),
+            'rejected_documents' => $rejectedDocumentsCount,
         ];
 
         // Get recent vehicles with expiration info

@@ -5,6 +5,8 @@ namespace App\Livewire\Admin\Applicant\Details\Documents;
 use App\Models\Application;
 use App\Models\Documents;
 use App\Models\Status;
+use App\Notifications\DocumentRejectedNotification;
+use App\Notifications\ApplicationRejectedNotification;
 use App\Services\ActivityLogService;
 use Dom\Document;
 use Illuminate\Support\Facades\Auth;
@@ -95,13 +97,18 @@ class DocumentViewer extends Component
             return;
         }
 
-        // Check if all documents are approved
-        $allDocumentsApproved = $application->documents->every(function ($doc) use ($approvedStatusId) {
+        // Only check current documents (exclude superseded/replaced documents)
+        $currentDocuments = $application->documents->filter(function ($doc) {
+            return $doc->is_current;
+        });
+
+        // Check if all current documents are approved
+        $allDocumentsApproved = $currentDocuments->every(function ($doc) use ($approvedStatusId) {
             return $doc->status_id === $approvedStatusId;
         });
 
-        // If all documents are approved, approve the application
-        if ($allDocumentsApproved && $application->documents->count() > 0) {
+        // If all current documents are approved, approve the application
+        if ($allDocumentsApproved && $currentDocuments->count() > 0) {
             $application->status_id = $approvedStatusId;
             $application->approved_by = Auth::id();
             $application->save();
@@ -147,9 +154,8 @@ class DocumentViewer extends Component
         }
     }
 
-    public function rejectDocument()
+    public function rejectDocument(string $rejectionReason = '')
     {
-
         $rejected_status = Status::select('id')->where('code', 'rejected')->first();
 
         $docId = $this->currentDocument['document_id'];
@@ -163,6 +169,9 @@ class DocumentViewer extends Component
             $document = Documents::with('application.user')->findOrFail($docId);
 
             $document->status_id = $rejected_status->id;
+            $document->rejection_reason = $rejectionReason ?: null;
+            $document->reviewed_by = Auth::id();
+            $document->reviewed_at = now();
 
             $application_id = $document->application_id;
 
@@ -172,6 +181,15 @@ class DocumentViewer extends Component
             $documentType = $this->currentDocument['name'] ?? $document->type ?? 'Document';
             $applicant = $document->application->user;
             ActivityLogService::logDocumentRejected($applicant, $documentType, Auth::user());
+
+            // Send notification to the applicant about document rejection
+            if ($applicant) {
+                $applicant->notify(new DocumentRejectedNotification(
+                    $document,
+                    Auth::user(),
+                    $rejectionReason ?: null
+                ));
+            }
 
             // Update application status to rejected when a document is rejected
             $this->updateApplicationStatusOnRejection($application_id, $rejected_status->id);

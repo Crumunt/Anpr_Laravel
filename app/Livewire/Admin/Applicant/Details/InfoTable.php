@@ -10,6 +10,7 @@ use App\Models\ApplicantTypeDocument;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\Vehicle\Vehicle;
+use App\Notifications\ApplicationRejectedNotification;
 use App\Rules\UniquePlateNumber;
 use App\Services\Admin\Applicants\ApplicantReadService;
 use App\Services\Admin\Vehicles\VehicleWriteService;
@@ -150,9 +151,12 @@ class InfoTable extends Component
         $vehicleApprovedStatus = Status::where('type', 'vehicle')->where('code', 'active')->first();
 
         try {
-            $documents = $application->documents;
+            // Only check current documents (exclude superseded/replaced documents)
+            $currentDocuments = $application->documents->filter(function ($doc) {
+                return $doc->is_current;
+            });
 
-            $hasUnverified = $documents->contains(function ($doc) use ($approvedStatus) {
+            $hasUnverified = $currentDocuments->contains(function ($doc) use ($approvedStatus) {
                 return $doc->status_id !== $approvedStatus->id;
             });
 
@@ -253,6 +257,13 @@ class InfoTable extends Component
             $user = User::find($this->userId);
             if ($user) {
                 ActivityLogService::logApplicationRejected($user, auth()->user());
+
+                // Send notification to the applicant about application rejection
+                $user->notify(new ApplicationRejectedNotification(
+                    $application,
+                    auth()->user(),
+                    'Your application has been rejected. Please review and resubmit your documents.'
+                ));
             }
 
             $this->loadData();

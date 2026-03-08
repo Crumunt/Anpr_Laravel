@@ -31,6 +31,7 @@ class Documents extends Model
     protected $casts = [
         'is_current' => 'boolean',
         'is_renewal_document' => 'boolean',
+        'reviewed_at' => 'datetime',
     ];
 
     public function application()

@@ -52,6 +52,20 @@
                         <i class="fas fa-car"></i>
                         <span>My Vehicles</span>
                     </a>
+                    <a href="{{ route('applicant.notifications') }}"
+                       class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative
+                              {{ request()->routeIs('applicant.notifications') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                        @php
+                            $unreadCount = auth()->user()?->unreadNotifications()->count() ?? 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                        </span>
+                        @endif
+                    </a>
                     <a href="{{ route('applicant.profile') }}"
                        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
                               {{ request()->routeIs('applicant.profile') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' }}">
@@ -116,6 +130,18 @@
                 <a href="{{ route('applicant.vehicles') }}" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('applicant.vehicles*') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-car w-5"></i>
                     <span>My Vehicles</span>
+                </a>
+                <a href="{{ route('applicant.notifications') }}" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium relative {{ request()->routeIs('applicant.notifications') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-bell w-5"></i>
+                    <span>Notifications</span>
+                    @php
+                        $mobileUnreadCount = auth()->user()?->unreadNotifications()->count() ?? 0;
+                    @endphp
+                    @if($mobileUnreadCount > 0)
+                    <span class="ml-auto w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {{ $mobileUnreadCount > 9 ? '9+' : $mobileUnreadCount }}
+                    </span>
+                    @endif
                 </a>
                 <a href="{{ route('applicant.profile') }}" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('applicant.profile') ? 'text-emerald-600 bg-emerald-50' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-user w-5"></i>

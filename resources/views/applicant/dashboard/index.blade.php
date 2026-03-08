@@ -89,6 +89,34 @@
         </div>
     </div>
 
+    <!-- Rejected Documents Alert -->
+    @if(($stats['rejected_documents'] ?? 0) > 0)
+    <div class="mb-8 lg:mb-10">
+        <a href="{{ route('applicant.notifications') }}" class="block bg-red-50 border border-red-200 rounded-xl p-4 hover:bg-red-100 transition-colors">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-exclamation text-red-600 text-xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-red-800 font-semibold">Action Required: Document Rejected</h4>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-200 text-red-800">
+                            {{ $stats['rejected_documents'] }}
+                        </span>
+                    </div>
+                    <p class="text-red-700 text-sm mt-1">
+                        You have <strong>{{ $stats['rejected_documents'] }}</strong> rejected document(s) that require your attention. Please review the feedback and resubmit.
+                    </p>
+                    <p class="text-red-600 text-xs mt-2 flex items-center gap-1">
+                        <i class="fas fa-arrow-right"></i>
+                        Click here to view and resubmit your documents
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+    @endif
+
     <!-- Expiration Alerts Section -->
     @if(($stats['expiring_soon'] ?? 0) > 0 || ($stats['expired'] ?? 0) > 0)
     <div class="mb-8 lg:mb-10 grid grid-cols-1 md:grid-cols-2 gap-4">

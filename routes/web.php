@@ -87,6 +87,8 @@ Route::prefix('applicant')->name('applicant.')->middleware(['auth', 'applicant']
     Route::get('/vehicles', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'index'])->name('vehicles');
     Route::get('/vehicles/{id}', [\App\Http\Controllers\Applicant\ApplicantVehicleController::class, 'show'])->name('vehicles.show');
 
+    Route::get('/notifications', [\App\Http\Controllers\Applicant\NotificationsController::class, 'index'])->name('notifications');
+
     Route::get('/activity-log', [\App\Http\Controllers\Applicant\ActivityLogController::class, 'index'])->name('activity-log');
 });
 

@@ -29,8 +29,8 @@
       const reason = this.selectedRejectionReason === 'Other (Please specify)'
         ? this.customRejectionReason
         : this.selectedRejectionReason;
-      // Handle reject action
-      $wire.rejectDocument();
+      // Handle reject action - pass the reason to Livewire
+      $wire.rejectDocument(reason);
       this.resetRejectForm();
     },
     markAsPending() {

@@ -48,7 +48,10 @@
         class="bg-white">
         <div class="px-4 py-3 space-y-2">
             @foreach($application['documents'] as $doc)
-            <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors duration-150">
+            @php
+                $isSuperseded = isset($doc['is_current']) && !$doc['is_current'];
+            @endphp
+            <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors duration-150 {{ $isSuperseded ? 'opacity-60' : '' }}">
                 <div class="flex items-center space-x-3 min-w-0 flex-1">
                     <!-- Document Icon -->
                     @php
@@ -73,7 +76,25 @@
 
                     <!-- Document Info -->
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ $doc['label'] }} <span><small>({{ Str::headline($doc['status']) }})</small></span></p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-sm font-medium text-gray-900 truncate {{ $isSuperseded ? 'line-through' : '' }}">{{ $doc['label'] }}</p>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium
+                                @if($doc['status'] === 'approved') bg-green-100 text-green-700
+                                @elseif($doc['status'] === 'under_review') bg-yellow-100 text-yellow-700
+                                @elseif($doc['status'] === 'rejected') bg-red-100 text-red-700
+                                @else bg-gray-100 text-gray-700
+                                @endif">
+                                {{ Str::headline($doc['status']) }}
+                            </span>
+                            @if($doc['is_resubmission'] ?? false)
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                                <svg class="w-3 h-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Resubmitted
+                            </span>
+                            @endif
+                        </div>
                         <p class="text-xs text-gray-500">{{ $doc['uploaded'] ?? 'No date' }}</p>
                     </div>
                 </div>
