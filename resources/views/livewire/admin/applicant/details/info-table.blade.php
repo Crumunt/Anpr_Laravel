@@ -986,7 +986,7 @@
         x-show="assignModalOpen"
         x-cloak
         style="display: none;"
-        class="fixed inset-0 z-[150] overflow-y-auto"
+        class="fixed inset-0 z-[9999] overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
