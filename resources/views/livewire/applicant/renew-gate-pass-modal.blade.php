@@ -17,21 +17,21 @@
             wire:click="closeModal"
             aria-hidden="true"></div>
 
-        <div class="flex min-h-full items-center justify-center p-4">
+        <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
             <!-- Modal panel -->
             <div
-                class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-2xl"
+                class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-[calc(100vw-1rem)] sm:max-w-2xl"
                 @click.stop>
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-cyan-600 via-cyan-700 to-cyan-600 px-6 py-5 shadow-lg">
+                <div class="bg-gradient-to-r from-cyan-600 via-cyan-700 to-cyan-600 px-4 sm:px-6 py-4 sm:py-5 shadow-lg">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-                                <i class="fas fa-sync text-white text-xl"></i>
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-sync text-white text-lg sm:text-xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-white" id="modal-title">Renew Gate Pass</h3>
-                                <p class="text-cyan-100 text-sm mt-0.5 font-medium">Step {{ $currentStep }} of {{ $totalSteps }}</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white" id="modal-title">Renew Gate Pass</h3>
+                                <p class="text-cyan-100 text-xs sm:text-sm mt-0.5 font-medium">Step {{ $currentStep }} of {{ $totalSteps }}</p>
                             </div>
                         </div>
                         <button
@@ -52,12 +52,12 @@
                                 </div>
                             @endfor
                         </div>
-                        <div class="flex justify-between text-xs font-semibold">
+                        <div class="flex justify-between text-[10px] sm:text-xs font-semibold">
                             <span class="transition-colors duration-200 {{ $currentStep >= 1 ? 'text-white' : 'text-cyan-100' }}">
-                                <i class="fas fa-file-alt mr-1"></i>Upload Documents
+                                <i class="fas fa-file-alt mr-1"></i><span class="hidden sm:inline">Upload </span>Documents
                             </span>
                             <span class="transition-colors duration-200 {{ $currentStep >= 2 ? 'text-white' : 'text-cyan-100' }}">
-                                <i class="fas fa-check-circle mr-1"></i>Review & Submit
+                                <i class="fas fa-check-circle mr-1"></i>Review<span class="hidden sm:inline"> & Submit</span>
                             </span>
                         </div>
                     </div>
@@ -65,14 +65,14 @@
 
                 <form wire:submit.prevent="submitRenewal">
                     <!-- Modal Body -->
-                    <div class="px-6 py-6 max-h-[60vh] overflow-y-auto">
+                    <div class="px-4 sm:px-6 py-4 sm:py-6 max-h-[55vh] sm:max-h-[60vh] overflow-y-auto">
                         <!-- Vehicle Info Banner -->
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center">
                                 <i class="fas fa-car text-cyan-600 mr-2"></i>
                                 Vehicle Being Renewed
                             </h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                                 <div>
                                     <dt class="text-xs text-gray-500 font-medium">Plate Number</dt>
                                     <dd class="text-sm text-gray-900 mt-1 font-mono font-bold">{{ $vehicle->plate_number ?? 'N/A' }}</dd>

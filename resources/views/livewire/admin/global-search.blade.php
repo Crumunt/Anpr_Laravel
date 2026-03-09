@@ -1,6 +1,153 @@
-<div class="relative w-64 md:w-80 hidden md:block"
-     x-data="{ open: @entangle('showDropdown') }"
-     @click.away="$wire.hideDropdown()">
+<div x-data="{
+        open: @entangle('showDropdown'),
+        mobileSearchOpen: false
+     }"
+     @click.away="$wire.hideDropdown(); mobileSearchOpen = false"
+     class="relative">
+
+    <!-- Mobile Search Button -->
+    <button @click="mobileSearchOpen = !mobileSearchOpen"
+            class="md:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </button>
+
+    <!-- Mobile Search Overlay -->
+    <div x-show="mobileSearchOpen"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="md:hidden fixed inset-0 bg-black/50 z-[150]"
+         @click="mobileSearchOpen = false"></div>
+
+    <!-- Mobile Search Panel -->
+    <div x-show="mobileSearchOpen"
+         x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-4"
+         class="md:hidden fixed top-0 left-0 right-0 bg-white z-[200] p-4 shadow-xl border-b border-gray-200">
+        <div class="flex items-center gap-3">
+            <button @click="mobileSearchOpen = false" class="p-2 text-gray-500 hover:text-gray-700 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="flex-1 relative">
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="query"
+                    wire:keydown.escape="hideDropdown"
+                    class="w-full pl-10 pr-10 py-3 text-base rounded-xl outline-none border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 bg-gray-50"
+                    placeholder="Search applicants, vehicles..."
+                    autocomplete="off"
+                    autofocus
+                />
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    @if($isLoading)
+                        <svg class="animate-spin h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    @endif
+                </div>
+                @if(strlen($query) > 0)
+                    <button wire:click="clearSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        <!-- Mobile Search Results -->
+        @if($showDropdown && strlen($query) > 0)
+            <div class="mt-4 max-h-[60vh] overflow-y-auto rounded-xl border border-gray-100 bg-white shadow-lg">
+                @if($isLoading)
+                    <div class="p-4 flex items-center gap-3 text-gray-500">
+                        <svg class="animate-spin h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Searching...</span>
+                    </div>
+                @elseif(count($results) === 0)
+                    <div class="px-4 py-5 text-gray-500 text-center">
+                        No results found for "<strong>{{ $query }}</strong>"
+                    </div>
+                @else
+                    @php
+                        $applicants = collect($results)->where('type', 'Applicant');
+                        $vehicles = collect($results)->where('type', 'Vehicle');
+                    @endphp
+                    @if($applicants->count() > 0)
+                        <div class="py-2">
+                            <div class="px-4 pb-2 text-[11px] tracking-wide uppercase text-gray-400">Applicants</div>
+                            @foreach($applicants as $item)
+                                <a href="{{ $item['url'] }}" @click="mobileSearchOpen = false"
+                                   class="flex items-center gap-3 px-4 py-3 hover:bg-green-50 border-b last:border-b-0 border-gray-50">
+                                    <svg class="h-5 w-5 text-blue-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-gray-800 truncate">{{ $item['label'] }}</div>
+                                        @if($item['sublabel'])
+                                            <div class="text-xs text-gray-500 truncate">{{ $item['sublabel'] }}</div>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if($vehicles->count() > 0)
+                        <div class="py-2 border-t border-gray-100">
+                            <div class="px-4 pb-2 text-[11px] tracking-wide uppercase text-gray-400">Vehicles</div>
+                            @foreach($vehicles as $item)
+                                <a href="{{ $item['url'] }}" @click="mobileSearchOpen = false"
+                                   class="flex items-center gap-3 px-4 py-3 hover:bg-green-50 border-b last:border-b-0 border-gray-50">
+                                    <svg class="h-5 w-5 text-yellow-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                                    </svg>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-gray-800 truncate">{{ $item['label'] }}</div>
+                                        @if($item['sublabel'])
+                                            <div class="text-xs text-gray-500 truncate">{{ $item['sublabel'] }}</div>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if(count($results) > 0)
+                        <div class="px-3 py-2 border-t border-gray-100">
+                            <a href="{{ route('admin.search.results', ['q' => $query]) }}" @click="mobileSearchOpen = false"
+                               class="block w-full text-center px-4 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition">
+                                View all results
+                            </a>
+                        </div>
+                    @endif
+                @endif
+            </div>
+        @endif
+    </div>
+
+    <!-- Desktop Search (existing) -->
+    <div class="relative w-64 md:w-80 hidden md:block">
 
     <!-- Search Input -->
     <input
@@ -152,4 +299,5 @@
             @endif
         </div>
     @endif
+    </div>
 </div>

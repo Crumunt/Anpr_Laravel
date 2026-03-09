@@ -17,21 +17,21 @@
             wire:click="closeModal"
             aria-hidden="true"></div>
 
-        <div class="flex min-h-full items-center justify-center p-4">
+        <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
             <!-- Modal panel -->
             <div
-                class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-2xl"
+                class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-[calc(100vw-1rem)] sm:max-w-2xl"
                 @click.stop>
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-green-800 via-green-700 to-green-800 px-6 py-5 shadow-lg">
+                <div class="bg-gradient-to-r from-green-800 via-green-700 to-green-800 px-4 sm:px-6 py-4 sm:py-5 shadow-lg">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-                                <i class="fas fa-car text-white text-xl"></i>
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-car text-white text-lg sm:text-xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-white" id="modal-title">Register New Vehicle</h3>
-                                <p class="text-green-200 text-sm mt-0.5 font-medium">Step {{ $currentStep }} of {{ $totalSteps }}</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white" id="modal-title">Register New Vehicle</h3>
+                                <p class="text-green-200 text-xs sm:text-sm mt-0.5 font-medium">Step {{ $currentStep }} of {{ $totalSteps }}</p>
                             </div>
                         </div>
                         <button
@@ -52,9 +52,9 @@
                                 </div>
                             @endfor
                         </div>
-                        <div class="flex justify-between text-xs font-semibold">
+                        <div class="flex justify-between text-[10px] sm:text-xs font-semibold">
                             <span class="transition-colors duration-200 {{ $currentStep >= 1 ? 'text-white' : 'text-green-200' }}">
-                                <i class="fas fa-car mr-1"></i>Vehicle Details
+                                <i class="fas fa-car mr-1"></i><span class="hidden sm:inline">Vehicle </span>Details
                             </span>
                             <span class="transition-colors duration-200 {{ $currentStep >= 2 ? 'text-white' : 'text-green-200' }}">
                                 <i class="fas fa-file-alt mr-1"></i>Documents
@@ -68,11 +68,11 @@
 
                 <form wire:submit.prevent="submitForm">
                     <!-- Modal Body -->
-                    <div class="px-6 py-6 max-h-[60vh] overflow-y-auto">
+                    <div class="px-4 sm:px-6 py-4 sm:py-6 max-h-[55vh] sm:max-h-[60vh] overflow-y-auto">
                     <!-- Step 1: Vehicle Details -->
                     @if($currentStep === 1)
-                    <div class="space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-4 sm:space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                             <!-- Vehicle Type -->
                             <div>
                                 <label for="vehicle_type" class="block text-sm font-medium text-gray-700 mb-1">

@@ -14,12 +14,12 @@
     </x-dashboard.buttons>
     <!-- Modal -->
     @if($showModal)
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
-        <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/50">
+        <div class="bg-white rounded-lg w-full max-w-[calc(100vw-1rem)] sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col">
             <form wire:submit.prevent="submitForm">
 
                                 <!-- Fixed Header -->
-                                <div class="flex items-center justify-between p-6 border-b">
+                                <div class="flex items-center justify-between p-4 sm:p-6 border-b">
                                     <div>
                                         <h2 class="text-xl font-semibold">Add Applicant</h2>
                                         <p class="text-sm text-gray-500 mt-1">Step {{ $currentStep }} of 4</p>
@@ -32,12 +32,12 @@
                                 </div>
 
                                 <!-- Progress Indicator -->
-                                <div class="px-6 pt-4">
+                                <div class="px-4 sm:px-6 pt-4">
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-medium {{ $currentStep >= 1 ? 'text-green-600' : 'text-gray-400' }}">Personal Info</span>
-                                        <span class="text-xs font-medium {{ $currentStep >= 2 ? 'text-green-600' : 'text-gray-400' }}">Vehicle Info</span>
-                                        <span class="text-xs font-medium {{ $currentStep >= 3 ? 'text-green-600' : 'text-gray-400' }}">Documents</span>
-                                        <span class="text-xs font-medium {{ $currentStep >= 4 ? 'text-green-600' : 'text-gray-400' }}">Review</span>
+                                        <span class="text-[10px] sm:text-xs font-medium {{ $currentStep >= 1 ? 'text-green-600' : 'text-gray-400' }}">Personal</span>
+                                        <span class="text-[10px] sm:text-xs font-medium {{ $currentStep >= 2 ? 'text-green-600' : 'text-gray-400' }}">Vehicle</span>
+                                        <span class="text-[10px] sm:text-xs font-medium {{ $currentStep >= 3 ? 'text-green-600' : 'text-gray-400' }}">Docs</span>
+                                        <span class="text-[10px] sm:text-xs font-medium {{ $currentStep >= 4 ? 'text-green-600' : 'text-gray-400' }}">Review</span>
                                     </div>
                                     <div class="flex gap-2">
                                         <div class="h-1 flex-1 rounded {{ $currentStep >= 1 ? 'bg-green-600' : 'bg-gray-200' }}"></div>
@@ -48,7 +48,7 @@
                                 </div>
 
                                 <!-- Scrollable Content -->
-                                <div class="flex-1 overflow-y-auto p-6">
+                                <div class="flex-1 overflow-y-auto p-4 sm:p-6">
 
                                     <!-- Step 1: Personal Info -->
                                     @if($currentStep === 1)
@@ -56,7 +56,7 @@
 
                                         <div>
                                             <h3 class="text-sm font-semibold text-gray-900 mb-4">Basic Information</h3>
-                                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
                                                     <input type="text" name="first_name"

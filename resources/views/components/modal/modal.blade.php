@@ -35,10 +35,10 @@ $formId = "{$type}-form";
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
         <div class="absolute inset-0 bg-gray-800/70 backdrop-blur-sm transition-opacity duration-300 ease-in-out opacity-0 modal-backdrop"></div>
     </div>
-    <div class="flex min-h-screen items-center justify-center p-4">
+    <div class="flex min-h-screen items-center justify-center p-2 sm:p-4">
         <div
-            class="bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300 ease-out {{ $maxWidth }} w-full modal-content border border-gray-100">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            class="bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0 duration-300 ease-out w-full max-w-[calc(100vw-1rem)] sm:max-w-[calc(100vw-2rem)] {{ $maxWidth }} modal-content border border-gray-100">
+            <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
                 <h2 id="{{ $id }}-title" class="text-xl font-semibold text-gray-800">{{ $title }}</h2>
                 <button
                     @click="resetForm()"
@@ -50,7 +50,7 @@ $formId = "{$type}-form";
                     </svg>
                 </button>
             </div>
-            <div class="p-6 max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div class="p-4 sm:p-6 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <form id="{{ $formId }}" @submit.prevent="submitForm">
                     @if ($type == 'applicant')
                         @include('components.modal.partials.applicant')

@@ -203,8 +203,120 @@
     </div>
     @endif
 
-    <!-- Table Container with Horizontal Scroll -->
-    <div class="relative w-full overflow-x-auto"> {{--removed overflow-x-auto on table root div--}}
+    <!-- Mobile Card View (visible on small screens) -->
+    <div class="md:hidden space-y-3 p-4">
+        @forelse ($rows as $index => $row)
+            @php
+                $isSelected = isset($selectedRows[$row['id']]);
+            @endphp
+            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm {{ $isSelected ? 'ring-2 ring-green-500 bg-green-50/50' : '' }}"
+                 wire:key="mobile-row-{{ $row['id'] }}">
+
+                <!-- Card Header with Checkbox and Actions -->
+                <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        @if($showCheckboxes)
+                        <input type="checkbox"
+                               :checked="{{ $isSelected ? 'true' : 'false' }}"
+                               wire:click="toggleRow('{{$row['id']}}')"
+                               value="{{ $row['id'] }}"
+                               class="w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-green-500 focus:ring-2 cursor-pointer">
+                        @endif
+                        @php
+                            $primaryKey = $headers[0]['key'] ?? array_key_first($row);
+                            $primaryValue = $row[$primaryKey] ?? $row['id'] ?? 'N/A';
+                        @endphp
+                        <span class="font-semibold text-gray-900 text-sm">{{ is_array($primaryValue) ? ($primaryValue['value'] ?? 'N/A') : $primaryValue }}</span>
+                    </div>
+
+                    @if($showActions)
+                    <div class="relative" x-data="{open: false}">
+                        <button @click="open = !open" type="button"
+                                class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                        </button>
+                        <div x-show="open" x-cloak @click.away="open = false"
+                             class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-1">
+                                @php
+                                    $viewRoute = match($type) {
+                                        'admin' => route('admin.admins.show', $row['id']),
+                                        'applicant' => route('admin.applicant.show', $row['id']),
+                                        default => route('admin.applicant.show', $row['id']),
+                                    };
+                                @endphp
+                                <a href="{{ $viewRoute }}" @click="open = false"
+                                   class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    View
+                                </a>
+                                <button wire:click="editRow('{{ $row['id'] }}')" @click="open = false"
+                                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Edit
+                                </button>
+                                <hr class="my-1 border-gray-100">
+                                <button wire:click="deleteRow('{{ $row['id'] }}')" @click="open = false"
+                                        wire:confirm="Are you sure you want to delete this item?"
+                                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Card Body with Data -->
+                <div class="space-y-2">
+                    @foreach ($headers as $headerIndex => $header)
+                        @if($headerIndex > 0) {{-- Skip first header as it's shown in card header --}}
+                            @php
+                                $key = $header['key'] ?? $header['label'];
+                                $value = $row[$key] ?? null;
+                                $label = $header['label'] ?? $key;
+                            @endphp
+                            <div class="flex items-start justify-between text-sm">
+                                <span class="text-gray-500 font-medium">{{ $label }}</span>
+                                <span class="text-gray-900 text-right ml-2">
+                                    @if(is_array($value))
+                                        @if(isset($value['component']))
+                                            <x-dynamic-component :component="$value['component']" :value="$value['value']" :type="$value['type'] ?? null" />
+                                        @else
+                                            {{ $value['value'] ?? '-' }}
+                                        @endif
+                                    @else
+                                        {{ $value ?? '-' }}
+                                    @endif
+                                </span>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        @empty
+            <div class="text-center py-12 text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="font-medium">No data available</p>
+                <p class="text-sm mt-1">There are no records to display.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Table Container with Horizontal Scroll (hidden on mobile) -->
+    <div class="relative w-full overflow-x-auto hidden md:block"> {{--removed overflow-x-auto on table root div--}}
         <table class="w-full text-sm border-collapse">
 
             <!-- Table Caption -->

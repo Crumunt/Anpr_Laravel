@@ -162,3 +162,140 @@
 [data-tooltip]:hover::after {
     opacity: 1;
 }
+
+/* ========================================
+   MOBILE RESPONSIVE UTILITIES
+   ======================================== */
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+    .touch-target {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Larger form inputs on mobile */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="search"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+
+    /* Better button spacing on mobile */
+    .btn, button[type="submit"], button[type="button"] {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+    .safe-area-bottom {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+    .safe-area-top {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+.no-horizontal-scroll {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* Mobile-friendly text truncation */
+.mobile-truncate {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive text sizing */
+.text-responsive {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+}
+.heading-responsive {
+    font-size: clamp(1.25rem, 4vw, 2rem);
+}
+
+/* Better scrolling on mobile */
+.scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Full-width containers on mobile */
+@media (max-width: 640px) {
+    .container-mobile-full {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        max-width: 100%;
+    }
+
+    /* Reduce spacing on mobile */
+    .mobile-compact {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    /* Stack flex items on mobile */
+    .mobile-stack {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Hide horizontal overflow for tables on mobile */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ========================================
+   MODAL RESPONSIVE UTILITIES
+   ======================================== */
+
+/* Modal mobile improvements */
+@media (max-width: 640px) {
+    /* Ensure modals don't overflow on small screens */
+    [role="dialog"] {
+        padding: 0.5rem;
+    }
+
+    /* Reduce modal header padding on mobile */
+    .modal-header-mobile {
+        padding: 1rem;
+    }
+
+    /* Better modal body on mobile */
+    .modal-body-mobile {
+        padding: 1rem;
+        max-height: 55vh;
+    }
+
+    /* Modal footer buttons stack on mobile */
+    .modal-footer-mobile {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+    }
+
+    .modal-footer-mobile > button {
+        width: 100%;
+    }
+}
+
+/* Smooth scroll for modal content */
+.modal-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}

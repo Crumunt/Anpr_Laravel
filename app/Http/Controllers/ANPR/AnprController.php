@@ -57,9 +57,12 @@ class AnprController extends Controller
 
                 $plateNumber = $detection['plate_text'];
 
-                // Check for duplicate detection in the last 2-5 minutes to avoid duplicates
+                // Check for duplicate detection in the last 5 minutes to avoid duplicates
                 // (e.g., when a vehicle is stopped at the gate for questioning)
+                // Only consider it a duplicate if same plate, location, and gate_type
                 $recentRecord = Record::where('plate_number', $plateNumber)
+                    ->where('location', $validated['location'] ?? null)
+                    ->where('gate_type', $validated['gate_type'] ?? null)
                     ->where('detected_at', '>=', now()->subMinutes(5))
                     ->first();
 

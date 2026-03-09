@@ -5,7 +5,7 @@
             @csrf
 
             <div id="form-tabs" role="tablist" aria-orientation="horizontal"
-                class="h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-4 mb-8 transition-all duration-300"
+                class="h-auto sm:h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-2 sm:grid-cols-4 gap-1 mb-6 sm:mb-8 transition-all duration-300"
                 tabindex="0" style="outline: none;">
                 <x-forms.tab-button
                     :active="true"
@@ -90,7 +90,7 @@
                         <option value="visitor">Visitor</option>
                     </x-forms.form-field>
                 </x-forms.form-section>
-                
+
                 <div class="flex justify-between mt-6">
                     <div></div>
                     <button type="button" class="next-btn
@@ -735,7 +735,7 @@
                 75% { transform: translateX(8px); }
                 100% { transform: translateX(0); }
             }
-            
+
             .animate-shake {
                 animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
             }
