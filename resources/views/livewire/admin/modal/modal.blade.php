@@ -16,7 +16,7 @@
     @if($showModal)
     <div class="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/50">
         <div class="bg-white rounded-lg w-full max-w-[calc(100vw-1rem)] sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col">
-            <form wire:submit.prevent="submitForm">
+            <form wire:submit.prevent="submitForm" class="flex flex-col flex-1 overflow-hidden">
 
                                 <!-- Fixed Header -->
                                 <div class="flex items-center justify-between p-4 sm:p-6 border-b">
