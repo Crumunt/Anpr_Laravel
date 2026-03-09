@@ -24,8 +24,6 @@
 
     @stack('styles')
     @livewireStyles
-
-    @livewireScripts
 </head>
 
 <body style="background-color: #f9fafb;" class="@yield('body-class')">
@@ -45,6 +43,7 @@
     @endif
 
     @stack('scripts')
+    @livewireScripts
 </body>
 
 </html>
