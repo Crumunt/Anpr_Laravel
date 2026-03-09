@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Helpers\ApplicationDisplayHelper;
 use App\Models\Vehicle\Vehicle;
+use App\Notifications\PasswordResetNotification;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,6 +54,17 @@ class User extends Authenticatable
             "deleted_at" => "datetime",
             "password" => "hashed",
         ];
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new PasswordResetNotification($token));
     }
 
     public function details()
