@@ -9,7 +9,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * Changes the `type` column from ENUM to VARCHAR to support
      * dynamic document types from the applicant_type_documents table.
      */

@@ -2,7 +2,7 @@
     <!-- Modal Backdrop -->
     @if($showModal && $vehicle)
     <div
-        class="fixed inset-0 z-50 overflow-y-auto"
+        class="fixed inset-0 z-[60] overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -13,14 +13,14 @@
 
         <!-- Background overlay -->
         <div
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+            class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
             wire:click="closeModal"
             aria-hidden="true"></div>
 
         <div class="flex min-h-full items-center justify-center p-4">
             <!-- Modal panel -->
             <div
-                class="relative transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all w-full max-w-2xl"
+                class="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-2xl"
                 @click.stop>
                 <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-cyan-600 via-cyan-700 to-cyan-600 px-6 py-5 shadow-lg">

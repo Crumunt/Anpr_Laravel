@@ -1,26 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter', 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* Hide scrollbar but retain scroll functionality */
 .hide-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    overflow: -moz-scrollbars-none;  /* Older Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow: -moz-scrollbars-none;
 }
 .hide-scrollbar::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera, Brave, Edge Chromium */
+    display: none;
     width: 0;
     height: 0;
     background: transparent;
+}
+
+/* CLSU Applicant Module Custom Styles */
+
+/* Smooth page transitions */
+.page-transition {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered card animations */
+.stagger-fade > * {
+    animation: fadeInUp 0.4s ease-out both;
+}
+.stagger-fade > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-fade > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-fade > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-fade > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-fade > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-fade > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* Glass morphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* CLSU gradient backgrounds */
+.clsu-gradient {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #1B7A3D 100%);
+}
+.clsu-gradient-light {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%);
+}
+.gold-accent {
+    background: linear-gradient(135deg, #F9A825 0%, #FBC02D 100%);
+}
+
+/* Sidebar nav active indicator */
+.nav-active {
+    position: relative;
+}
+.nav-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    background: linear-gradient(180deg, #F9A825, #FBC02D);
+    border-radius: 0 4px 4px 0;
+}
+
+/* Enhanced focus styles for accessibility */
+.focus-ring:focus-visible {
+    outline: 3px solid #F9A825;
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Card hover lift effect */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -12px rgba(27, 94, 32, 0.15);
+}
+
+/* Subtle card shadow on hover for stat cards */
+.stat-card-hover {
+    transition: all 0.25s ease;
+}
+.stat-card-hover:hover {
+    box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth icon bounce on hover */
+@keyframes iconBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+.icon-bounce:hover i {
+    animation: iconBounce 0.4s ease;
+}
+
+/* Pulse dot for notifications */
+@keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+}
+.pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Status indicator glow */
+.status-glow-green {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+.status-glow-amber {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+.status-glow-red {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Tooltip styles */
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    background: #1B5E20;
+    color: white;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 6px;
+}
+[data-tooltip]:hover::after {
+    opacity: 1;
 }
