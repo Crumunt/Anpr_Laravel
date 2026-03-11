@@ -210,7 +210,7 @@ class Record extends Model
         if (empty($location) || $location === 'all') {
             return $query;
         }
-        return $query->whereHas('gate', fn($q) => $q->where('gate_type', strtolower($location)));
+        return $query->whereHas('gate', fn($q) => $q->where('gate_type', $location));
     }
 
     /**

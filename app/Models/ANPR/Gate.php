@@ -24,8 +24,8 @@ class Gate extends Model
     /**
      * Gate location options
      */
-    public const LOCATION_ENTRY = 'Entry';
-    public const LOCATION_EXIT = 'Exit';
+    public const LOCATION_ENTRY = 'entry';
+    public const LOCATION_EXIT = 'exit';
 
     /**
      * Get all available gate locations
