@@ -177,7 +177,7 @@ class Record extends Model
         if (empty($gateType) || $gateType === 'all') {
             return $query;
         }
-        return $query->where('gate_name', $gateType);
+        return $query->where('location', $gateType);
     }
 
     /**
@@ -199,7 +199,7 @@ class Record extends Model
         if (empty($gateName) || $gateName === 'all') {
             return $query;
         }
-        return $query->whereHas('gate', fn($q) => $q->where('gate_name', $gateName));
+        return $query->whereHas('gate', fn($q) => $q->where('gate_type', $gateName));
     }
 
     /**
@@ -210,7 +210,7 @@ class Record extends Model
         if (empty($location) || $location === 'all') {
             return $query;
         }
-        return $query->whereHas('gate', fn($q) => $q->where('gate_location', $location));
+        return $query->whereHas('gate', fn($q) => $q->where('gate_type', $location));
     }
 
     /**
