@@ -234,7 +234,7 @@ class RecentVehiclesTable extends Component
             ->with('gate')
             ->where('created_at', '>=', now()->subHours($hours))
             ->when($this->search, fn($q) => $q->searchPlate($this->search))
-            ->when($this->gateFilter !== 'all', fn($q) => $q->byGateName($this->gateFilter))
+            ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
             ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
             ->orderBy($this->sortField, $this->sortDirection);
     }
