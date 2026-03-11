@@ -177,7 +177,7 @@ class Record extends Model
         if (empty($gateType) || $gateType === 'all') {
             return $query;
         }
-        return $query->where('gate_type', $gateType);
+        return $query->where('gate_name', $gateType);
     }
 
     /**
