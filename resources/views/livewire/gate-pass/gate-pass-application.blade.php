@@ -393,14 +393,23 @@
                                         </div>
                                         @error("files.{$document->name}.*") <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                                         @if(isset($files[$document->name]) && is_array($files[$document->name]))
-                                        @foreach($files[$document->name] as $uploadedFile)
-                                        <div class="mt-2 flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                                            <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                            </svg>
-                                            <span class="text-sm text-gray-700">{{ $uploadedFile->getClientOriginalName() }}</span>
+                                        <div class="mt-2 space-y-1" wire:loading.remove wire:target="files.{{ $document->name }}">
+                                        @foreach($files[$document->name] as $index => $uploadedFile)
+                                        <div class="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-md">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span class="text-sm text-gray-700 truncate">{{ $uploadedFile->getClientOriginalName() }}</span>
+                                            </div>
+                                            <button type="button" wire:click="removeFile('{{ $document->name }}', {{ $index }})" class="text-red-500 hover:text-red-700 p-1" title="Remove file">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
                                         @endforeach
+                                        </div>
                                         @endif
                                     </div>
                                     @empty

@@ -157,6 +157,15 @@ class NotificationsPanel extends Component
         $this->resetErrorBag();
     }
 
+    /**
+     * Clear the selected document without closing the modal.
+     */
+    public function clearNewDocument()
+    {
+        $this->newDocument = null;
+        $this->resetErrorBag('newDocument');
+    }
+
     public function resubmitDocument()
     {
         $this->validate([

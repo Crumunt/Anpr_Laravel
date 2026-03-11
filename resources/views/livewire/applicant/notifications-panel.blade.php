@@ -217,17 +217,42 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Upload New Document <span class="text-red-500">*</span>
                             </label>
+                            @if($newDocument)
+                            <!-- File selected - show file info with remove button -->
+                            <div class="mt-1 p-4 border-2 border-green-300 bg-green-50 rounded-xl" wire:loading.remove wire:target="newDocument">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-check-circle text-xl text-green-600"></i>
+                                        <div>
+                                            <p class="font-medium text-green-700 truncate">{{ $newDocument->getClientOriginalName() }}</p>
+                                            <p class="text-xs text-gray-500">Click "Change" to select a different file</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <label for="newDocumentInput" class="cursor-pointer px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+                                            Change
+                                        </label>
+                                        <button type="button" wire:click="clearNewDocument" class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Remove file">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input
+                                    id="newDocumentInput"
+                                    type="file"
+                                    wire:model="newDocument"
+                                    class="sr-only"
+                                    accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                            @else
+                            <!-- No file selected - show upload prompt -->
                             <div
                                 class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-green-400 transition-colors cursor-pointer"
-                                onclick="document.getElementById('newDocumentInput').click()">
+                                onclick="document.getElementById('newDocumentInput').click()"
+                                wire:loading.remove wire:target="newDocument">
                                 <div class="space-y-2 text-center">
-                                    @if($newDocument)
-                                    <div class="flex items-center justify-center gap-2 text-green-600">
-                                        <i class="fas fa-check-circle text-xl"></i>
-                                        <span class="font-medium">{{ $newDocument->getClientOriginalName() }}</span>
-                                    </div>
-                                    <p class="text-xs text-gray-500">Click to change file</p>
-                                    @else
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
                                     <div class="flex text-sm text-gray-600">
                                         <span class="font-medium text-green-700 hover:text-green-600">
@@ -236,7 +261,6 @@
                                         <span class="pl-1">or drag and drop</span>
                                     </div>
                                     <p class="text-xs text-gray-500">PDF, JPG, JPEG, PNG up to 10MB</p>
-                                    @endif
                                 </div>
                                 <input
                                     id="newDocumentInput"
@@ -244,6 +268,17 @@
                                     wire:model="newDocument"
                                     class="sr-only"
                                     accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                            @endif
+                            <!-- Loading Spinner -->
+                            <div wire:loading wire:target="newDocument" class="mt-1">
+                                <div class="flex items-center justify-center gap-3 p-6 bg-blue-50 border border-blue-200 rounded-xl">
+                                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-sm font-medium text-blue-700">Uploading document...</span>
+                                </div>
                             </div>
                             @error('newDocument')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

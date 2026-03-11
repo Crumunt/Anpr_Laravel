@@ -721,12 +721,19 @@
                                     @error('vehicle_registration') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                                     @if($vehicle_registration)
                                     <div class="mt-3 space-y-2" wire:loading.remove wire:target="vehicle_registration">
-                                        @foreach ($vehicle_registration as $file)
-                                        <div class="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-                                            <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                            </svg>
-                                            <span class="text-sm text-gray-700">{{ $file->getClientOriginalName() }}</span>
+                                        @foreach ($vehicle_registration as $index => $file)
+                                        <div class="flex items-center justify-between gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                            </div>
+                                            <button type="button" wire:click="removeVehicleFile('vehicle_registration', {{ $index }})" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors" title="Remove file">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
                                         @endforeach
                                     </div>
@@ -763,12 +770,19 @@
                                     @error('license') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                                     @if($license)
                                     <div class="mt-3 space-y-2" wire:loading.remove wire:target="license">
-                                        @foreach ($license as $file)
-                                        <div class="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-                                            <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                            </svg>
-                                            <span class="text-sm text-gray-700">{{ $file->getClientOriginalName() }}</span>
+                                        @foreach ($license as $index => $file)
+                                        <div class="flex items-center justify-between gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                            </div>
+                                            <button type="button" wire:click="removeVehicleFile('license', {{ $index }})" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors" title="Remove file">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
                                         @endforeach
                                     </div>
@@ -805,12 +819,19 @@
                                     @error('proof_of_identification') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                                     @if($proof_of_identification)
                                     <div class="mt-3 space-y-2" wire:loading.remove wire:target="proof_of_identification">
-                                        @foreach ($proof_of_identification as $file)
-                                        <div class="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-                                            <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                            </svg>
-                                            <span class="text-sm text-gray-700">{{ $file->getClientOriginalName() }}</span>
+                                        @foreach ($proof_of_identification as $index => $file)
+                                        <div class="flex items-center justify-between gap-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span class="text-sm text-gray-700 truncate">{{ $file->getClientOriginalName() }}</span>
+                                            </div>
+                                            <button type="button" wire:click="removeVehicleFile('proof_of_identification', {{ $index }})" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors" title="Remove file">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
                                         @endforeach
                                     </div>

@@ -144,6 +144,17 @@ class GatePassApplication extends Component
         $this->currentStep--;
     }
 
+    /**
+     * Remove a file from the upload list.
+     */
+    public function removeFile($type, $index)
+    {
+        if (isset($this->files[$type][$index])) {
+            unset($this->files[$type][$index]);
+            $this->files[$type] = array_values($this->files[$type]);
+        }
+    }
+
     public function submitForm()
     {
         $validated = $this->validate($this->getAllRules());
