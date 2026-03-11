@@ -162,10 +162,20 @@ class RecentVehiclesTable extends Component
      */
     protected function loadAvailableLocations(): void
     {
-        $this->availableLocations = [
-            Gate::LOCATION_ENTRY => Gate::LOCATION_ENTRY,
-            Gate::LOCATION_EXIT => Gate::LOCATION_EXIT,
-        ];
+        $this->availableLocations = Gate::active()
+            ->select('gate_location')
+            ->distinct()
+            ->orderBy('gate_location')
+            ->pluck('gate_location', 'gate_location')
+            ->toArray();
+
+        // If no locations in database yet, fall back to constants
+        if (empty($this->availableLocations)) {
+            $this->availableLocations = [
+                Gate::LOCATION_ENTRY => Gate::LOCATION_ENTRY,
+                Gate::LOCATION_EXIT => Gate::LOCATION_EXIT,
+            ];
+        }
     }
 
     /**

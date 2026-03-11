@@ -72,7 +72,7 @@ class Gate extends Model
     /**
      * Scope: Filter by gate name
      */
-    public function scopeByName(Builder $query, string $gateName): Builder
+    public function scopeByGateName(Builder $query, string $gateName): Builder
     {
         return $query->where('gate_name', $gateName);
     }
