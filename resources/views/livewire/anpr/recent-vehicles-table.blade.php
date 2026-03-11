@@ -82,7 +82,7 @@
                         >
                             <option value="all">All Directions</option>
                             @foreach($availableLocations as $value => $label)
-                                <option value="{{ $value }}">{{ $label }}</option>
+                                <option value="{{ strtolower($value) }}">{{ $label }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
