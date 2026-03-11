@@ -199,7 +199,8 @@ class Record extends Model
         if (empty($gateName) || $gateName === 'all') {
             return $query;
         }
-        return $query->whereHas('gate', fn($q) => $q->where('gate_type', $gateName));
+        // Filter by location column which stores the gate name (e.g., "Main Gate")
+        return $query->where('location', $gateName);
     }
 
     /**
@@ -210,7 +211,8 @@ class Record extends Model
         if (empty($location) || $location === 'all') {
             return $query;
         }
-        return $query->whereHas('gate', fn($q) => $q->where('gate_type', $location));
+        // Filter by gate_type column which stores direction as lowercase (e.g., "entry", "exit")
+        return $query->whereRaw('LOWER(gate_type) = ?', [strtolower($location)]);
     }
 
     /**
