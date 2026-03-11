@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ANPR;
 
 use App\Http\Controllers\Controller;
+use App\Models\ANPR\Gate;
 use App\Models\ANPR\Record;
 use App\Models\Vehicle\Vehicle;
 use Illuminate\Http\Request;
@@ -77,6 +78,10 @@ class AnprController extends Controller
                     ->where('assigned_gate_pass', '!=', '')
                     ->first();
 
+                // Look up the gate by slug to get gate_id
+                $gateType = $validated['gate_type'] ?? null;
+                $gate = $gateType ? Gate::where('slug', $gateType)->first() : null;
+
                 // Create detection record
                 $plateDetection = Record::create([
                     'plate_number' => $plateNumber,
@@ -86,7 +91,8 @@ class AnprController extends Controller
                     'bbox_x2' => $detection['bbox']['x2'] ?? null,
                     'bbox_y2' => $detection['bbox']['y2'] ?? null,
                     'camera_id' => $validated['camera_id'] ?? null,
-                    'gate_type' => $validated['gate_type'] ?? null,
+                    'gate_type' => $gateType,
+                    'gate_id' => $gate?->id,
                     'location' => $validated['location'] ?? null,
                     'detected_at' => $validated['timestamp'] ?? now(),
                     'gate_pass_number' => $registeredVehicle?->assigned_gate_pass,
