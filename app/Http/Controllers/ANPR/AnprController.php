@@ -78,9 +78,12 @@ class AnprController extends Controller
                     ->where('assigned_gate_pass', '!=', '')
                     ->first();
 
-                // Look up the gate by slug to get gate_id
-                $gateType = $validated['gate_type'] ?? null;
-                $gate = $gateType ? Gate::where('slug', $gateType)->first() : null;
+                // Look up the gate by gate_name and gate_location to get gate_id
+                $gateName = $validated['gate_type'] ?? null;
+                $gateLocation = $validated['location'] ?? null;
+                $gate = ($gateName && $gateLocation)
+                    ? Gate::where('gate_name', $gateName)->where('gate_location', $gateLocation)->first()
+                    : null;
 
                 // Create detection record
                 $plateDetection = Record::create([
@@ -91,9 +94,9 @@ class AnprController extends Controller
                     'bbox_x2' => $detection['bbox']['x2'] ?? null,
                     'bbox_y2' => $detection['bbox']['y2'] ?? null,
                     'camera_id' => $validated['camera_id'] ?? null,
-                    'gate_type' => $gateType,
+                    'gate_type' => $gate?->slug ?? $gateName,
                     'gate_id' => $gate?->id,
-                    'location' => $validated['location'] ?? null,
+                    'location' => $gateLocation,
                     'detected_at' => $validated['timestamp'] ?? now(),
                     'gate_pass_number' => $registeredVehicle?->assigned_gate_pass,
                     'vehicle_id' => $registeredVehicle?->id,
