@@ -166,7 +166,8 @@
 
             <!-- Modal Footer - Action Buttons -->
             <div class="border-t border-gray-200 bg-white px-6 py-4">
-                <!-- Reject Reason Dropdown -->
+                <!-- Reject Reason Dropdown (only shown if user can approve/reject) -->
+                @if($this->canApproveOrReject)
                 <div
                     x-show="showRejectDropdown"
                     x-transition:enter="transition ease-out duration-200"
@@ -213,6 +214,7 @@
                         </button>
                     </div>
                 </div>
+                @endif
 
                 <!-- Action Buttons -->
                 <div
@@ -243,7 +245,8 @@
                     </div>
 
                     <div class="flex items-center space-x-3">
-                        <!-- Mark as Pending -->
+                        {{-- Mark as Pending - Show only when document is approved or rejected --}}
+                        @if($this->canApproveOrReject && ($this->isDocumentApproved || $this->isDocumentRejected))
                         <button
                             @click="markAsPending()"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-50 border border-yellow-300 rounded-md hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
@@ -252,8 +255,10 @@
                             </svg>
                             Mark as Pending
                         </button>
+                        @endif
 
-                        <!-- Reject -->
+                        {{-- Reject - Show only when document is pending and user can approve/reject --}}
+                        @if($this->canApproveOrReject && $this->isDocumentPending)
                         <button
                             @click="showRejectDropdown = true"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
@@ -262,8 +267,10 @@
                             </svg>
                             Reject
                         </button>
+                        @endif
 
-                        <!-- Approve -->
+                        {{-- Approve - Show only when document is pending and user can approve/reject --}}
+                        @if($this->canApproveOrReject && $this->isDocumentPending)
                         <button
                             wire:click="approveDocument()"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors shadow-sm">
@@ -272,6 +279,33 @@
                             </svg>
                             Approve
                         </button>
+                        @endif
+
+                        {{-- Status indicator when user cannot approve/reject --}}
+                        @if(!$this->canApproveOrReject)
+                        <span class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md
+                            @if($this->isDocumentApproved) text-green-700 bg-green-50 border border-green-200
+                            @elseif($this->isDocumentRejected) text-red-700 bg-red-50 border border-red-200
+                            @else text-yellow-700 bg-yellow-50 border border-yellow-200
+                            @endif">
+                            @if($this->isDocumentApproved)
+                                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Approved
+                            @elseif($this->isDocumentRejected)
+                                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Rejected
+                            @else
+                                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Pending Review
+                            @endif
+                        </span>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -8,6 +8,7 @@ use App\Models\Status;
 use App\Notifications\DocumentRejectedNotification;
 use App\Notifications\ApplicationRejectedNotification;
 use App\Services\ActivityLogService;
+use App\Traits\HasRoleBasedAccess;
 use Dom\Document;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Js;
@@ -16,9 +17,47 @@ use Livewire\Component;
 
 class DocumentViewer extends Component
 {
+    use HasRoleBasedAccess;
 
     public ?array $currentDocument = null;
     public bool $show = false;
+
+    /**
+     * Check if user can approve or reject documents
+     * Only super_admin and admin_editor can perform these actions
+     */
+    public function getCanApproveOrRejectProperty(): bool
+    {
+        return $this->canApproveApplications();
+    }
+
+    /**
+     * Check if current document is approved
+     */
+    public function getIsDocumentApprovedProperty(): bool
+    {
+        return isset($this->currentDocument['status']) &&
+               strtolower($this->currentDocument['status']) === 'approved';
+    }
+
+    /**
+     * Check if current document is rejected
+     */
+    public function getIsDocumentRejectedProperty(): bool
+    {
+        return isset($this->currentDocument['status']) &&
+               strtolower($this->currentDocument['status']) === 'rejected';
+    }
+
+    /**
+     * Check if current document is pending (under_review or pending)
+     */
+    public function getIsDocumentPendingProperty(): bool
+    {
+        if (!isset($this->currentDocument['status'])) return true;
+        $status = strtolower($this->currentDocument['status']);
+        return in_array($status, ['pending', 'under_review', 'submitted']);
+    }
 
     #[On('open-document-viewer')]
     public function openViewer(array $document)
