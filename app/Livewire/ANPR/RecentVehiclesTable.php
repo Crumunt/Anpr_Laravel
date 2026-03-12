@@ -230,7 +230,7 @@ class RecentVehiclesTable extends Component
     {
         return Record::query()
             ->with('gate')
-            ->where('created_at', '>=', now()->subDay())
+            ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
             ->when($this->search, fn($q) => $q->searchPlate($this->search))
             ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
             ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
