@@ -250,34 +250,6 @@
                             </div>
                         </div>
 
-                        <!-- Work Information Section -->
-                        <div class="space-y-4 pt-6 border-t border-gray-200">
-                            <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wide flex items-center gap-2">
-                                <i class="fas fa-briefcase text-gray-400"></i>
-                                Work Information
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="collegeDepartment" class="block text-sm font-medium text-gray-700 mb-1">College/Unit/Department</label>
-                                    <input
-                                        type="text"
-                                        id="collegeDepartment"
-                                        wire:model="collegeDepartment"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
-                                        placeholder="Enter college/unit/department">
-                                </div>
-                                <div>
-                                    <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                                    <input
-                                        type="text"
-                                        id="position"
-                                        wire:model="position"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
-                                        placeholder="Enter position">
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Form Actions -->
                         <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
                             <button
