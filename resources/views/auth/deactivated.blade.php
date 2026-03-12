@@ -22,7 +22,7 @@
 </style>
 @endpush
 
-@section('content')
+@section('main-content')
 <div class="min-h-screen flex items-center justify-center px-4 py-12">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Header -->
