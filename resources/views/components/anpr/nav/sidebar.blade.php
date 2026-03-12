@@ -190,11 +190,6 @@
                 <p class="text-sm font-medium">{{ $userName }}</p>
                 <p class="text-xs opacity-70">{{ $userRole }}</p>
             </div>
-            <div class="ml-auto">
-                <button class="text-white opacity-70 hover:opacity-100" aria-label="User menu">
-                    <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
-                </button>
-            </div>
         </div>
     </div>
 </aside>

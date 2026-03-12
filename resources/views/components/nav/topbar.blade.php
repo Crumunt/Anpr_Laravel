@@ -26,7 +26,7 @@ $userInitials = $user
                 <livewire:admin.global-search />
 
                 <!-- User Dropdown -->
-                <div class="relative" id="userDropdown">
+                <div class="relative flex" id="userDropdown">
                     <div class="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center">
                         <span class="text-green-700 font-bold text-sm">{{ $userInitials }}</span>
                     </div>
@@ -34,9 +34,6 @@ $userInitials = $user
                         <p class="text-sm font-medium text-gray-700">{{ $userName }}</p>
                         <p class="text-xs text-gray-500">{{ ucfirst($userRole) }}</p>
                     </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
                 </div>
             </div>
         </header>
