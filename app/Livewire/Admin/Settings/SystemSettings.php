@@ -51,8 +51,8 @@ class SystemSettings extends Component
 
     public function mount(): void
     {
-        // Check if user has permission
-        if (!Auth::user()?->hasAnyRole(['super_admin', 'admin_editor'])) {
+        // Check if user has permission - super_admin only
+        if (!Auth::user()?->hasRole('super_admin')) {
             abort(403, 'Unauthorized access to system settings.');
         }
 

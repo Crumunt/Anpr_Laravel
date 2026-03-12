@@ -1,7 +1,7 @@
 @extends('layouts.anpr-layout')
 
 @section('title', 'Analytics')
-@section('page-title', 'Analytics & Reports')
+@section('page-title', "Analytics & Reports")
 @section('page-subtitle', 'Vehicle traffic insights and statistics')
 
 @section('content')
