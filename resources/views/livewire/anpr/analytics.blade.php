@@ -140,8 +140,9 @@
                 <div class="space-y-3">
                     @php
                         $maxHourly = max(array_column($hourlyData, 'count')) ?: 1;
+                        $displayHours = $showAllHours ? $hourlyData : array_slice($hourlyData, 0, 12);
                     @endphp
-                    @foreach(array_slice($hourlyData, 0, 12) as $hour)
+                    @foreach($displayHours as $hour)
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-medium text-gray-500 w-12">{{ $hour['hour'] }}:00</span>
                             <div class="flex-1 bg-gray-100 rounded-full h-6 relative overflow-hidden">
@@ -163,7 +164,7 @@
                         wire:click="$toggle('showAllHours')"
                         class="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
                     >
-                        {{ $showAllHours ?? false ? 'Show Less' : 'Show All Hours' }}
+                        {{ $showAllHours ? 'Show Less' : 'Show All Hours' }}
                     </button>
                 @endif
             </div>

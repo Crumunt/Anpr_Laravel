@@ -95,6 +95,11 @@ class Analytics extends Component
     public int $topPlatesLimit = 10;
 
     /**
+     * Show all hours in hourly chart
+     */
+    public bool $showAllHours = false;
+
+    /**
      * Report form data
      */
     public array $reportForm = [
