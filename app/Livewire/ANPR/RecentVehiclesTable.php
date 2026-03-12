@@ -228,11 +228,9 @@ class RecentVehiclesTable extends Component
      */
     protected function getRecordsQuery()
     {
-        $hours = config('anpr.dashboard.metrics_hours', 24);
-
         return Record::query()
             ->with('gate')
-            ->where('created_at', '>=', now()->subHours($hours))
+            ->where('created_at', '>=', now()->subDay())
             ->when($this->search, fn($q) => $q->searchPlate($this->search))
             ->when($this->gateFilter !== 'all', fn($q) => $q->byGate($this->gateFilter))
             ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
