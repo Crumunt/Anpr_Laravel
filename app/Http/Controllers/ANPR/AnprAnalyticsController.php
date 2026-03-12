@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ANPR\Gate;
 use App\Models\ANPR\Record;
 use App\Models\Vehicle\Vehicle;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -193,130 +194,132 @@ class AnprAnalyticsController extends Controller
     }
 
     /**
-     * Stream a PDF (HTML) report download.
+     * Generate a PDF report download.
      */
     protected function streamPdfReport($records, $registeredVehicles, string $type, $startDate, $endDate, string $gateFilter, string $locationFilter)
     {
-        $filename = "anpr_{$type}_report_{$startDate->format('Ymd')}_{$endDate->format('Ymd')}.html";
+        $filename = "anpr_{$type}_report_{$startDate->format('Ymd')}_{$endDate->format('Ymd')}.pdf";
 
-        return response()->streamDownload(function () use ($records, $registeredVehicles, $type, $startDate, $endDate, $gateFilter, $locationFilter) {
-            $totalDetections = $records->count();
-            $uniquePlates = $records->pluck('plate_number')->unique()->count();
-            $flaggedCount = $records->filter(fn($r) => $r->is_flagged)->count();
-            $avgConfidence = round($records->avg('confidence') * 100, 1);
-            $registeredCount = $registeredVehicles->count();
-            $reportTitle = ucfirst($type) . ' Report';
+        $totalDetections = $records->count();
+        $uniquePlates = $records->pluck('plate_number')->unique()->count();
+        $flaggedCount = $records->filter(fn($r) => $r->is_flagged)->count();
+        $avgConfidence = round($records->avg('confidence') * 100, 1);
+        $registeredCount = $registeredVehicles->count();
+        $reportTitle = ucfirst($type) . ' Report';
 
-            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>ANPR ' . $reportTitle . '</title>';
-            echo '<style>
-                body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
-                h1 { color: #1a5632; border-bottom: 3px solid #1a5632; padding-bottom: 10px; }
-                h2 { color: #1a5632; margin-top: 30px; }
-                .meta { color: #666; margin-bottom: 20px; }
-                .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
-                .stat-card { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; text-align: center; }
-                .stat-value { font-size: 28px; font-weight: bold; color: #1a5632; }
-                .stat-label { font-size: 13px; color: #666; margin-top: 5px; }
-                table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
-                th { background: #1a5632; color: white; padding: 10px 8px; text-align: left; }
-                td { padding: 8px; border-bottom: 1px solid #dee2e6; }
-                tr:nth-child(even) { background: #f8f9fa; }
-                .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-                .badge-flagged { background: #fee2e2; color: #dc2626; }
-                .badge-normal { background: #dcfce7; color: #16a34a; }
-                .badge-active { background: #dcfce7; color: #16a34a; }
-                .badge-expired { background: #fee2e2; color: #dc2626; }
-                .badge-expiring { background: #fef3c7; color: #d97706; }
-                .badge-unreg { background: #f3f4f6; color: #6b7280; }
-                .footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #dee2e6; color: #999; font-size: 12px; }
-                @media print { body { margin: 20px; } }
-            </style></head><body>';
+        // Build HTML content for PDF
+        $html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>ANPR ' . $reportTitle . '</title>';
+        $html .= '<style>
+            body { font-family: DejaVu Sans, sans-serif; margin: 30px; color: #333; font-size: 12px; }
+            h1 { color: #1a5632; border-bottom: 3px solid #1a5632; padding-bottom: 10px; font-size: 22px; }
+            h2 { color: #1a5632; margin-top: 25px; font-size: 16px; }
+            .meta { color: #666; margin-bottom: 20px; line-height: 1.6; }
+            .stats-table { width: 100%; margin: 15px 0; }
+            .stats-table td { text-align: center; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+            .stat-value { font-size: 20px; font-weight: bold; color: #1a5632; }
+            .stat-label { font-size: 11px; color: #666; margin-top: 5px; }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px; }
+            th { background: #1a5632; color: white; padding: 8px 6px; text-align: left; }
+            td { padding: 6px; border-bottom: 1px solid #dee2e6; }
+            tr:nth-child(even) { background: #f8f9fa; }
+            .badge { display: inline-block; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: bold; }
+            .badge-flagged { background: #fee2e2; color: #dc2626; }
+            .badge-normal { background: #dcfce7; color: #16a34a; }
+            .badge-active { background: #dcfce7; color: #16a34a; }
+            .badge-expired { background: #fee2e2; color: #dc2626; }
+            .badge-expiring { background: #fef3c7; color: #d97706; }
+            .badge-unreg { background: #f3f4f6; color: #6b7280; }
+            .footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #dee2e6; color: #999; font-size: 10px; }
+        </style></head><body>';
 
-            echo '<h1>ANPR ' . $reportTitle . '</h1>';
-            echo '<div class="meta">';
-            echo '<strong>Date Range:</strong> ' . $startDate->format('M d, Y') . ' &mdash; ' . $endDate->format('M d, Y') . '<br>';
-            echo '<strong>Gate:</strong> ' . ($gateFilter !== 'all' ? e($gateFilter) : 'All Gates') . ' | ';
-            echo '<strong>Direction:</strong> ' . ($locationFilter !== 'all' ? e($locationFilter) : 'All Directions') . '<br>';
-            echo '<strong>Generated:</strong> ' . now()->format('M d, Y H:i:s') . '</div>';
+        $html .= '<h1>ANPR ' . $reportTitle . '</h1>';
+        $html .= '<div class="meta">';
+        $html .= '<strong>Date Range:</strong> ' . $startDate->format('M d, Y') . ' &mdash; ' . $endDate->format('M d, Y') . '<br>';
+        $html .= '<strong>Gate:</strong> ' . ($gateFilter !== 'all' ? e($gateFilter) : 'All Gates') . ' | ';
+        $html .= '<strong>Direction:</strong> ' . ($locationFilter !== 'all' ? e($locationFilter) : 'All Directions') . '<br>';
+        $html .= '<strong>Generated:</strong> ' . now()->format('M d, Y H:i:s') . '</div>';
 
-            // Stats cards
-            echo '<div class="stats-grid">';
-            echo '<div class="stat-card"><div class="stat-value">' . number_format($totalDetections) . '</div><div class="stat-label">Total Detections</div></div>';
-            echo '<div class="stat-card"><div class="stat-value">' . number_format($uniquePlates) . '</div><div class="stat-label">Unique Plates</div></div>';
-            echo '<div class="stat-card"><div class="stat-value">' . number_format($flaggedCount) . '</div><div class="stat-label">Flagged</div></div>';
-            echo '<div class="stat-card"><div class="stat-value">' . $avgConfidence . '%</div><div class="stat-label">Avg Confidence</div></div>';
-            echo '<div class="stat-card"><div class="stat-value">' . number_format($registeredCount) . '</div><div class="stat-label">Registered Vehicles</div></div>';
-            echo '</div>';
+        // Stats as a simple table for better PDF compatibility
+        $html .= '<table class="stats-table"><tr>';
+        $html .= '<td><div class="stat-value">' . number_format($totalDetections) . '</div><div class="stat-label">Total Detections</div></td>';
+        $html .= '<td><div class="stat-value">' . number_format($uniquePlates) . '</div><div class="stat-label">Unique Plates</div></td>';
+        $html .= '<td><div class="stat-value">' . number_format($flaggedCount) . '</div><div class="stat-label">Flagged</div></td>';
+        $html .= '<td><div class="stat-value">' . $avgConfidence . '%</div><div class="stat-label">Avg Confidence</div></td>';
+        $html .= '<td><div class="stat-value">' . number_format($registeredCount) . '</div><div class="stat-label">Registered</div></td>';
+        $html .= '</tr></table>';
 
-            if ($type === 'summary') {
-                // Gate breakdown
-                echo '<h2>Gate Breakdown</h2><table><thead><tr><th>Gate</th><th>Direction</th><th>Count</th></tr></thead><tbody>';
-                $gateGroups = $records->groupBy(fn($r) => ($r->gate?->gate_name ?? 'Unknown') . '|' . ($r->gate?->gate_location ?? 'Unknown'));
-                foreach ($gateGroups as $key => $group) {
-                    [$gateName, $gateLocation] = explode('|', $key);
-                    echo '<tr><td>' . e($gateName) . '</td><td>' . e($gateLocation) . '</td><td>' . $group->count() . '</td></tr>';
-                }
-                echo '</tbody></table>';
-
-                // Top plates with owner info
-                echo '<h2>Top Detected Plates with Owner Information</h2>';
-                echo '<table><thead><tr><th>#</th><th>Plate</th><th>Detections</th><th>Gate Pass</th><th>Vehicle Owner</th><th>Vehicle</th><th>Status</th></tr></thead><tbody>';
-                $plateCounts = $records->groupBy('plate_number')->map(fn($g) => $g->count())->sortDesc()->take(50);
-                $rank = 1;
-                foreach ($plateCounts as $plate => $count) {
-                    $vehicle = $registeredVehicles->get($plate);
-                    $ownerName = $vehicle?->user?->details?->full_name ?? '<span class="badge badge-unreg">Unregistered</span>';
-                    $gatePass = $vehicle?->assigned_gate_pass ?? 'None';
-                    $vehicleInfo = $vehicle ? e($vehicle->vehicle_info) : 'N/A';
-                    $statusBadge = '';
-                    if ($vehicle) {
-                        if ($vehicle->isExpired()) {
-                            $statusBadge = '<span class="badge badge-expired">Expired</span>';
-                        } elseif ($vehicle->isExpiringSoon()) {
-                            $statusBadge = '<span class="badge badge-expiring">Expiring Soon</span>';
-                        } else {
-                            $statusBadge = '<span class="badge badge-active">Active</span>';
-                        }
-                    } else {
-                        $statusBadge = '<span class="badge badge-unreg">N/A</span>';
-                    }
-                    echo '<tr><td>' . $rank++ . '</td><td><strong>' . e($plate) . '</strong></td><td>' . $count . '</td><td>' . e($gatePass) . '</td><td>' . $ownerName . '</td><td>' . $vehicleInfo . '</td><td>' . $statusBadge . '</td></tr>';
-                }
-                echo '</tbody></table>';
-            } else {
-                // Detailed / Flagged records table
-                echo '<h2>Detection Records</h2>';
-                echo '<table><thead><tr><th>Time</th><th>Plate</th><th>Confidence</th><th>Gate</th><th>Direction</th><th>Status</th><th>Owner</th><th>Vehicle</th><th>Gate Pass</th></tr></thead><tbody>';
-                foreach ($records as $record) {
-                    $vehicle = $registeredVehicles->get($record->plate_number);
-                    $ownerName = $vehicle?->user?->details?->full_name ?? '';
-                    $gatePass = $vehicle?->assigned_gate_pass ?? '';
-                    $vehicleInfo = $vehicle ? e($vehicle->vehicle_info) : '';
-                    $statusBadge = $record->is_flagged
-                        ? '<span class="badge badge-flagged">Flagged</span>'
-                        : '<span class="badge badge-normal">Normal</span>';
-
-                    echo '<tr>';
-                    echo '<td>' . ($record->detected_at?->format('Y-m-d H:i:s') ?? $record->created_at->format('Y-m-d H:i:s')) . '</td>';
-                    echo '<td><strong>' . e($record->plate_number) . '</strong></td>';
-                    echo '<td>' . round($record->confidence * 100, 1) . '%</td>';
-                    echo '<td>' . e($record->gate?->gate_name ?? 'Unknown') . '</td>';
-                    echo '<td>' . e($record->gate?->gate_location ?? 'Unknown') . '</td>';
-                    echo '<td>' . $statusBadge . '</td>';
-                    echo '<td>' . e($ownerName) . '</td>';
-                    echo '<td>' . $vehicleInfo . '</td>';
-                    echo '<td>' . e($gatePass) . '</td>';
-                    echo '</tr>';
-                }
-                echo '</tbody></table>';
+        if ($type === 'summary') {
+            // Gate breakdown
+            $html .= '<h2>Gate Breakdown</h2><table><thead><tr><th>Gate</th><th>Direction</th><th>Count</th></tr></thead><tbody>';
+            $gateGroups = $records->groupBy(fn($r) => ($r->gate?->gate_name ?? 'Unknown') . '|' . ($r->gate?->gate_location ?? 'Unknown'));
+            foreach ($gateGroups as $key => $group) {
+                [$gateName, $gateLocation] = explode('|', $key);
+                $html .= '<tr><td>' . e($gateName) . '</td><td>' . e($gateLocation) . '</td><td>' . $group->count() . '</td></tr>';
             }
+            $html .= '</tbody></table>';
 
-            echo '<div class="footer">ANPR System &mdash; Report generated on ' . now()->format('M d, Y H:i:s') . '</div>';
-            echo '</body></html>';
-        }, $filename, [
-            'Content-Type' => 'text/html',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ]);
+            // Top plates with owner info
+            $html .= '<h2>Top Detected Plates with Owner Information</h2>';
+            $html .= '<table><thead><tr><th>#</th><th>Plate</th><th>Detections</th><th>Gate Pass</th><th>Vehicle Owner</th><th>Vehicle</th><th>Status</th></tr></thead><tbody>';
+            $plateCounts = $records->groupBy('plate_number')->map(fn($g) => $g->count())->sortDesc()->take(50);
+            $rank = 1;
+            foreach ($plateCounts as $plate => $count) {
+                $vehicle = $registeredVehicles->get($plate);
+                $ownerName = $vehicle?->user?->details?->full_name ?? '<span class="badge badge-unreg">Unregistered</span>';
+                $gatePass = $vehicle?->assigned_gate_pass ?? 'None';
+                $vehicleInfo = $vehicle ? e($vehicle->vehicle_info) : 'N/A';
+                $statusBadge = '';
+                if ($vehicle) {
+                    if ($vehicle->isExpired()) {
+                        $statusBadge = '<span class="badge badge-expired">Expired</span>';
+                    } elseif ($vehicle->isExpiringSoon()) {
+                        $statusBadge = '<span class="badge badge-expiring">Expiring Soon</span>';
+                    } else {
+                        $statusBadge = '<span class="badge badge-active">Active</span>';
+                    }
+                } else {
+                    $statusBadge = '<span class="badge badge-unreg">N/A</span>';
+                }
+                $html .= '<tr><td>' . $rank++ . '</td><td><strong>' . e($plate) . '</strong></td><td>' . $count . '</td><td>' . e($gatePass) . '</td><td>' . $ownerName . '</td><td>' . $vehicleInfo . '</td><td>' . $statusBadge . '</td></tr>';
+            }
+            $html .= '</tbody></table>';
+        } else {
+            // Detailed / Flagged records table
+            $html .= '<h2>Detection Records</h2>';
+            $html .= '<table><thead><tr><th>Time</th><th>Plate</th><th>Conf</th><th>Gate</th><th>Dir</th><th>Status</th><th>Owner</th><th>Vehicle</th><th>Pass</th></tr></thead><tbody>';
+            foreach ($records as $record) {
+                $vehicle = $registeredVehicles->get($record->plate_number);
+                $ownerName = $vehicle?->user?->details?->full_name ?? '';
+                $gatePass = $vehicle?->assigned_gate_pass ?? '';
+                $vehicleInfo = $vehicle ? e($vehicle->vehicle_info) : '';
+                $statusBadge = $record->is_flagged
+                    ? '<span class="badge badge-flagged">Flagged</span>'
+                    : '<span class="badge badge-normal">Normal</span>';
+
+                $html .= '<tr>';
+                $html .= '<td>' . ($record->detected_at?->format('Y-m-d H:i') ?? $record->created_at->format('Y-m-d H:i')) . '</td>';
+                $html .= '<td><strong>' . e($record->plate_number) . '</strong></td>';
+                $html .= '<td>' . round($record->confidence * 100, 1) . '%</td>';
+                $html .= '<td>' . e($record->gate?->gate_name ?? 'Unknown') . '</td>';
+                $html .= '<td>' . e($record->gate?->gate_location ?? 'Unknown') . '</td>';
+                $html .= '<td>' . $statusBadge . '</td>';
+                $html .= '<td>' . e($ownerName) . '</td>';
+                $html .= '<td>' . $vehicleInfo . '</td>';
+                $html .= '<td>' . e($gatePass) . '</td>';
+                $html .= '</tr>';
+            }
+            $html .= '</tbody></table>';
+        }
+
+        $html .= '<div class="footer">ANPR System &mdash; Report generated on ' . now()->format('M d, Y H:i:s') . '</div>';
+        $html .= '</body></html>';
+
+        // Generate PDF using DomPDF
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4', 'landscape')
+            ->setOption(['defaultFont' => 'DejaVu Sans']);
+
+        return $pdf->download($filename);
     }
 
     /**
