@@ -3,14 +3,12 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\User;
-use App\Services\PhilippineAddressService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
@@ -52,14 +50,6 @@ class AccountSettings extends Component
     public string $lastName = '';
     public string $suffix = '';
     public string $phoneNumber = '';
-    public string $region = '';
-    public string $province = '';
-    public string $municipality = '';
-    public string $barangay = '';
-    public string $zipCode = '';
-    public string $collegeDepartment = '';
-    public string $position = '';
-    public string $licenseNumber = '';
 
     // Edit mode toggle
     public bool $isEditingProfile = false;
@@ -103,14 +93,6 @@ class AccountSettings extends Component
             $this->lastName = $details->last_name ?? '';
             $this->suffix = $details->suffix ?? '';
             $this->phoneNumber = $details->phone_number ?? '';
-            $this->region = $details->region ?? '';
-            $this->province = $details->province ?? '';
-            $this->municipality = $details->municipality ?? '';
-            $this->barangay = $details->barangay ?? '';
-            $this->zipCode = $details->zip_code ?? '';
-            $this->collegeDepartment = $details->college_unit_department ?? '';
-            $this->position = $details->position ?? '';
-            $this->licenseNumber = $details->license_number ?? '';
         }
     }
 
@@ -129,69 +111,6 @@ class AccountSettings extends Component
     }
 
     /**
-     * Get regions for dropdown
-     */
-    #[Computed]
-    public function regions(): array
-    {
-        return PhilippineAddressService::getRegionsForSelect();
-    }
-
-    /**
-     * Get provinces for dropdown based on selected region
-     */
-    #[Computed]
-    public function provinces(): array
-    {
-        return PhilippineAddressService::getProvincesForSelect($this->region);
-    }
-
-    /**
-     * Get municipalities for dropdown based on selected region and province
-     */
-    #[Computed]
-    public function municipalities(): array
-    {
-        return PhilippineAddressService::getMunicipalitiesForSelect($this->region, $this->province);
-    }
-
-    /**
-     * Get barangays for dropdown based on selected region, province, and municipality
-     */
-    #[Computed]
-    public function barangays(): array
-    {
-        return PhilippineAddressService::getBarangaysForSelect($this->region, $this->province, $this->municipality);
-    }
-
-    /**
-     * Handle region change - reset dependent fields
-     */
-    public function updatedRegion(): void
-    {
-        $this->province = '';
-        $this->municipality = '';
-        $this->barangay = '';
-    }
-
-    /**
-     * Handle province change - reset dependent fields
-     */
-    public function updatedProvince(): void
-    {
-        $this->municipality = '';
-        $this->barangay = '';
-    }
-
-    /**
-     * Handle municipality change - reset dependent fields
-     */
-    public function updatedMunicipality(): void
-    {
-        $this->barangay = '';
-    }
-
-    /**
      * Update profile information
      */
     public function updateProfile(): void
@@ -202,14 +121,6 @@ class AccountSettings extends Component
             'lastName' => 'required|string|max:100',
             'suffix' => 'nullable|string|max:20',
             'phoneNumber' => 'nullable|string|max:20|regex:/^[0-9+\-\s()]*$/',
-            'region' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'municipality' => 'nullable|string|max:100',
-            'barangay' => 'nullable|string|max:100',
-            'zipCode' => 'nullable|string|max:10',
-            'collegeDepartment' => 'nullable|string|max:255',
-            'position' => 'nullable|string|max:100',
-            'licenseNumber' => 'nullable|string|max:50',
         ], [
             'firstName.required' => 'First name is required.',
             'lastName.required' => 'Last name is required.',
@@ -230,14 +141,6 @@ class AccountSettings extends Component
                     'last_name' => $this->lastName,
                     'suffix' => $this->suffix ?: null,
                     'phone_number' => $this->phoneNumber ?: null,
-                    'region' => $this->region ?: null,
-                    'province' => $this->province ?: null,
-                    'municipality' => $this->municipality ?: null,
-                    'barangay' => $this->barangay ?: null,
-                    'zip_code' => $this->zipCode ?: null,
-                    'college_unit_department' => $this->collegeDepartment ?: null,
-                    'position' => $this->position ?: null,
-                    'license_number' => $this->licenseNumber ?: null,
                 ]
             );
 
@@ -247,8 +150,9 @@ class AccountSettings extends Component
             $this->user->refresh();
             $this->user->load('details');
 
-            // Update display name
+            // Update display name and sync local properties
             $this->displayName = $this->user->details?->full_name ?? $this->user->email;
+            $this->loadProfileDetails();
 
             $this->isEditingProfile = false;
             $this->dispatch('toast', type: 'success', message: 'Profile updated successfully.');

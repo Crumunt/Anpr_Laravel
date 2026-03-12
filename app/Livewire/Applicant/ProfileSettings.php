@@ -263,8 +263,9 @@ class ProfileSettings extends Component
             $this->user->refresh();
             $this->user->load('details');
 
-            // Update display name
+            // Update display name and sync local properties
             $this->displayName = $this->user->details?->full_name ?? $this->user->email;
+            $this->loadProfileDetails();
 
             $this->isEditingProfile = false;
             $this->dispatch('toast', type: 'success', message: 'Profile updated successfully.');
