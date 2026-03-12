@@ -28,23 +28,12 @@ $userName = $userName ?? auth()->user()->name ?? 'User';
                 </button>
 
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-[#006300]">{{ $pageTitle }}</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-[#006300]">{!! $pageTitle !!}</h1>
                 </div>
             </div>
 
             <!-- Right Side -->
             <div class="flex items-center space-x-2 md:space-x-4">
-                <!-- Search (Desktop Only) -->
-                <div class="relative hidden lg:block">
-                    <input
-                        type="text"
-                        id="search-input"
-                        placeholder="{{ $searchPlaceholder }}"
-                        class="py-2 pl-9 pr-4 w-48 xl:w-64 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 text-sm"
-                        aria-label="{{ $searchAriaLabel }}">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm" aria-hidden="true"></i>
-                </div>
-
                 <!-- Divider -->
                 <div class="h-8 w-0.5 bg-gray-200 hidden sm:block"></div>
 
