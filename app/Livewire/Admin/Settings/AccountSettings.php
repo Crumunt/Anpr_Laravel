@@ -3,12 +3,14 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\User;
+use App\Services\PhilippineAddressService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
@@ -33,6 +35,7 @@ class AccountSettings extends Component
     // Processing states
     public bool $updatingEmail = false;
     public bool $updatingPassword = false;
+    public bool $updatingProfile = false;
     public bool $processing = false;
 
     // Active tab
@@ -42,6 +45,24 @@ class AccountSettings extends Component
     public string $displayName = '';
     public string $role = '';
     public string $memberSince = '';
+
+    // Profile editing fields
+    public string $firstName = '';
+    public string $middleName = '';
+    public string $lastName = '';
+    public string $suffix = '';
+    public string $phoneNumber = '';
+    public string $region = '';
+    public string $province = '';
+    public string $municipality = '';
+    public string $barangay = '';
+    public string $zipCode = '';
+    public string $collegeDepartment = '';
+    public string $position = '';
+    public string $licenseNumber = '';
+
+    // Edit mode toggle
+    public bool $isEditingProfile = false;
 
     /**
      * Mount the component with the authenticated user
@@ -64,6 +85,187 @@ class AccountSettings extends Component
         $this->displayName = $this->user->details?->full_name ?? $this->user->email;
         $this->role = $this->user->roles->first()?->name ?? 'User';
         $this->memberSince = $this->user->created_at?->format('F j, Y') ?? 'Unknown';
+
+        // Load profile details
+        $this->loadProfileDetails();
+    }
+
+    /**
+     * Load profile details from user details
+     */
+    protected function loadProfileDetails(): void
+    {
+        $details = $this->user->details;
+
+        if ($details) {
+            $this->firstName = $details->first_name ?? '';
+            $this->middleName = $details->middle_name ?? '';
+            $this->lastName = $details->last_name ?? '';
+            $this->suffix = $details->suffix ?? '';
+            $this->phoneNumber = $details->phone_number ?? '';
+            $this->region = $details->region ?? '';
+            $this->province = $details->province ?? '';
+            $this->municipality = $details->municipality ?? '';
+            $this->barangay = $details->barangay ?? '';
+            $this->zipCode = $details->zip_code ?? '';
+            $this->collegeDepartment = $details->college_unit_department ?? '';
+            $this->position = $details->position ?? '';
+            $this->licenseNumber = $details->license_number ?? '';
+        }
+    }
+
+    /**
+     * Toggle profile editing mode
+     */
+    public function toggleEditProfile(): void
+    {
+        $this->isEditingProfile = !$this->isEditingProfile;
+
+        if (!$this->isEditingProfile) {
+            // Reset to original values when canceling
+            $this->loadProfileDetails();
+            $this->resetValidation();
+        }
+    }
+
+    /**
+     * Get regions for dropdown
+     */
+    #[Computed]
+    public function regions(): array
+    {
+        return PhilippineAddressService::getRegionsForSelect();
+    }
+
+    /**
+     * Get provinces for dropdown based on selected region
+     */
+    #[Computed]
+    public function provinces(): array
+    {
+        return PhilippineAddressService::getProvincesForSelect($this->region);
+    }
+
+    /**
+     * Get municipalities for dropdown based on selected region and province
+     */
+    #[Computed]
+    public function municipalities(): array
+    {
+        return PhilippineAddressService::getMunicipalitiesForSelect($this->region, $this->province);
+    }
+
+    /**
+     * Get barangays for dropdown based on selected region, province, and municipality
+     */
+    #[Computed]
+    public function barangays(): array
+    {
+        return PhilippineAddressService::getBarangaysForSelect($this->region, $this->province, $this->municipality);
+    }
+
+    /**
+     * Handle region change - reset dependent fields
+     */
+    public function updatedRegion(): void
+    {
+        $this->province = '';
+        $this->municipality = '';
+        $this->barangay = '';
+    }
+
+    /**
+     * Handle province change - reset dependent fields
+     */
+    public function updatedProvince(): void
+    {
+        $this->municipality = '';
+        $this->barangay = '';
+    }
+
+    /**
+     * Handle municipality change - reset dependent fields
+     */
+    public function updatedMunicipality(): void
+    {
+        $this->barangay = '';
+    }
+
+    /**
+     * Update profile information
+     */
+    public function updateProfile(): void
+    {
+        $this->validate([
+            'firstName' => 'required|string|max:100',
+            'middleName' => 'nullable|string|max:100',
+            'lastName' => 'required|string|max:100',
+            'suffix' => 'nullable|string|max:20',
+            'phoneNumber' => 'nullable|string|max:20|regex:/^[0-9+\-\s()]*$/',
+            'region' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'municipality' => 'nullable|string|max:100',
+            'barangay' => 'nullable|string|max:100',
+            'zipCode' => 'nullable|string|max:10',
+            'collegeDepartment' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:100',
+            'licenseNumber' => 'nullable|string|max:50',
+        ], [
+            'firstName.required' => 'First name is required.',
+            'lastName.required' => 'Last name is required.',
+            'phoneNumber.regex' => 'Please enter a valid phone number.',
+        ]);
+
+        $this->updatingProfile = true;
+
+        try {
+            DB::beginTransaction();
+
+            // Create or update user details
+            $this->user->details()->updateOrCreate(
+                ['user_id' => $this->user->id],
+                [
+                    'first_name' => $this->firstName,
+                    'middle_name' => $this->middleName ?: null,
+                    'last_name' => $this->lastName,
+                    'suffix' => $this->suffix ?: null,
+                    'phone_number' => $this->phoneNumber ?: null,
+                    'region' => $this->region ?: null,
+                    'province' => $this->province ?: null,
+                    'municipality' => $this->municipality ?: null,
+                    'barangay' => $this->barangay ?: null,
+                    'zip_code' => $this->zipCode ?: null,
+                    'college_unit_department' => $this->collegeDepartment ?: null,
+                    'position' => $this->position ?: null,
+                    'license_number' => $this->licenseNumber ?: null,
+                ]
+            );
+
+            DB::commit();
+
+            // Refresh user data
+            $this->user->refresh();
+            $this->user->load('details');
+
+            // Update display name
+            $this->displayName = $this->user->details?->full_name ?? $this->user->email;
+
+            $this->isEditingProfile = false;
+            $this->dispatch('toast', type: 'success', message: 'Profile updated successfully.');
+
+            Log::info('Admin profile updated', [
+                'user_id' => $this->user->id,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('toast', type: 'error', message: 'Failed to update profile. Please try again.');
+            Log::error('Profile update failed', [
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage()
+            ]);
+        } finally {
+            $this->updatingProfile = false;
+        }
     }
 
     /**
