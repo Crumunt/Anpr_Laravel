@@ -112,6 +112,11 @@ class RecentVehiclesTable extends Component
     ];
 
     /**
+     * Force add log even if duplicate detected
+     */
+    public bool $forceAddLog = false;
+
+    /**
      * Initialize the component
      */
     public function mount(): void
@@ -353,12 +358,23 @@ class RecentVehiclesTable extends Component
     public function closeAddLogModal(): void
     {
         $this->showAddLogModal = false;
+        $this->forceAddLog = false;
         $this->addLogForm = [
             'plate_number' => '',
             'gate_name' => '',
             'direction' => '',
         ];
         $this->resetValidation();
+    }
+
+    /**
+     * Force add manual log (bypass duplicate check)
+     */
+    public function forceAddManualLog(): void
+    {
+        $this->forceAddLog = true;
+        $this->resetValidation();
+        $this->saveManualLog();
     }
 
     /**
@@ -371,6 +387,25 @@ class RecentVehiclesTable extends Component
             'addLogForm.gate_name' => 'required|string',
             'addLogForm.direction' => 'required|string|in:Entry,Exit',
         ]);
+
+        $plateNumber = strtoupper($this->addLogForm['plate_number']);
+
+        // Check if this plate was recorded within the last 5 minutes (unless force adding)
+        if (!$this->forceAddLog) {
+            $recentRecord = Record::where('plate_number', $plateNumber)
+                ->where('created_at', '>=', now()->subMinutes(5))
+                ->first();
+
+            if ($recentRecord) {
+                $this->addError('addLogForm.plate_number',
+                    "This plate ({$plateNumber}) was already recorded {$recentRecord->created_at->diffForHumans()}."
+                );
+                return;
+            }
+        }
+
+        // Reset force flag
+        $this->forceAddLog = false;
 
         // Find the matching gate by name and location
         $gate = Gate::where('gate_name', $this->addLogForm['gate_name'])

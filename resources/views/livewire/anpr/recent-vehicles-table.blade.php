@@ -576,7 +576,22 @@
                                     autofocus
                                 >
                                 @error('addLogForm.plate_number')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 mr-2"></i>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-amber-700">{{ $message }}</p>
+                                                <button
+                                                    type="button"
+                                                    wire:click="forceAddManualLog"
+                                                    class="mt-2 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-lg hover:bg-amber-200 transition-colors"
+                                                >
+                                                    <i class="fas fa-plus mr-1"></i>
+                                                    Add Anyway
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @enderror
                             </div>
 
