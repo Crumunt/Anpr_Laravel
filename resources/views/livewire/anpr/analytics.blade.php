@@ -210,7 +210,7 @@
             <div class="p-6">
                 @php
                     $totalGateDetections = array_sum(array_column($gateDistribution, 'count')) ?: 1;
-                    $gateColors = ['entry' => 'blue', 'exit' => 'green', 'parking' => 'purple'];
+                    $gateColors = ['entry' => 'blue', 'exit' => 'green'];
                 @endphp
                 <div class="space-y-4">
                     @forelse($gateDistribution as $gate)

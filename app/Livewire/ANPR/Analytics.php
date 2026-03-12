@@ -284,20 +284,19 @@ class Analytics extends Component
         $startDate = $this->getDateRangeStart();
         $endDate = $this->getDateRangeEnd();
 
-        // Get distribution from gates table with proper join
+        // Use location and gate_type columns directly (they store gate name and direction)
         $gateRecords = Record::query()
-            ->join('gates', 'records.gate_id', '=', 'gates.id')
-            ->whereBetween('records.created_at', [$startDate, $endDate])
-            ->when($this->locationFilter !== 'all', fn($q) => $q->where('gates.gate_location', $this->locationFilter))
-            ->selectRaw('gates.gate_name, gates.gate_location, COUNT(*) as count')
-            ->groupBy('gates.gate_name', 'gates.gate_location')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->when($this->locationFilter !== 'all', fn($q) => $q->byGateLocation($this->locationFilter))
+            ->selectRaw('COALESCE(location, "Unknown") as gate_name, COALESCE(gate_type, "unknown") as gate_location, COUNT(*) as count')
+            ->groupBy('location', 'gate_type')
             ->orderByDesc('count')
             ->get();
 
         $this->gateDistribution = $gateRecords->map(fn($r) => [
-            'gate_name' => $r->gate_name ?? 'unknown',
-            'gate_location' => $r->gate_location ?? 'unknown',
-            'gate_type' => $r->gate_name ?? 'unknown', // For backward compatibility
+            'gate_name' => $r->gate_name ?: 'Unknown',
+            'gate_location' => ucfirst($r->gate_location ?: 'unknown'),
+            'gate_type' => $r->gate_name ?: 'Unknown', // For backward compatibility
             'count' => $r->count,
         ])->toArray();
     }

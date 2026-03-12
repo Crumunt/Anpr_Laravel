@@ -133,7 +133,7 @@ class AnprAnalyticsController extends Controller
 
         fputcsv($handle, ['=== GATE BREAKDOWN ===']);
         fputcsv($handle, ['Gate', 'Direction', 'Count']);
-        $gateGroups = $records->groupBy(fn($r) => ($r->gate?->gate_name ?? 'Unknown') . '|' . ($r->gate?->gate_location ?? 'Unknown'));
+        $gateGroups = $records->groupBy(fn($r) => ($r->location ?? 'Unknown') . '|' . ucfirst($r->gate_type ?? 'unknown'));
         foreach ($gateGroups as $key => $group) {
             [$gateName, $gateLocation] = explode('|', $key);
             fputcsv($handle, [$gateName, $gateLocation, $group->count()]);
@@ -180,8 +180,8 @@ class AnprAnalyticsController extends Controller
                 $record->detected_at?->format('Y-m-d H:i:s') ?? $record->created_at->format('Y-m-d H:i:s'),
                 $record->plate_number,
                 round($record->confidence * 100, 1) . '%',
-                $record->gate?->gate_name ?? 'Unknown',
-                $record->gate?->gate_location ?? 'Unknown',
+                $record->location ?? 'Unknown',
+                ucfirst($record->gate_type ?? 'unknown'),
                 $record->is_flagged ? 'Flagged' : 'Normal',
                 $record->camera_id ?? 'N/A',
                 $record->gate_pass_number ?? 'None',
@@ -251,7 +251,7 @@ class AnprAnalyticsController extends Controller
         if ($type === 'summary') {
             // Gate breakdown
             $html .= '<h2>Gate Breakdown</h2><table><thead><tr><th>Gate</th><th>Direction</th><th>Count</th></tr></thead><tbody>';
-            $gateGroups = $records->groupBy(fn($r) => ($r->gate?->gate_name ?? 'Unknown') . '|' . ($r->gate?->gate_location ?? 'Unknown'));
+            $gateGroups = $records->groupBy(fn($r) => ($r->location ?? 'Unknown') . '|' . ucfirst($r->gate_type ?? 'unknown'));
             foreach ($gateGroups as $key => $group) {
                 [$gateName, $gateLocation] = explode('|', $key);
                 $html .= '<tr><td>' . e($gateName) . '</td><td>' . e($gateLocation) . '</td><td>' . $group->count() . '</td></tr>';
@@ -300,8 +300,8 @@ class AnprAnalyticsController extends Controller
                 $html .= '<td>' . ($record->detected_at?->format('Y-m-d H:i') ?? $record->created_at->format('Y-m-d H:i')) . '</td>';
                 $html .= '<td><strong>' . e($record->plate_number) . '</strong></td>';
                 $html .= '<td>' . round($record->confidence * 100, 1) . '%</td>';
-                $html .= '<td>' . e($record->gate?->gate_name ?? 'Unknown') . '</td>';
-                $html .= '<td>' . e($record->gate?->gate_location ?? 'Unknown') . '</td>';
+                $html .= '<td>' . e($record->location ?? 'Unknown') . '</td>';
+                $html .= '<td>' . e(ucfirst($record->gate_type ?? 'unknown')) . '</td>';
                 $html .= '<td>' . $statusBadge . '</td>';
                 $html .= '<td>' . e($ownerName) . '</td>';
                 $html .= '<td>' . $vehicleInfo . '</td>';
