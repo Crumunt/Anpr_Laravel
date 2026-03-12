@@ -224,6 +224,7 @@ class EditAdminModal extends Component
             $this->dispatch('toast', type: 'success', message: 'Admin account updated successfully.');
             $this->dispatch('fetchCardData');
             $this->dispatch('filterTableData', filters: []);
+            $this->dispatch('adminUpdated');
 
             $this->closeModal();
         } catch (\Exception $e) {
