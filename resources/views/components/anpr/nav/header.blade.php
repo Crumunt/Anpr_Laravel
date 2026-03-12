@@ -45,52 +45,8 @@ $userName = $userName ?? auth()->user()->name ?? 'User';
                     <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm" aria-hidden="true"></i>
                 </div>
 
-                <!-- Status Indicator -->
-                @php
-                $statusColorClass = 'text-emerald-600';
-                $statusBgClass = 'bg-emerald-50';
-                $statusDotClass = 'bg-emerald-500';
-
-                if (in_array($systemStatusColor ?? 'green-600', ['emerald-600', 'green-600'])) {
-                    $statusColorClass = 'text-emerald-600';
-                    $statusBgClass = 'bg-emerald-50';
-                    $statusDotClass = 'bg-emerald-500';
-                } elseif (($systemStatusColor ?? '') === 'red-600') {
-                    $statusColorClass = 'text-red-600';
-                    $statusBgClass = 'bg-red-50';
-                    $statusDotClass = 'bg-red-500';
-                } elseif (in_array($systemStatusColor ?? '', ['amber-600', 'yellow-600'])) {
-                    $statusColorClass = 'text-amber-600';
-                    $statusBgClass = 'bg-amber-50';
-                    $statusDotClass = 'bg-amber-500';
-                } elseif (($systemStatusColor ?? '') === 'blue-600') {
-                    $statusColorClass = 'text-blue-600';
-                    $statusBgClass = 'bg-blue-50';
-                    $statusDotClass = 'bg-blue-500';
-                }
-
-                $systemStatusText = is_array($systemStatus ?? 'Online') ? json_encode($systemStatus) : (string)($systemStatus ?? 'Online');
-                @endphp
-
-                <div class="hidden sm:flex items-center space-x-2 {{ $statusBgClass }} px-3 py-1.5 rounded-full">
-                    <span class="w-2 h-2 {{ $statusDotClass }} rounded-full animate-pulse"></span>
-                    <span class="text-xs md:text-sm {{ $statusColorClass }} font-medium">{{ $systemStatusText }}</span>
-                </div>
-
                 <!-- Divider -->
                 <div class="h-8 w-0.5 bg-gray-200 hidden sm:block"></div>
-
-                <!-- Notifications -->
-                <div class="relative">
-                    <button class="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors" aria-label="{{ $notificationCount ?? 0 }} notifications">
-                        <i class="fas fa-bell" aria-hidden="true"></i>
-                        @if(($notificationCount ?? 0) > 0)
-                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                            {{ $notificationCount }}
-                        </span>
-                        @endif
-                    </button>
-                </div>
 
                 <!-- User Menu -->
                 <div class="relative" id="userDropdown">
