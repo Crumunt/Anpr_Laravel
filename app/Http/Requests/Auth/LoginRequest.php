@@ -49,6 +49,20 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Check if the authenticated user's account is archived/deactivated
+        $user = Auth::user();
+        if ($user && ($user->is_deleted || !$user->is_active)) {
+            Auth::logout();
+            $this->session()->invalidate();
+            $this->session()->regenerateToken();
+
+            RateLimiter::clear($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'deactivated',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -26,7 +26,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // If the account is deactivated, redirect to the deactivated page
+            if (($e->errors()['email'][0] ?? null) === 'deactivated') {
+                return redirect()->route('account.deactivated');
+            }
+            throw $e;
+        }
 
         $request->session()->regenerate();
 
