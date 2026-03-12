@@ -73,16 +73,15 @@ class DashboardCards extends Component
      */
     protected function loadVehicleMetrics(): void
     {
-        $hours = config('anpr.dashboard.metrics_hours', 24);
-        $cutoffTime = now()->subHours($hours);
+        $startOfDay = now()->startOfDay();
+        $endOfDay = now()->endOfDay();
 
-        // Count total vehicles in the last 24 hours
-        $this->totalVehicles = Record::where('created_at', '>=', $cutoffTime)->count();
+        $stats = Record::whereBetween('created_at', [$startOfDay, $endOfDay])
+            ->selectRaw('COUNT(*) as total, COUNT(DISTINCT plate_number) as unique_plates')
+            ->first();
 
-        // Count unique plate numbers in the last 24 hours
-        $this->uniquePlates = Record::where('created_at', '>=', $cutoffTime)
-            ->distinct('plate_number')
-            ->count('plate_number');
+        $this->totalVehicles = $stats->total;
+        $this->uniquePlates = $stats->unique_plates;
     }
 
     /**
@@ -105,49 +104,37 @@ class DashboardCards extends Component
     protected function calculatePercentChanges(): void
     {
         $hours = config('anpr.dashboard.metrics_hours', 24);
+
         $previousStart = now()->subHours($hours * 2);
         $previousEnd = now()->subHours($hours);
         $currentStart = now()->subHours($hours);
 
-        // Previous period vehicle count
-        $previousVehicles = Record::whereBetween('created_at', [$previousStart, $previousEnd])->count();
+        // Previous vehicle stats
+        $previousStats = Record::whereBetween('created_at', [$previousStart, $previousEnd])
+            ->selectRaw('COUNT(*) as vehicles, COUNT(DISTINCT plate_number) as unique_plates')
+            ->first();
 
-        // Calculate vehicle percentage change
-        if ($previousVehicles > 0) {
-            $this->percentChanges['vehicles'] = round(
-                (($this->totalVehicles - $previousVehicles) / $previousVehicles) * 100,
-                1
-            );
-        } else {
-            $this->percentChanges['vehicles'] = $this->totalVehicles > 0 ? 100 : 0;
-        }
+        $previousVehicles = $previousStats->vehicles;
+        $previousUnique = $previousStats->unique_plates;
 
-        // Previous period unique plates
-        $previousUnique = Record::whereBetween('created_at', [$previousStart, $previousEnd])
-            ->distinct('plate_number')
-            ->count('plate_number');
+        // Vehicle percentage
+        $this->percentChanges['vehicles'] = $previousVehicles > 0
+            ? round((($this->totalVehicles - $previousVehicles) / $previousVehicles) * 100, 1)
+            : ($this->totalVehicles > 0 ? 100 : 0);
 
-        if ($previousUnique > 0) {
-            $this->percentChanges['unique'] = round(
-                (($this->uniquePlates - $previousUnique) / $previousUnique) * 100,
-                1
-            );
-        } else {
-            $this->percentChanges['unique'] = $this->uniquePlates > 0 ? 100 : 0;
-        }
+        // Unique plates percentage
+        $this->percentChanges['unique'] = $previousUnique > 0
+            ? round((($this->uniquePlates - $previousUnique) / $previousUnique) * 100, 1)
+            : ($this->uniquePlates > 0 ? 100 : 0);
 
-        // Flagged vehicles change (compare to flags created yesterday)
+        // Flagged vehicles
         $yesterdayFlags = FlaggedVehicle::whereBetween('created_at', [$previousStart, $previousEnd])->count();
-        $todayFlags = FlaggedVehicle::where('created_at', '>=', $currentStart)->count();
 
-        if ($yesterdayFlags > 0) {
-            $this->percentChanges['flagged'] = round(
-                (($todayFlags - $yesterdayFlags) / $yesterdayFlags) * 100,
-                1
-            );
-        } else {
-            $this->percentChanges['flagged'] = $todayFlags > 0 ? 100 : 0;
-        }
+        $todayFlags = FlaggedVehicle::whereBetween('created_at', [$currentStart, now()])->count();
+
+        $this->percentChanges['flagged'] = $yesterdayFlags > 0
+            ? round((($todayFlags - $yesterdayFlags) / $yesterdayFlags) * 100, 1)
+            : ($todayFlags > 0 ? 100 : 0);
     }
 
     /**
