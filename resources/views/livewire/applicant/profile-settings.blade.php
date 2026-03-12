@@ -66,7 +66,6 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" role="tabpanel" id="profile-panel" aria-labelledby="profile-tab">
                 <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                     <h3 class="text-xl font-bold text-gray-900">Profile Information</h3>
-                    <p class="text-sm text-gray-600 mt-1.5">Update your email address and view your profile details</p>
                 </div>
                 <div class="p-6 lg:p-8 space-y-8">
                     <!-- User Details (Read-only) -->
@@ -105,6 +104,7 @@
                                     <i class="fas fa-envelope text-gray-400"></i>
                                 </div>
                                 <input
+                                    readonly
                                     type="email"
                                     id="email"
                                     wire:model.blur="email"

@@ -53,7 +53,6 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900">Profile Information</h3>
-                    <p class="text-sm text-gray-500 mt-1">Update your email address and view your profile details</p>
                 </div>
                 <div class="p-6 space-y-6">
                     <!-- User Details (Read-only) -->
@@ -83,6 +82,7 @@
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                         <div class="flex gap-3">
                             <input
+                                readonly
                                 type="email"
                                 id="email"
                                 wire:model="email"
