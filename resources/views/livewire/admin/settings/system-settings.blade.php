@@ -287,33 +287,6 @@
                     </div>
                 </div>
 
-                <!-- Queue Management -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900">Queue Management</h3>
-                        <p class="text-sm text-gray-500 mt-1">Manage background job queue</p>
-                    </div>
-                    <div class="p-6 flex flex-wrap gap-3">
-                        <button
-                            wire:click="retryFailedJobs"
-                            wire:loading.attr="disabled"
-                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-700 bg-amber-100 rounded-lg hover:bg-amber-200 transition-colors disabled:opacity-50">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Retry Failed Jobs
-                        </button>
-                        <button
-                            wire:click="flushFailedJobs"
-                            wire:loading.attr="disabled"
-                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Clear Failed Jobs
-                        </button>
-                    </div>
-                </div>
                 @endif
                 @endrole
 
@@ -348,19 +321,100 @@
                                     @endif
                                 </p>
                             </div>
-                            <button
+                            <!-- <button
                                 wire:click="toggleMaintenanceMode"
                                 wire:loading.attr="disabled"
                                 class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50
                                     {{ $maintenanceMode ? 'text-green-700 bg-green-100 hover:bg-green-200' : 'text-amber-700 bg-amber-100 hover:bg-amber-200' }}">
                                 {{ $maintenanceMode ? 'Go Live' : 'Enable Maintenance' }}
+                            </button> -->
+
+                            {{-- Trigger Button --}}
+                            <button
+                                wire:click="$set('showMaintenanceModal', true)"
+                                wire:loading.attr="disabled"
+                                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50
+        {{ $maintenanceMode ? 'text-green-700 bg-green-100 hover:bg-green-200' : 'text-amber-700 bg-amber-100 hover:bg-amber-200' }}">
+                                {{ $maintenanceMode ? 'Go Live' : 'Enable Maintenance' }}
                             </button>
+
+                            {{-- Maintenance Mode Confirmation Modal --}}
+                            @if($showMaintenanceModal)
+                            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+                                wire:click.self="$set('showMaintenanceModal', false)">
+                                <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden border border-gray-200">
+
+                                    {{-- Header --}}
+                                    <div class="flex items-center gap-3 px-6 py-5 border-b"
+                                        style="background-color: #EAF3DE; border-color: #C8E0A8;">
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                                            style="background-color: #F9A825;">
+                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                                                stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                                <line x1="12" y1="9" x2="12" y2="13" />
+                                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-base leading-tight" style="color: #1B5E20;">Enable maintenance mode</p>
+                                            <p class="text-xs mt-0.5" style="color: #4A7C2A;">Central Luzon State University</p>
+                                        </div>
+                                    </div>
+
+                                    {{-- Body --}}
+                                    <div class="px-6 py-5 bg-white">
+                                        <p class="text-sm text-gray-700 mb-3 leading-relaxed">
+                                            You are about to put the application into
+                                            <span class="font-medium" style="color: #1B5E20;">maintenance mode</span>. During this time:
+                                        </p>
+
+                                        <ul class="space-y-2 mb-4">
+                                            @foreach([
+                                            'All users will be redirected to the maintenance page',
+                                            'Active sessions will be terminated',
+                                            'Administrators can still access the system',
+                                            ] as $item)
+                                            <li class="flex items-start gap-2.5 text-sm text-gray-500 leading-relaxed">
+                                                <span class="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                                    style="background-color: #F9A825;"></span>
+                                                {{ $item }}
+                                            </li>
+                                            @endforeach
+                                        </ul>
+
+                                        <div class="rounded-r-md px-3 py-2.5 mb-5 text-xs leading-relaxed"
+                                            style="background-color: #FFFDE7; border-left: 3px solid #F9A825; color: #795548;">
+                                            Are you sure you want to proceed? This action will affect all active users immediately.
+                                        </div>
+
+                                        {{-- Actions --}}
+                                        <div class="flex justify-end gap-2.5">
+                                            <button
+                                                wire:click="$set('showMaintenanceModal', false)"
+                                                class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                                                Cancel
+                                            </button>
+                                            <button
+                                                wire:click="toggleMaintenanceMode"
+                                                wire:loading.attr="disabled"
+                                                class="px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors hover:opacity-90 disabled:opacity-60"
+                                                style="background-color: #1B5E20;">
+                                                <span wire:loading.remove wire:target="toggleMaintenanceMode">Enable maintenance</span>
+                                                <span wire:loading wire:target="toggleMaintenanceMode">Processing...</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Cache Management -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Cache Management</h3>
                         <p class="text-sm text-gray-500 mt-1">Clear application caches to refresh data</p>
@@ -385,7 +439,7 @@
                             Optimize for Production
                         </button>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Danger Zone -->
                 @if(auth()->user()->hasRole('super_admin'))

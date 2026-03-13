@@ -49,6 +49,8 @@ class SystemSettings extends Component
     // Processing states
     public bool $processing = false;
 
+    public bool $showMaintenanceModal = false;
+
     public function mount(): void
     {
         // Check if user has permission - super_admin only
@@ -258,6 +260,7 @@ class SystemSettings extends Component
             Log::error('Maintenance mode toggle failed', ['error' => $e->getMessage()]);
         } finally {
             $this->processing = false;
+            $this->showMaintenanceModal = false;
         }
     }
 
