@@ -82,8 +82,8 @@ class DashboardStatCards extends Component
 
     private function getApplicationStats(): array
     {
-        $pending = Application::whereHas('status', fn($q) => $q->where('code', 'under_review'))->count();
-        $approved = Application::whereHas('status', fn($q) => $q->where('code', 'approved'))->count();
+        $pending = Application::whereHas('status', fn($q) => $q->where('code', 'under_review'))->whereNot('is_deleted', '1')->count();
+        $approved = Application::whereHas('status', fn($q) => $q->where('code', 'approved'))->whereNot('is_deleted', '1')->count();
         $rejected = Application::whereHas('status', fn($q) => $q->where('code', 'rejected'))->count();
         $total = Application::count();
 
